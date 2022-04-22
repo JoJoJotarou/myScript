@@ -1,4 +1,8 @@
-
+/**
+ * @author: JoJoJotarou
+ * @description: 浏览器访问 `https://plogin.m.jd.com/login/login` 登录后，点击"我的"，QX提示成功即可
+ *
+ */
 const $ = Env("JD Cookie")
 
 !(async () => {
