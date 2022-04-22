@@ -9,7 +9,7 @@ const $ = Env("JD Cookie")
     const JD_COOKIE = $request.headers['Cookie'] || $request.headers['Cookie']
     if (JD_COOKIE) {
 
-        $.log(`cookie: ${JD_COOKIE}!`)
+        console.log(`old cookie: ${$.getdata('JO_JD_COOKIE')}`)
         if ($.getdata('JO_JD_COOKIE') && JD_COOKIE === $.getdata('JO_JD_COOKIE')) {
             $.subt = '获取会话: 相同的Cookie!'
         } else {
@@ -22,7 +22,7 @@ const $ = Env("JD Cookie")
                 body: {
                     "token": "77e6a8a246dd4c8c9fa561c4c23293d6",
                     "title": "标题12",
-                    "content": JD_COOKIE,
+                    "content": `${JD_COOKIE}`,
                     "topic": "test",
                     "template": "txt"
                 }
