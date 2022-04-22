@@ -8,6 +8,8 @@ const $ = Env("JD Cookie")
     $.log('', `🔔 ${$.name}, 获取会话: 开始!`, '')
     const JD_COOKIE = $request.headers['Cookie'] || $request.headers['Cookie']
     if (JD_COOKIE) {
+
+        $.log(`cookie: ${JD_COOKIE}!`)
         if ($.getdata('JO_JD_COOKIE') && JD_COOKIE === $.getdata('JO_JD_COOKIE')) {
             $.subt = '获取会话: 相同的Cookie!'
         } else {
