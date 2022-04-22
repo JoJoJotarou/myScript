@@ -4,12 +4,12 @@ const $ = Env("JD Cookie")
 !(async () => {
     $.log(`++++++++++ 【${$.name} 开始】 ++++++++++`)
     const JD_COOKIE = $request.headers['Cookie'] || $request.headers['cookie']
-    if (JD_COOKIE) {
+    if (JD_COOKIE && JD_COOKIE.indexOf("pt_key") !== -1 && JD_COOKIE.indexOf("pt_pin") !== -1) {
         $.setdata(JD_COOKIE, 'JO_JD_COOKIE')
         $.subt = '✅ 获取会话: 成功!'
         $.log(`📢 ${$.name}, 获取会话: 成功!`)
     } else {
-        throw "无法获取cookie字段"
+        throw "尚未登陆"
     }
 })().catch((e) => {
     $.subt = '❌ 获取会话: 失败!'
