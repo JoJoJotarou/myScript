@@ -6,10 +6,10 @@ const $ = Env("JD Cookie")
     $.log('', `🔔 ${$.name}, 获取会话: 开始!`, '')
     const JD_COOKIE = $request.headers['Cookie'] || $request.headers['Cookie']
     if (JD_COOKIE) {
-        if ($.getdata('JO_JD_COOKIE') && _new === $.getdata('JO_JD_COOKIE')) {
+        if ($.getdata('JO_JD_COOKIE') && JD_COOKIE === $.getdata('JO_JD_COOKIE')) {
             $.subt = '获取会话: 相同的Cookie!'
         } else {
-            $.setdata(_new, 'JO_JD_COOKIE')
+            $.setdata(JD_COOKIE, 'JO_JD_COOKIE')
             $.subt = '获取会话: 成功!'
             $.log(`❌ ${$.name}, 获取会话: 成功! 结果: ${JD_COOKIE}!`)
         }
