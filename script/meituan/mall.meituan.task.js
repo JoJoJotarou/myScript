@@ -55,7 +55,7 @@ function share(queryStr, headers) {
     });
 }
 
-!(async () => {
+!(() => {
     const GLOBAL_MEITUAN_QUERY_STR = $.getdata('GLOBAL_MEITUAN_QUERY_STR');
     const GLOBAL_MEITUAN_HEADERS = JSON.parse(
         $.getdata('GLOBAL_MEITUAN_HEADERS')
