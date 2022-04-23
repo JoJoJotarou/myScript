@@ -43,9 +43,15 @@ function share(queryStr, headers) {
         headers: headers,
     };
 
+    console.log('1111')
+
     return new Promise((resolve, reject) => {
         try {
             $.get(option, (error, response, data) => {
+                console.log(data);
+                console.log(response);
+                console.log(error);
+
                 if (response.statusCode == 200 && data.code == 0) {
                     _coins += Number(data['data']['rewardValue']) || 0;
                     _log.push(
@@ -72,7 +78,9 @@ function share(queryStr, headers) {
     );
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
+        console.log('0000')
         await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
+        console.log('2222')
         // await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
 
