@@ -1,6 +1,6 @@
 {
   "name": "JoJoJotarou 脚本收集",
-  "description": "Task collect by JoJoJotarou.",
+  "description": "Task collect by @JoJoJotarou.",
   "task": [
     {
       "config": "5 8 * * * https://raw.githubusercontent.com/NobyDa/Script/master/iQIYI-DailyBonus/iQIYI.js, tag=爱奇艺签到, img-url=https://raw.githubusercontent.com/NobyDa/mini/master/Color/iQIYI.png, enabled=true"

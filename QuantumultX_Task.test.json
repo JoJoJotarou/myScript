@@ -1,0 +1,9 @@
+{
+  "name": "JoJoJotarou 测试",
+  "description": "Task test by @JoJoJotarou.",
+  "task": [
+    {
+      "config": "30 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task.js, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/quantumult-x.png, tag=美团买菜_test, enabled=true"
+    }
+  ]
+}
