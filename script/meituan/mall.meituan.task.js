@@ -39,7 +39,7 @@ function checkIn(queryStr, headers) {
 function share(queryStr, headers) {
     let taskName = '微信分享';
     let option = {
-        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}&shareBusinessType=2'`,
+        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}&shareBusinessType=2`,
         headers: headers,
     };
 
