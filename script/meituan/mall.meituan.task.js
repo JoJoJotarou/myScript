@@ -47,7 +47,7 @@ function share(queryStr, headers) {
 
     return new Promise((resolve, reject) => {
         try {
-            $.get(option, (error, response, data) => {
+            $.post(option, (error, response, data) => {
                 console.log(data);
                 console.log(response);
                 console.log(error);
