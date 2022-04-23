@@ -51,18 +51,21 @@ function share(queryStr, headers) {
                 console.log(data);
                 console.log(response);
                 console.log(error);
-
+                console.log('????')
                 if (response.statusCode == 200 && data.code == 0) {
+                    console.log('success')
                     _coins += Number(data['data']['rewardValue']) || 0;
                     _log.push(
                         `${taskName}: 成功! 获取 ${data['data']['rewardValue']} 个买菜币 ~`
                     );
                     _desc.push(`${taskName}: 成功`);
                 } else {
+                    console.log('error')
                     throw new Error(error || data);
                 }
             });
         } catch (error) {
+            console.log('exp')
             _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
             _desc.push(`${taskName}: 失败`);
         } finally {
