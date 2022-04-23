@@ -73,7 +73,7 @@ function share(queryStr, headers) {
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
         await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-        await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
+        // await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
 
     _desc.push('详情请查看日志 ~');
