@@ -1,4 +1,6 @@
-
+/**
+ * 美团买菜各项活动
+ */
 const $ = Env('美团买菜');
 
 async function checkIn(queryStr, headers) {
@@ -13,21 +15,52 @@ async function checkIn(queryStr, headers) {
 
     $.post(option, (error, response, data) => {
         if (error) {
-            $.subt = '❌ 签到: 失败! 请查看日志';
+            $.subt = '❌ 签到: 失败, 请查看日志!';
             $.desc = error;
             $.log(`📢 ${$.name}, 签到: 失败! 原因: ${error}!`);
-        } else if (response.statusCode == 200) {
+        } else if (response.statusCode == 200 && data.code == 0) {
             $.subt = '✅ 签到: 成功!';
             $.desc = data;
             $.log(`📢 ${$.name}, 签到: 成功! 结果：${data}`);
         } else {
-            $.subt = '❓ 签到: 未知!';
+            $.subt = '❓ 签到: 未知错误, 请查看日志!';
             $.desc = data;
-            $.log(`📢 ${$.name}, 签到: 未知! 原因: ${data}!`);
+            $.log(`📢 ${$.name}, 签到: 未知错误! 原因: ${data}!`);
         }
 
         $.msg($.name, $.subt, $.desc);
         $.log(`++++++++++ 【${$.name}】 签到结束++++++++++`);
+        $.done();
+    });
+}
+
+async function share(queryStr, headers) {
+    $.log(`++++++++++ 【${$.name}】 微信分享开始++++++++++`);
+
+    queryStr += '&shareBusinessType=2';
+
+    let option = {
+        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}`,
+        headers: headers,
+    };
+
+    $.get(option, (error, response, data) => {
+        if (error) {
+            $.subt = '❌ 微信分享: 失败, 请查看日志!';
+            $.desc = error;
+            $.log(`📢 ${$.name}, 微信分享: 失败! 原因: ${error}!`);
+        } else if (response.statusCode == 200 && data.code == 0) {
+            $.subt = '✅ 微信分享: 成功!';
+            $.desc = `🪙 获取 ${data['data']['rewardValue']} 个买菜币 ~`;
+            $.log(`📢 ${$.name}, 微信分享: 成功! 结果：${data}`);
+        } else {
+            $.subt = '❓ 微信分享: 未知错误, 请查看日志!';
+            $.desc = data;
+            $.log(`📢 ${$.name}, 微信分享: 未知错误! 原因: ${data}!`);
+        }
+
+        $.msg($.name, $.subt, $.desc);
+        $.log(`++++++++++ 【${$.name}】 微信分享结束++++++++++`);
         $.done();
     });
 }
@@ -40,9 +73,9 @@ async function checkIn(queryStr, headers) {
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
         await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
+        await $.wait(1000);
+        await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
-
-    // await $.wait(1000);
 })();
 
 
