@@ -62,16 +62,8 @@ function share(queryStr, headers) {
     );
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
-        checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
-            (e) => {
-                $.logErr(e);
-            }
-        );
-        share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
-            (e) => {
-                $.logErr(e);
-            }
-        );
+        checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
+        share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
 
     _desc.push('详情请查看日志 ~');
