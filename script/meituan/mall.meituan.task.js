@@ -48,8 +48,8 @@ function share(queryStr, headers) {
     console.log(JSON.stringify(option))
 
     return new Promise((resolve, reject) => {
-        try {
-            $.post(option, (error, response, data) => {
+        $.get(option, (error, response, data) => {
+            try {
                 console.log(data);
                 console.log(response);
                 console.log(error);
@@ -65,14 +65,14 @@ function share(queryStr, headers) {
                     console.log('error')
                     throw new Error(error || data);
                 }
-            });
-        } catch (error) {
-            console.log('exp')
-            _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
-            _desc.push(`${taskName}: 失败`);
-        } finally {
-            resolve();
-        }
+            } catch (error) {
+                console.log('exp')
+                _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${taskName}: 失败`);
+            } finally {
+                resolve();
+            }
+        });
     });
 }
 
