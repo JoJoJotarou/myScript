@@ -45,6 +45,8 @@ function share(queryStr, headers) {
 
     console.log('1111')
 
+    console.log(JSON.stringify(option))
+
     return new Promise((resolve, reject) => {
         try {
             $.post(option, (error, response, data) => {
