@@ -18,17 +18,17 @@ function checkIn(queryStr, headers) {
         $.post(option, (error, response, data) => {
             try {
                 if (response.statusCode == 200 && data.code == 0) {
-                    _coins += Number(data['data']['rewardValue']) || 0;
+                    _coins += Number(JSON.parse(data).data.rewardValue) || 0;
                     _log.push(
                         `${taskName}: 成功! 获取 ${data['data']['rewardValue']} 个买菜币 ~`
                     );
-                    _desc.push(`${taskName}: 成功`);
+                    _desc.push(`${taskName}: ✅`);
                 } else {
                     throw new Error(error || data);
                 }
             } catch (error) {
                 _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName}: 失败`);
+                _desc.push(`${taskName}: ❌`);
             } finally {
                 resolve();
             }
@@ -43,32 +43,30 @@ function share(queryStr, headers) {
         headers: headers,
     };
 
-    console.log('1111')
-
-    console.log(JSON.stringify(option))
-
     return new Promise((resolve, reject) => {
         $.get(option, (error, response, data) => {
             try {
-                console.log(data);
-                console.log(response);
-                console.log(error);
-                console.log('????')
-                if (response.statusCode == 200 && data.code == 0) {
-                    console.log('success')
-                    _coins += Number(data['data']['rewardValue']) || 0;
-                    _log.push(
-                        `${taskName}: 成功! 获取 ${data['data']['rewardValue']} 个买菜币 ~`
-                    );
-                    _desc.push(`${taskName}: 成功`);
+                if (
+                    response.statusCode == 200 &&
+                    JSON.parse(data).code == 0 &&
+                    JSON.parse(data).data.result === true
+                ) {
+                    _coin = JSON.parse(data).data.rewardValue;
+                    _coins += Number(_coin);
+                    _log.push(`${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
+                    _desc.push(`${taskName}: ✅`);
+                } else if (
+                    response.statusCode == 200 &&
+                    JSON.parse(data).code == 0 &&
+                    JSON.parse(data).data.result === false
+                ) {
+                    throw new Error('重复执行');
                 } else {
-                    console.log('error')
                     throw new Error(error || data);
                 }
             } catch (error) {
-                console.log('exp')
                 _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName}: 失败`);
+                _desc.push(`${taskName} ❌`);
             } finally {
                 resolve();
             }
@@ -83,15 +81,13 @@ function share(queryStr, headers) {
     );
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
-        console.log('0000')
+        await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
         await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-        console.log('2222')
-        // await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
 
     _desc.push('详情请查看日志 ~');
     $.log(..._log);
-    $.subt = `本次执行获得买菜币: ${_coins} 个`;
+    $.subt = `本次执行获得买菜币: ${_coins} 个, 执行结果:`;
     $.desc = _desc.join('\n');
     $.msg($.name, $.subt, $.desc);
 })()
