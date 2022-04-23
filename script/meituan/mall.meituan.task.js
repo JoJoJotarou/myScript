@@ -34,7 +34,9 @@ async function checkIn(queryStr, headers) {
 
 !(async () => {
     const GLOBAL_MEITUAN_QUERY_STR = $.getdata('GLOBAL_MEITUAN_QUERY_STR');
-    const GLOBAL_MEITUAN_HEADERS = $.getdata('GLOBAL_MEITUAN_HEADERS');
+    const GLOBAL_MEITUAN_HEADERS = JSON.parse(
+        $.getdata('GLOBAL_MEITUAN_HEADERS')
+    );
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
         await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);

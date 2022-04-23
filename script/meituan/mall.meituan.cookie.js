@@ -23,7 +23,10 @@ const $ = Env('美团买菜 Cookie');
         GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('userid')
     ) {
         $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
-        $.setdata(GLOBAL_MEITUAN_HEADERS, 'GLOBAL_MEITUAN_HEADERS');
+        $.setdata(
+            JSON.stringify(GLOBAL_MEITUAN_HEADERS),
+            'GLOBAL_MEITUAN_HEADERS'
+        );
         $.subt = '✅ 获取会话: 成功!';
     } else {
         throw '尚未登陆';
