@@ -11,7 +11,7 @@ async function checkIn(queryStr, headers) {
         headers: headers,
     };
 
-    $.get(option, (error, response, data) => {
+    $.post(option, (error, response, data) => {
         if (error) {
             $.subt = '❌ 签到: 失败! 请查看日志';
             $.desc = error;
