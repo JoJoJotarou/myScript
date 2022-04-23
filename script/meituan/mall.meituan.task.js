@@ -7,7 +7,7 @@ let _log = [];
 let _coins = 0;
 let _desc = [];
 
-async function checkIn(queryStr, headers) {
+function checkIn(queryStr, headers) {
     let taskName = '【签到】';
     let option = {
         url: `https://mall.meituan.com/api/c/mallcoin/checkIn/userCheckInNew?${queryStr}&channel=7`,
@@ -31,7 +31,7 @@ async function checkIn(queryStr, headers) {
     });
 }
 
-async function share(queryStr, headers) {
+function share(queryStr, headers) {
     let taskName = '【微信分享】';
     let option = {
         url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}&shareBusinessType=2'`,
@@ -62,13 +62,12 @@ async function share(queryStr, headers) {
     );
 
     if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
-        await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
+        checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
             (e) => {
                 $.logErr(e);
             }
         );
-        await $.wait(1000);
-        await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
+        share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS).catch(
             (e) => {
                 $.logErr(e);
             }
