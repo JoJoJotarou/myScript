@@ -18,17 +18,16 @@ function checkIn(queryStr, headers) {
         $.post(option, (error, response, data) => {
             try {
                 if (response.statusCode == 200 && data.code == 0) {
-                    _coins += Number(JSON.parse(data).data.rewardValue) || 0;
-                    _log.push(
-                        `${taskName}: 成功! 获取 ${data['data']['rewardValue']} 个买菜币 ~`
-                    );
-                    _desc.push(`${taskName}: ✅`);
+                    _coin = JSON.parse(data).data.rewardValue;
+                    _coins += Number(_coin) || 0;
+                    _log.push(`✅ ${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
+                    _desc.push(`${taskName} ✅`);
                 } else {
                     throw new Error(error || data);
                 }
             } catch (error) {
-                _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName}: ❌`);
+                _log.push(`⚠️ ${taskName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${taskName} ⚠️`);
             } finally {
                 resolve();
             }
@@ -37,7 +36,7 @@ function checkIn(queryStr, headers) {
 }
 
 function share(queryStr, headers) {
-    let taskName = '微信分享';
+    let taskName = '【微信分享】';
     let option = {
         url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}&shareBusinessType=2`,
         headers: headers,
@@ -53,8 +52,8 @@ function share(queryStr, headers) {
                 ) {
                     _coin = JSON.parse(data).data.rewardValue;
                     _coins += Number(_coin);
-                    _log.push(`${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-                    _desc.push(`${taskName}: ✅`);
+                    _log.push(`✅ ${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
+                    _desc.push(`${taskName} ✅`);
                 } else if (
                     response.statusCode == 200 &&
                     JSON.parse(data).code == 0 &&
@@ -65,8 +64,8 @@ function share(queryStr, headers) {
                     throw new Error(error || data);
                 }
             } catch (error) {
-                _log.push(`❌${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName} ❌`);
+                _log.push(`⚠️ ${taskName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${taskName} ⚠️`);
             } finally {
                 resolve();
             }
@@ -85,7 +84,6 @@ function share(queryStr, headers) {
         await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     }
 
-    _desc.push('详情请查看日志 ~');
     $.log(..._log);
     $.subt = `本次执行获得买菜币: ${_coins} 个, 执行结果:`;
     $.desc = _desc.join('\n');
