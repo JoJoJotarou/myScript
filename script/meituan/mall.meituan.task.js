@@ -8,7 +8,7 @@ let _coins = 0;
 let _desc = [];
 
 function checkIn(queryStr, headers) {
-    let taskName = '【签到】';
+    let eventName = '【签到】';
     let option = {
         url: `https://mall.meituan.com/api/c/mallcoin/checkIn/userCheckInNew?${queryStr}&channel=7`,
         headers: headers,
@@ -20,14 +20,14 @@ function checkIn(queryStr, headers) {
                 if (response.statusCode == 200 && data.code == 0) {
                     _coin = JSON.parse(data).data.rewardValue;
                     _coins += Number(_coin) || 0;
-                    _log.push(`✅ ${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-                    _desc.push(`${taskName} ✅`);
+                    _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
+                    _desc.push(`${eventName} ✅`);
                 } else {
                     throw new Error(error || data);
                 }
             } catch (error) {
-                _log.push(`⚠️ ${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName} ⚠️`);
+                _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${eventName} ⚠️`);
             } finally {
                 resolve();
             }
@@ -36,7 +36,7 @@ function checkIn(queryStr, headers) {
 }
 
 function share(queryStr, headers) {
-    let taskName = '【微信分享】';
+    let eventName = '【微信分享】';
     let option = {
         url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getShareReward?${queryStr}&shareBusinessType=2`,
         headers: headers,
@@ -52,8 +52,8 @@ function share(queryStr, headers) {
                 ) {
                     _coin = JSON.parse(data).data.rewardValue;
                     _coins += Number(_coin);
-                    _log.push(`✅ ${taskName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-                    _desc.push(`${taskName} ✅`);
+                    _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
+                    _desc.push(`${eventName} ✅`);
                 } else if (
                     response.statusCode == 200 &&
                     JSON.parse(data).code == 0 &&
@@ -64,8 +64,109 @@ function share(queryStr, headers) {
                     throw new Error(error || data);
                 }
             } catch (error) {
-                _log.push(`⚠️ ${taskName}: 失败! 原因:\n${error}!`);
-                _desc.push(`${taskName} ⚠️`);
+                _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${eventName} ⚠️`);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
+function getTasks(queryStr, headers) {
+    let eventName = '【领取/完成任务】';
+    let option = {
+        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/queryTaskListInfoV2?${queryStr}&channel=7`,
+        headers: headers,
+    }
+    return new Promise((resolve, reject) => {
+        $.get(option, (error, response, data) => {
+            try {
+                tasks = JSON.parse(data).data.checkInTaskInfos;
+
+                if (
+                    response.statusCode == 200 &&
+                    JSON.parse(data).code == 0 &&
+                    tasks
+                ) {
+                    tasks.forEach(task => {
+                        if (task.buttonDesc === "领任务") {
+                            _log.push(`🤖 ${eventName}: 开始领取任务 ${task.taskName} ~`);
+                            takeTask(queryStr, headers, task.taskName, task.id, task.activityId)
+                        } else if (task.buttonDesc === "去逛逛") {
+                            // 浏览商品, 第二次需间隔至少1小时
+                            if (task.taskChance > 0) {
+                                _log.push(`🤖 ${eventName}: 开始完成任务 ${task.taskName} ~`);
+                                browseGoods(queryStr, headers);
+                            }
+                        } else if (task.buttonDesc === "去购物") {
+                            _log.push("🤪 要花钱了，老夫无能为力 ~");
+                        }
+                    });
+                    _desc.push(`${eventName} ✅`);
+                } else {
+                    throw new Error(error || data);
+                }
+            } catch (error) {
+                _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
+                _desc.push(`${eventName} ⚠️`);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
+
+function takeTask(queryStr, headers, taskName, taskId, activityId) {
+    let eventName = '【领取任务】';
+    let option = {
+        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTask?${queryStr}&channel=7&activityId=${activityId}&taskId=${taskId}`,
+        headers: headers,
+    }
+
+    return new Promise((resolve, reject) => {
+        $.get(option, (error, response, data) => {
+            try {
+                if (
+                    response.statusCode == 200 &&
+                    JSON.parse(data).code == 0 &&
+                    JSON.parse(data).data == true
+                ) {
+                    _log.push(`✅ ${eventName}: <${eventName}> 成功!`);
+                } else {
+                    throw new Error(error || data);
+                }
+            } catch (error) {
+                _log.push(`⚠️ ${eventName}: <${eventName}> 失败! 原因:\n${error}!`);
+            } finally {
+                resolve();
+            }
+        });
+    });
+}
+
+function browseGoods(queryStr, headers) {
+    // 获取多少个无法得知，需要自行APP查询
+    let eventName = '【浏览商品15秒】';
+    let option = {
+        url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTask?${queryStr}&entrance=1&limit=15&offset=15`,
+        headers: headers,
+    }
+
+    return new Promise((resolve, reject) => {
+        $.get(option, (error, response, data) => {
+            try {
+                if (
+                    response.statusCode == 200 &&
+                    JSON.parse(data).code == 0
+                ) {
+                    _log.push(`✅ ${eventName}: 成功!`);
+                } else {
+                    throw new Error(error || data);
+                }
+            } catch (error) {
+                _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
             } finally {
                 resolve();
             }
