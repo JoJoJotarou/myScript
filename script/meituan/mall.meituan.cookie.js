@@ -3,7 +3,7 @@
  * @description: 美团APP -> 美团买菜 -> 我的 -> 签到领币，QX提示成功即可
  *
  */
-const $ = Env('美团买菜 Cookie');
+const $ = Env('美团买菜');
 
 !(async () => {
   const GLOBAL_MEITUAN_HEADERS = $request.headers;
@@ -20,14 +20,14 @@ const $ = Env('美团买菜 Cookie');
   ) {
     $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
     $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
-    $.subt = '✅ 获取会话: 成功';
+    $.subt = '✅ 获取会话成功';
   } else {
     throw '无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '⚠️ 获取会话: 失败';
-    $.log(`🤖 获取会话: 失败! 原因: ${e}`);
+    $.subt = '⚠️ 获取会话失败';
+    $.log(`🤖 获取会话失败! 原因: ${e}`);
   })
   .finally(() => {
     $.msg($.name, $.subt, '');
