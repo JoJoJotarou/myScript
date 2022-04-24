@@ -7,7 +7,7 @@ const $ = Env('美团买菜 Cookie');
 
 !(async () => {
   const GLOBAL_MEITUAN_HEADERS = $request.headers;
-  const GLOBAL_MEITUAN_QUERY_STR = $request.url.match(/getWeekCheckInProgressBar\?(.*)/)[1];
+  const GLOBAL_MEITUAN_QUERY_STR = $request.url.match(/queryTaskListInfoV2\?(.*)/)[1];
   const COOKIE = GLOBAL_MEITUAN_HEADERS['Cookie'] || GLOBAL_MEITUAN_HEADERS['cookie'];
 
   if (
