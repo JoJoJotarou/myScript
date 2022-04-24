@@ -9,6 +9,7 @@ let _desc = [];
 
 function checkIn(queryStr, headers) {
   let eventName = '【签到】';
+  headers['Content-Type'] = 'application/json';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/userCheckInNew?${queryStr}`,
     headers: headers,
@@ -162,7 +163,7 @@ function doneTasks(queryStr, headers) {
         .filter((task) => task.buttonDesc === '去购物')
         .forEach((task) => {
           _log.push(
-            `⚠️ ${task.taskName} ${$.time('yyyy-MM-dd', task.taskExpiredTime)} 任务失效，要花钱了，老夫无能为力 ~`
+            `⚠️ 【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效，要花钱了，老夫无能为力 ~`
           );
           _desc.push(`${task.taskName} 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
         });
@@ -209,7 +210,7 @@ function totalCoins(queryStr, headers) {
     $.get(option, (error, response, data) => {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0) {
-          let totalCoins = Number(JSON.parse(data).data.totalCoins) || 0;
+          let totalCoins = Number(JSON.parse(data).data.balance) || 0;
           _log.push(`✅ ${eventName}（总数）: ${totalCoins} ~`);
           resolve(totalCoins);
         } else {
@@ -236,9 +237,10 @@ function coupons(queryStr, headers, totalCoins) {
       try {
         couponList = JSON.parse(data).data;
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && couponList) {
-          amount = couponList.filter((coupon) => coupon.sellPrice <= totalCoins).size();
+          _couponList = couponList.filter((coupon) => coupon.sellPrice <= totalCoins);
+          amount = _couponList ? _couponList.length : 0;
           _log.push(`✅ ${eventName}（总数）: ${amount} ~`);
-          resolve(totalCoins);
+          resolve(amount);
         } else {
           throw new Error(error || data);
         }
