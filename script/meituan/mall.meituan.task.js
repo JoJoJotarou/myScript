@@ -324,9 +324,9 @@ function coupons(queryStr, headers, totalCoins) {
     totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS, totalCoins);
     if (amount > 0) {
-      $.subt = `获得买菜币:${_coins}, 总共:${totalCoins}, ${amount}种优惠卷可兑换, 执行结果:`;
+      $.subt = `买菜币:${totalCoins}(+${_coins}), ${amount}种优惠卷可兑`;
     } else {
-      $.subt = `获得买菜币:${_coins}, 总共:${totalCoins}, 执行结果:`;
+      $.subt = `买菜币:${totalCoins}(+${_coins})`;
     }
   } else {
     $.subt = '⚠️ 任务失败! 请先获取会话!';
