@@ -159,10 +159,11 @@ function doneTasks(queryStr, headers) {
       tasks
         .filter((task) => task.buttonDesc === '去逛逛')
         .forEach((task) => {
-          res = browseGoods1(queryStr, headers);
-          if (res) {
-            browseGoods2(queryStr, headers, task);
-          }
+          browseGoods1(queryStr, headers).then((res) => {
+            if (res) {
+              browseGoods2(queryStr, headers, task);
+            }
+          });
         });
 
       // 购物任务
