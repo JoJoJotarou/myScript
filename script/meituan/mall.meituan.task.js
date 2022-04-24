@@ -29,12 +29,16 @@ function checkIn(queryStr, headers) {
   return new Promise((resolve, reject) => {
     $.post(option, (error, response, data) => {
       try {
-        if (response.statusCode === 200 && data.code === 0 && JSON.parse(data).data.result === true) {
+        if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
           _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
           _desc.push(`${eventName} ✅`);
-        } else if (response.statusCode === 200 && data.code === 0 && JSON.parse(data).data.result === false) {
+        } else if (
+          response.statusCode === 200 &&
+          JSON.parse(data).code === 0 &&
+          JSON.parse(data).data.result === false
+        ) {
           throw new Error('重复签到');
         } else {
           throw new Error(error || data);
