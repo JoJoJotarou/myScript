@@ -153,34 +153,47 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
 }
 
 function doneTasks(queryStr, headers) {
-  return new Promise((resolve, reject) => {
-    getTasks(queryStr, headers).then((tasks) => {
-      // 浏览商品, 第二次需间隔至少1小时, 完成2次则忽略【浏览商品15秒】活动
-      _tasks = tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2);
-      if (_tasks.length > 0) {
-        _tasks.forEach((task) => {
-          browseGoods1(queryStr, headers).then((res) => {
-            if (res) {
-              browseGoods2(queryStr, headers, task);
-            }
+  try {
+    getTasks(queryStr, headers)
+      .then((tasks) => {
+        // 浏览商品, 第二次需间隔至少1小时, 完成2次则忽略【浏览商品15秒】活动
+        tmp = tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2);
+        if (tmp.length > 0) {
+          tmp.forEach((task) => {
+            browseGoods1(queryStr, headers).then((res) => {
+              if (res) {
+                browseGoods2(queryStr, headers, task);
+              }
+            });
           });
-        });
-      } else {
-        _log.push(`⚠️ 【浏览商品】: 无浏览商品任务!`);
-      }
-
-      // 购物任务
-      tasks
-        .filter((task) => task.buttonDesc === '去购物')
-        .forEach((task) => {
-          _log.push(
-            `⚠️ 【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效，要花钱了，老夫无能为力 ~`
-          );
-          _desc.push(`【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
-        });
-    });
-    resolve();
-  });
+        } else {
+          _log.push(`⚠️ 【浏览商品15秒】活动已完成!`);
+        }
+        return tasks;
+      })
+      .then((tasks) => {
+        // 防止漏网之鱼
+        tasks
+          .filter((task) => task.buttonDesc === '领奖励')
+          .forEach((task) => {
+            browseGoods2(queryStr, headers, task);
+          });
+        return tasks;
+      })
+      .then((tasks) => {
+        // 购物任务
+        tasks
+          .filter((task) => task.buttonDesc === '去购物')
+          .forEach((task) => {
+            _log.push(
+              `⚠️ 【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效，要花钱了，老夫无能为力 ~`
+            );
+            _desc.push(`【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
+          });
+      });
+  } catch (error) {
+    _log.push(`⚠️ 【完成任务】: 失败! 原因:\n${error}!`);
+  }
 }
 
 function browseGoods1(queryStr, headers) {
