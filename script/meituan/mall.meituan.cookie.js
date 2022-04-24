@@ -20,13 +20,13 @@ const $ = Env('美团买菜 Cookie');
   ) {
     $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
     $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
-    $.subt = '✅ 获取会话: 成功!';
+    $.subt = '✅ 获取会话: 成功';
   } else {
     throw '无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '⚠️ 获取会话: 失败!';
+    $.subt = '⚠️ 获取会话: 失败';
     $.log(`🤖 获取会话: 失败! 原因: ${e}`);
   })
   .finally(() => {
