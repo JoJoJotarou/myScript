@@ -159,7 +159,10 @@ function doneTasks(queryStr, headers) {
       tasks
         .filter((task) => task.buttonDesc === '去逛逛')
         .forEach((task) => {
-          browseGoods(queryStr, headers, task);
+          res = browseGoods1(queryStr, headers);
+          if (res) {
+            browseGoods2(queryStr, headers, task);
+          }
         });
 
       // 购物任务
@@ -176,8 +179,8 @@ function doneTasks(queryStr, headers) {
   });
 }
 
-function _browseGoods(queryStr, headers) {
-  let eventName = '【浏览商品等待事件】';
+function browseGoods1(queryStr, headers) {
+  let eventName = '【浏览商品-步骤1】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/taskEventComplete?${queryStr}&eventType=6`,
     headers: headers,
@@ -188,33 +191,28 @@ function _browseGoods(queryStr, headers) {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.serverTime) {
           _log.push(`✅ ${eventName}: 成功!`);
+          _desc.push(`${eventName} ✅`);
           resolve(true);
         } else {
           throw new Error(error || data);
         }
       } catch (error) {
         _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
+        _desc.push(`${eventName} ⚠️`);
         resolve(false);
       }
     });
   });
 }
 
-function browseGoods(queryStr, headers, task) {
-  let eventName = '【浏览商品】';
+function browseGoods2(queryStr, headers, task) {
+  let eventName = '【浏览商品-步骤2】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTaskReward?${queryStr}&activityId=${task.activityId}&taskId=${task.id}&taskType=${task.taskType}&userTaskId=${task.userTaskId}&rewardId=${task.rewardId}`,
     headers: headers,
   };
 
   return new Promise((resolve, reject) => {
-    res = _browseGoods(queryStr, headers);
-    if (!res) {
-      _log.push(`⚠️ ${eventName}: 失败! 原因: 未能完成【浏览商品等待事件】!`);
-      _desc.push(`${eventName} ⚠️`);
-      resolve();
-      return;
-    }
     $.get(option, (error, response, data) => {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
