@@ -3,20 +3,20 @@
  * @description: 浏览器访问 `https://plogin.m.jd.com/login/login` 登录后，点击"我的"，QX提示成功即可
  *
  */
-const $ = Env('JD Cookie');
+const $ = Env('京东');
 
 !(async () => {
   const JD_COOKIE = $request.headers['Cookie'] || $request.headers['cookie'];
   if (JD_COOKIE && JD_COOKIE.indexOf('pt_key') !== -1 && JD_COOKIE.indexOf('pt_pin') !== -1) {
     $.setdata(JD_COOKIE, 'GLOBAL_JD_COOKIE');
-    $.subt = '✅ 获取会话: 成功!';
+    $.subt = '✅ 获取会话成功';
   } else {
     throw '无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '⚠️ 获取会话: 失败!';
-    $.log(`🤖 获取会话: 失败! 原因: ${e}!`);
+    $.subt = '⚠️ 获取会话失败';
+    $.log(`🤖 获取会话失败! 原因: ${e}`);
   })
   .finally(() => {
     $.msg($.name, $.subt, '');
