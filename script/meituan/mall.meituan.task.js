@@ -39,7 +39,7 @@ function checkIn(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`⚠️ ${eventName}: 失败! 原因: 重复签到!`);
+          _log.push(`⚠️ ${eventName}: 今日签到已完成!`);
         } else {
           throw new Error(error || data);
         }
@@ -73,7 +73,7 @@ function share(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`⚠️ ${eventName}: 失败! 原因: 重复分享!`);
+          _log.push(`⚠️ ${eventName}: 今日分享已完成!`);
         } else {
           throw new Error(error || data);
         }
@@ -172,7 +172,7 @@ function doneTasks(queryStr, headers) {
         return tasks;
       })
       .then((tasks) => {
-        // 防止漏网之鱼
+        // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
         tasks
           .filter((task) => task.buttonDesc === '领奖励')
           .forEach((task) => {
