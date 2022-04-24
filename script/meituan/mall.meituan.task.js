@@ -39,7 +39,7 @@ function checkIn(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          throw new Error('重复签到');
+          _log.push(`⚠️ ${eventName}: 失败! 原因: 重复签到!`);
         } else {
           throw new Error(error || data);
         }
@@ -73,7 +73,7 @@ function share(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          throw new Error('重复分享');
+          _log.push(`⚠️ ${eventName}: 失败! 原因: 重复分享!`);
         } else {
           throw new Error(error || data);
         }
@@ -159,7 +159,7 @@ function doneTasks(queryStr, headers) {
       tasks
         .filter((task) => task.buttonDesc === '去逛逛')
         .forEach((task) => {
-          _browseGoods(queryStr, headers);
+          browseGoods(queryStr, headers, task);
         });
 
       // 购物任务
@@ -169,7 +169,7 @@ function doneTasks(queryStr, headers) {
           _log.push(
             `⚠️ 【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效，要花钱了，老夫无能为力 ~`
           );
-          _desc.push(`${task.taskName} 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
+          _desc.push(`【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
         });
     });
     resolve();
@@ -177,18 +177,50 @@ function doneTasks(queryStr, headers) {
 }
 
 function _browseGoods(queryStr, headers) {
-  // 获取多少个买菜无法得知，需要自行APP查询
-  let eventName = '【浏览商品15秒】';
+  let eventName = '【浏览商品等待事件】';
   let option = {
-    url: `https://mall.meituan.com/api/c/poi/207/sku/list/hotsell?${queryStr}&entrance=1&limit=15&offset=15`,
+    url: `https://mall.meituan.com/api/c/mallcoin/checkIn/taskEventComplete?${queryStr}&eventType=6`,
     headers: headers,
   };
 
   return new Promise((resolve, reject) => {
     $.get(option, (error, response, data) => {
       try {
-        if (response.statusCode === 200 && JSON.parse(data).code === 0) {
+        if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.serverTime) {
           _log.push(`✅ ${eventName}: 成功!`);
+          resolve(true);
+        } else {
+          throw new Error(error || data);
+        }
+      } catch (error) {
+        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
+        resolve(false);
+      }
+    });
+  });
+}
+
+function browseGoods(queryStr, headers, task) {
+  let eventName = '【浏览商品】';
+  let option = {
+    url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTaskReward?${queryStr}&activityId=${task.activityId}&taskId=${task.id}&taskType=${task.taskType}&userTaskId=${task.userTaskId}&rewardId=${task.rewardId}`,
+    headers: headers,
+  };
+
+  return new Promise((resolve, reject) => {
+    res = _browseGoods(queryStr, headers);
+    if (!res) {
+      _log.push(`⚠️ ${eventName}: 失败! 原因: 未能完成【浏览商品等待事件】!`);
+      _desc.push(`${eventName} ⚠️`);
+      resolve();
+      return;
+    }
+    $.get(option, (error, response, data) => {
+      try {
+        if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
+          _coin = JSON.parse(data).data.rewardValue;
+          _coins += Number(_coin) || 0;
+          _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
           _desc.push(`${eventName} ✅`);
         } else {
           throw new Error(error || data);
