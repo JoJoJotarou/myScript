@@ -155,16 +155,19 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
 function doneTasks(queryStr, headers) {
   return new Promise((resolve, reject) => {
     getTasks(queryStr, headers).then((tasks) => {
-      // 浏览商品, 第二次需间隔至少1小时
-      tasks
-        .filter((task) => task.buttonDesc === '去逛逛')
-        .forEach((task) => {
+      // 浏览商品, 第二次需间隔至少1小时, 完成2次则忽略【浏览商品15秒】活动
+      _tasks = tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2);
+      if (_tasks.length > 0) {
+        _tasks.forEach((task) => {
           browseGoods1(queryStr, headers).then((res) => {
             if (res) {
               browseGoods2(queryStr, headers, task);
             }
           });
         });
+      } else {
+        _log.push(`⚠️ 【浏览商品】: 无浏览商品任务!`);
+      }
 
       // 购物任务
       tasks
@@ -181,7 +184,7 @@ function doneTasks(queryStr, headers) {
 }
 
 function browseGoods1(queryStr, headers) {
-  let eventName = '【浏览商品-步骤1】';
+  let eventName = '【浏览商品15秒(1/2)-模拟浏览】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/taskEventComplete?${queryStr}&eventType=6`,
     headers: headers,
@@ -207,7 +210,7 @@ function browseGoods1(queryStr, headers) {
 }
 
 function browseGoods2(queryStr, headers, task) {
-  let eventName = '【浏览商品-步骤2】';
+  let eventName = '【浏览商品15秒(2/2)-领取奖励】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTaskReward?${queryStr}&activityId=${task.activityId}&taskId=${task.id}&taskType=${task.taskType}&userTaskId=${task.userTaskId}&rewardId=${task.rewardId}`,
     headers: headers,
