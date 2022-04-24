@@ -1,7 +1,7 @@
 /**
  * 美团买菜各项活动, 其中浏览商品, 第二次需与第一次间隔至少1小时
  */
-const $ = Env('美团买菜 - 买菜币');
+const $ = Env('美团买菜');
 
 let _log = [];
 let _coins = 0;
@@ -329,7 +329,7 @@ function coupons(queryStr, headers, totalCoins) {
       $.subt = `买菜币:${totalCoins}(+${_coins})`;
     }
   } else {
-    $.subt = '⚠️ 任务失败! 请先获取会话!';
+    $.subt = '⚠️ 请先获取会话';
     _log.push($.subt);
   }
 
