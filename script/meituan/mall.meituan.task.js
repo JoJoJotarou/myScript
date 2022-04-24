@@ -13,7 +13,7 @@ function checkIn(queryStr, headers) {
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/userCheckInNew?${queryStr}`,
     headers: headers,
-    body: {
+    body: JSON.stringify({
       userId: queryStr.match(/userId=(\d+)/)[1],
       riskMap: {
         platform: 5,
@@ -23,7 +23,7 @@ function checkIn(queryStr, headers) {
         utm_medium: queryStr.match(/utm_medium=(\w+)/)[1],
         fingerprint: '',
       },
-    },
+    }),
   };
 
   return new Promise((resolve, reject) => {
@@ -265,9 +265,9 @@ function coupons(queryStr, headers, totalCoins) {
     totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
     amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS, totalCoins);
     if (amount > 0) {
-      $.subt = `本次获得买菜币:${_coins}个, 总共${totalCoins}个, 执行结果:`;
+      $.subt = `获得买菜币:${_coins}, 总共:${totalCoins}, ${amount}种优惠卷可兑换, 执行结果:`;
     } else {
-      $.subt = `本次获得买菜币:${_coins}个, 总共${totalCoins}个,有${amount}种优惠价可兑换, 执行结果:`;
+      $.subt = `获得买菜币:${_coins}, 总共:${totalCoins}, 执行结果:`;
     }
   } else {
     $.subt = '⚠️ 任务失败! 请先获取会话!';
