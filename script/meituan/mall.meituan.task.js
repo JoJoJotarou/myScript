@@ -1,5 +1,3 @@
-const { resolve } = require('path');
-
 /**
  * 美团买菜各项活动
  */
