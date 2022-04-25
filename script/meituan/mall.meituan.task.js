@@ -39,7 +39,7 @@ function checkIn(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`🟡${eventName}: 今日签到已完成!`);
+          _log.push(`🟡${eventName}: 今日签到已完成`);
         } else {
           throw error || data;
         }
@@ -73,7 +73,7 @@ function share(queryStr, headers) {
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`🟡${eventName}: 今日分享已完成!`);
+          _log.push(`🟡${eventName}: 今日分享已完成`);
         } else {
           throw error || data;
         }
@@ -244,7 +244,7 @@ function totalCoins(queryStr, headers) {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0) {
           let totalCoins = JSON.parse(data).data.balance;
-          _log.push(`🟢${eventName}: 当前共有${totalCoins}个买菜币 ~`);
+          _log.push(`🟢${eventName}: 当前共有${totalCoins}个买菜币`);
           resolve(totalCoins);
         } else {
           throw error || data;
@@ -272,7 +272,7 @@ function coupons(queryStr, headers, totalCoins) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && couponList) {
           _couponList = couponList.filter((coupon) => coupon.sellPrice <= totalCoins);
           amount = _couponList ? _couponList.length : 0;
-          _log.push(`🟢${eventName}: ${amount}种优惠券可兑换 ~`);
+          _log.push(`🟢${eventName}: ${amount}种优惠券可兑换`);
           resolve(amount);
         } else {
           throw error || data;
