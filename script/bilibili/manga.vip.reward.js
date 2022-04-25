@@ -4,6 +4,7 @@
  * 🌟本脚本适用于年度大会员
  */
 const $ = Env('哔漫大会员特权');
+const BILI_MANGA_COOKIE = $.getdata('CookieBM');
 
 let _log = [];
 let _desc = [];
@@ -41,7 +42,6 @@ function getVipReward(eventName, url) {
 }
 
 !(async () => {
-  const BILI_MANGA_COOKIE = $.getdata('CookieBM');
   if (!BILI_MANGA_COOKIE) {
     _desc.push(`🔴请先获取哔漫Cookie`);
   } else {
