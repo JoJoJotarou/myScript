@@ -377,7 +377,7 @@ function coupons(queryStr, headers, totalCoins) {
     await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     // 模拟浏览15秒
-    await $.wait(16000);
+    // await $.wait(16000);
     await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await popReward(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
