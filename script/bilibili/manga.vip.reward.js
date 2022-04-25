@@ -14,7 +14,6 @@ function getVipReward(eventName, url) {
     url: url,
     headers: JSON.parse({
       Cookie: BILI_MANGA_COOKIE,
-      Content-Type: 'application/json',
     }),
     body: 'platform=ios',
   };
