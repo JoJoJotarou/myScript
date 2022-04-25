@@ -3,7 +3,7 @@
  */
 const $ = Env('美团买菜');
 
-let _log = [' '];
+let _log = [];
 let _coins = 0;
 let _desc = [];
 
@@ -251,10 +251,10 @@ function isPopReward(queryStr, headers) {
           checkInCount = JSON.parse(data).data.checkInCount;
           rewardPackageTypes = JSON.parse(data).data.rewardPackageTypes || '';
 
-          if (isPopRewarded && a.data.rewardPackageTypes.indexOf(checkInCount) === -1) {
+          if (isPopRewarded && rewardPackageTypes.indexOf(checkInCount) === -1) {
             _log.push(`🟢${eventName}: ${checkInCount}天礼包可领取`);
             resolve(checkInCount);
-          } else if (isPopRewarded && a.data.rewardPackageTypes.indexOf(checkInCount) !== -1) {
+          } else if (isPopRewarded && rewardPackageTypes.indexOf(checkInCount) !== -1) {
             _log.push(`🟡${eventName}: ${checkInCount}天礼包已领取`);
           } else {
             _log.push(`🟡${eventName}: 无礼包可领取`);
