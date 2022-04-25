@@ -13,14 +13,14 @@ const $ = Env('京东');
     JD_COOKIE.toLocaleLowerCase().indexOf('pt_pin') !== -1
   ) {
     $.setdata(JD_COOKIE, 'GLOBAL_JD_COOKIE');
-    $.subt = '✅ 获取会话成功';
+    $.subt = '🟢获取会话成功';
   } else {
     throw '未登录，无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '⚠️ 获取会话失败';
-    $.log(`🤖 获取会话失败! 原因: ${e}`);
+    $.subt = '🔴获取会话失败';
+    $.log(`🔴获取会话失败: ${e}`);
   })
   .finally(() => {
     $.msg($.name, $.subt, '');

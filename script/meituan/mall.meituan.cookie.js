@@ -10,24 +10,17 @@ const $ = Env('美团买菜');
   const GLOBAL_MEITUAN_QUERY_STR = $request.url.match(/queryTaskListInfoV2\?(.*)/)[1];
   const COOKIE = GLOBAL_MEITUAN_HEADERS['Cookie'] || GLOBAL_MEITUAN_HEADERS['cookie'];
 
-  if (
-    COOKIE.toLocaleLowerCase().indexOf('uuid=') !== -1 &&
-    COOKIE.toLocaleLowerCase().indexOf('userid=') !== -1 &&
-    COOKIE.toLocaleLowerCase().indexOf('t=') !== -1 &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('uuid=') !== -1 &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('userid=') !== -1 &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('t=') !== -1
-  ) {
+  if (COOKIE.toLocaleLowerCase().indexOf('uuid=') !== -1) {
     $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
     $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
-    $.subt = '✅ 获取会话成功';
+    $.subt = '🟢获取会话成功';
   } else {
     throw '未登录，无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '⚠️ 获取会话失败';
-    $.log(`🤖 获取会话失败! 原因: ${e}`);
+    $.subt = '🔴获取会话失败';
+    $.log(`🔴获取会话失败: ${e}`);
   })
   .finally(() => {
     $.msg($.name, $.subt, '');
