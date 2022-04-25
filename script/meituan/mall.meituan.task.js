@@ -3,7 +3,7 @@
  */
 const $ = Env('美团买菜');
 
-let _log = [];
+let _log = [''];
 let _coins = 0;
 let _desc = [];
 
@@ -155,25 +155,26 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
 async function doneTasks(queryStr, headers) {
   tasks = await getTasks(queryStr, headers);
 
-  for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
-    res = await browseGoods1(queryStr, headers);
-    if (res) {
-      await browseGoods2(queryStr, headers, task);
+  tasks
+    .filter((task) => task.buttonDesc === '去购物')
+    .forEach((task) => {
+      _log.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效`);
+      _desc.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效 `);
+    });
+
+  if (tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount === 2).length > 0) {
+    _log.push(`🟡【浏览商品15秒】已完成!`);
+  } else {
+    for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
+      res = await browseGoods1(queryStr, headers);
+      if (res) {
+        await browseGoods2(queryStr, headers, task);
+      }
     }
   }
-
-  if (tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount === 2).length === 0) {
-    _log.push(`🟡【浏览商品15秒】已完成!`);
-  }
-
   // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
   for (task in tasks.filter((task) => task.buttonDesc === '领奖励')) {
     await browseGoods2(queryStr, headers, task);
-  }
-
-  for (task in tasks.filter((task) => task.buttonDesc === '去购物')) {
-    _log.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效`);
-    _desc.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效 `);
   }
 }
 
