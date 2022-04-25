@@ -12,10 +12,9 @@ let _desc = [];
 function getVipReward(eventName, url) {
   let option = {
     url: url,
-    headers: {
+    headers: JSON.stringify({
       Cookie: BILI_MANGA_COOKIE,
-      Content-Type: 'application/json',
-    },
+    }),
     body: 'platform=ios',
   };
 
