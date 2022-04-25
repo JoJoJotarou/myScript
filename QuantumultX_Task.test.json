@@ -4,9 +4,6 @@
   "task": [
     {
       "config": "0 6,8 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task.js, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/quantumult-x.png, tag=美团买菜_test, enabled=true"
-    },
-    {
-      "config": "0 10 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task2.js, img-url=https://raw.githubusercontent.com/crossutility/Quantumult-X/master/quantumult-x.png, tag=美团买菜_test2, enabled=true"
     }
   ]
 }
