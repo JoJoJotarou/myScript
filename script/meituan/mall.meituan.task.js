@@ -256,8 +256,10 @@ function isPopReward(queryStr, headers) {
             resolve(checkInCount);
           } else if (isPopRewarded && rewardPackageTypes.indexOf(checkInCount) !== -1) {
             _log.push(`🟡${eventName}: ${checkInCount}天礼包已领取`);
+            resolve();
           } else {
             _log.push(`🟡${eventName}: 无礼包可领取`);
+            resolve();
           }
         } else {
           throw error || data;
