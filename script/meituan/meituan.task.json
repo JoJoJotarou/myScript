@@ -1,0 +1,9 @@
+{
+  "name": "美团脚本集合",
+  "description": "Script Gallery by @JoJoJotarou",
+  "task": [
+    {
+      "config": "0 6,8 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.png, tag=美团买菜, enabled=true"
+    }
+  ]
+}
