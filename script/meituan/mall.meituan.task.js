@@ -3,7 +3,7 @@
  */
 const $ = Env('美团买菜');
 
-let _log = [''];
+let _log = [' '];
 let _coins = 0;
 let _desc = [];
 
@@ -115,7 +115,7 @@ function getTasks(queryStr, headers) {
 
 async function takeTask(queryStr, headers) {
   tasks = await getTasks(queryStr, headers);
-  for (task in tasks.filter((task) => task.buttonDesc === '领任务')) {
+  for (task of tasks.filter((task) => task.buttonDesc === '领任务')) {
     await _takeTask(queryStr, headers, task.taskName, task.id, task.activityId);
   }
 }
@@ -162,7 +162,7 @@ async function doneTasks(queryStr, headers) {
     return tasks;
   });
 
-  for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
+  for (task of tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
     res = await browseGoods1(queryStr, headers);
     if (res) {
       await browseGoods2(queryStr, headers, task);
@@ -170,7 +170,7 @@ async function doneTasks(queryStr, headers) {
   }
 
   // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
-  for (task in tasks.filter((task) => task.buttonDesc === '领奖励')) {
+  for (task of tasks.filter((task) => task.buttonDesc === '领奖励')) {
     await browseGoods2(queryStr, headers, task);
   }
 }
