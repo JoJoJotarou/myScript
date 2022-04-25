@@ -376,6 +376,7 @@ function coupons(queryStr, headers, totalCoins) {
     await checkIn(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS), totalCoins);
     if (amount > 0) {
