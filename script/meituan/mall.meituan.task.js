@@ -113,17 +113,11 @@ function getTasks(queryStr, headers) {
   });
 }
 
-function takeTask(queryStr, headers) {
-  return new Promise((resolve, reject) => {
-    getTasks(queryStr, headers).then((tasks) => {
-      tasks
-        .filter((task) => task.buttonDesc === '领任务')
-        .forEach((task) => {
-          _takeTask(queryStr, headers, task.taskName, task.id, task.activityId);
-        });
-    });
-    resolve();
-  });
+async function takeTask(queryStr, headers) {
+  tasks = await getTasks(queryStr, headers);
+  for (task in tasks.filter((task) => task.buttonDesc === '领任务')) {
+    await _takeTask(queryStr, headers, task.taskName, task.id, task.activityId);
+  }
 }
 
 function _takeTask(queryStr, headers, taskName, taskId, activityId) {
@@ -153,25 +147,28 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
 }
 
 async function doneTasks(queryStr, headers) {
-  tasks = await getTasks(queryStr, headers);
+  tasks = await getTasks(queryStr, headers).then((tasks) => {
+    tasks
+      .filter((task) => task.buttonDesc === '去购物')
+      .forEach((task) => {
+        _log.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效`);
+        _desc.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效 `);
+      });
 
-  tasks
-    .filter((task) => task.buttonDesc === '去购物')
-    .forEach((task) => {
-      _log.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效`);
-      _desc.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效 `);
-    });
+    if (tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount === 2).length > 0) {
+      _log.push(`🟡【浏览商品15秒】已完成`);
+    }
 
-  if (tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount === 2).length > 0) {
-    _log.push(`🟡【浏览商品15秒】已完成!`);
-  } else {
-    for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
-      res = await browseGoods1(queryStr, headers);
-      if (res) {
-        await browseGoods2(queryStr, headers, task);
-      }
+    return tasks;
+  });
+
+  for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
+    res = await browseGoods1(queryStr, headers);
+    if (res) {
+      await browseGoods2(queryStr, headers, task);
     }
   }
+
   // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
   for (task in tasks.filter((task) => task.buttonDesc === '领奖励')) {
     await browseGoods2(queryStr, headers, task);
