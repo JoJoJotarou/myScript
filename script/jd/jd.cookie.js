@@ -7,11 +7,15 @@ const $ = Env('京东');
 
 !(async () => {
   const JD_COOKIE = $request.headers['Cookie'] || $request.headers['cookie'];
-  if (JD_COOKIE && JD_COOKIE.indexOf('pt_key') !== -1 && JD_COOKIE.indexOf('pt_pin') !== -1) {
+  if (
+    JD_COOKIE &&
+    JD_COOKIE.toLocaleLowerCase().indexOf('pt_key') !== -1 &&
+    JD_COOKIE.toLocaleLowerCase().indexOf('pt_pin') !== -1
+  ) {
     $.setdata(JD_COOKIE, 'GLOBAL_JD_COOKIE');
     $.subt = '✅ 获取会话成功';
   } else {
-    throw '无法获取用户信息';
+    throw '未登录，无法获取用户信息';
   }
 })()
   .catch((e) => {

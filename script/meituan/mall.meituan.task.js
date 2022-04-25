@@ -32,20 +32,20 @@ function checkIn(queryStr, headers) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-          _desc.push(`${eventName} ✅`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _desc.push(`🟢${eventName}`);
         } else if (
           response.statusCode === 200 &&
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`⚠️ ${eventName}: 今日签到已完成!`);
+          _log.push(`🟡${eventName}: 今日签到已完成!`);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
       } finally {
         resolve();
       }
@@ -66,20 +66,20 @@ function share(queryStr, headers) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-          _desc.push(`${eventName} ✅`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _desc.push(`🟢${eventName}`);
         } else if (
           response.statusCode === 200 &&
           JSON.parse(data).code === 0 &&
           JSON.parse(data).data.result === false
         ) {
-          _log.push(`⚠️ ${eventName}: 今日分享已完成!`);
+          _log.push(`🟡${eventName}: 今日分享已完成!`);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
       } finally {
         resolve();
       }
@@ -88,7 +88,7 @@ function share(queryStr, headers) {
 }
 
 function getTasks(queryStr, headers) {
-  let eventName = '【获取任务】';
+  let eventName = '【获取任务列表】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/queryTaskListInfoV2?${queryStr}`,
     headers: headers,
@@ -101,11 +101,11 @@ function getTasks(queryStr, headers) {
           // 返回数组防止后面的任务无法执行
           resolve(tasks || []);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
         // 返回数组防止后面的任务无法执行
         resolve([]);
       }
@@ -127,7 +127,7 @@ function takeTask(queryStr, headers) {
 }
 
 function _takeTask(queryStr, headers, taskName, taskId, activityId) {
-  let eventName = '【领任务】';
+  let eventName = `【领任务-${taskName}】`;
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTask?${queryStr}&activityId=${activityId}&taskId=${taskId}`,
     headers: headers,
@@ -137,14 +137,14 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
     $.get(option, (error, response, data) => {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data === true) {
-          _log.push(`✅ ${eventName}: ${taskName} 领取成功!`);
-          _desc.push(`${eventName} ${taskName} ✅`);
+          _log.push(`🟢${eventName}: 成功`);
+          _desc.push(`🟢${eventName}`);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: ${taskName} 领取失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ${taskName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
       } finally {
         resolve();
       }
@@ -152,60 +152,33 @@ function _takeTask(queryStr, headers, taskName, taskId, activityId) {
   });
 }
 
-function doneTasks(queryStr, headers) {
-  let eventName = '【完成任务】';
-  return new Promise((resolve, reject) => {
-    try {
-      getTasks(queryStr, headers)
-        .then((tasks) => {
-          // 完成2次则忽略【浏览商品15秒】活动
-          tmp = tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2);
-          if (tmp.length > 0) {
-            tmp.forEach((task) => {
-              browseGoods1(queryStr, headers).then((res) => {
-                if (res) {
-                  browseGoods2(queryStr, headers, task);
-                }
-              });
-            });
-          } else {
-            _log.push(`⚠️ 【浏览商品15秒】活动已完成!`);
-          }
-          return tasks;
-        })
-        .then((tasks) => {
-          // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
-          tasks
-            .filter((task) => task.buttonDesc === '领奖励')
-            .forEach((task) => {
-              browseGoods2(queryStr, headers, task);
-            });
-          return tasks;
-        })
-        .then((tasks) => {
-          // 购物任务
-          tasks
-            .filter((task) => task.buttonDesc === '去购物')
-            .forEach((task) => {
-              _log.push(
-                `⚠️ 【${task.taskName}】 将在${$.time(
-                  'yyyy-MM-dd',
-                  task.taskExpiredTime
-                )}失效，要花钱了，老夫无能为力 ~`
-              );
-              _desc.push(`【${task.taskName}】 将在${$.time('yyyy-MM-dd', task.taskExpiredTime)}失效 ⚠️`);
-            });
-        });
-    } catch (error) {
-      _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-    } finally {
-      resolve();
+async function doneTasks(queryStr, headers) {
+  tasks = await getTasks(queryStr, headers);
+
+  for (task in tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount < 2)) {
+    res = await browseGoods1(queryStr, headers);
+    if (res) {
+      await browseGoods2(queryStr, headers, task);
     }
-  });
+  }
+
+  if (tasks.filter((task) => task.buttonDesc === '去逛逛' && task.taskFinishCount === 2).length === 0) {
+    _log.push(`🟡【浏览商品15秒】已完成!`);
+  }
+
+  // 防止漏网之鱼（记不清浏览后未领取时按钮是不是叫领奖励了）
+  for (task in tasks.filter((task) => task.buttonDesc === '领奖励')) {
+    await browseGoods2(queryStr, headers, task);
+  }
+
+  for (task in tasks.filter((task) => task.buttonDesc === '去购物')) {
+    _log.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效`);
+    _desc.push(`🟡【${task.taskName}】${$.time('M-dd', task.taskExpiredTime)}失效 `);
+  }
 }
 
 function browseGoods1(queryStr, headers) {
-  let eventName = '【浏览商品15秒(1/2)-模拟浏览】';
+  let eventName = '【浏览商品(1/2)-模拟浏览】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/taskEventComplete?${queryStr}&eventType=6`,
     headers: headers,
@@ -215,15 +188,15 @@ function browseGoods1(queryStr, headers) {
     $.get(option, (error, response, data) => {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.serverTime) {
-          _log.push(`✅ ${eventName}: 成功!`);
-          _desc.push(`${eventName} ✅`);
+          _log.push(`🟢${eventName}: 成功`);
+          _desc.push(`🟢${eventName}`);
           resolve(true);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
         resolve(false);
       }
     });
@@ -231,7 +204,7 @@ function browseGoods1(queryStr, headers) {
 }
 
 function browseGoods2(queryStr, headers, task) {
-  let eventName = '【浏览商品15秒(2/2)-领取奖励】';
+  let eventName = '【浏览商品(2/2)-领取奖励】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTaskReward?${queryStr}&activityId=${task.activityId}&taskId=${task.id}&taskType=${task.taskType}&userTaskId=${task.userTaskId}&rewardId=${task.rewardId}`,
     headers: headers,
@@ -243,14 +216,14 @@ function browseGoods2(queryStr, headers, task) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`✅ ${eventName}: 成功! 获取 ${_coin} 个买菜币 ~`);
-          _desc.push(`${eventName} ✅`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _desc.push(`🟢${eventName}`);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`${eventName} ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
       } finally {
         resolve();
       }
@@ -259,7 +232,7 @@ function browseGoods2(queryStr, headers, task) {
 }
 
 function totalCoins(queryStr, headers) {
-  let eventName = '【可用买菜币】';
+  let eventName = '【账户买菜币】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getUserInfo?${queryStr}`,
     headers: headers,
@@ -269,15 +242,15 @@ function totalCoins(queryStr, headers) {
     $.get(option, (error, response, data) => {
       try {
         if (response.statusCode === 200 && JSON.parse(data).code === 0) {
-          let totalCoins = Number(JSON.parse(data).data.balance) || 0;
-          _log.push(`✅ ${eventName}（总数）: ${totalCoins} ~`);
+          let totalCoins = JSON.parse(data).data.balance;
+          _log.push(`🟢${eventName}: 当前共有${totalCoins}个买菜币 ~`);
           resolve(totalCoins);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`获取${eventName}数量时发生错误 ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
         resolve(0);
       }
     });
@@ -285,7 +258,7 @@ function totalCoins(queryStr, headers) {
 }
 
 function coupons(queryStr, headers, totalCoins) {
-  let eventName = '【可兑换优惠券】';
+  let eventName = '【是否可兑优惠券】';
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/couponList?${queryStr}`,
     headers: headers,
@@ -298,14 +271,14 @@ function coupons(queryStr, headers, totalCoins) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && couponList) {
           _couponList = couponList.filter((coupon) => coupon.sellPrice <= totalCoins);
           amount = _couponList ? _couponList.length : 0;
-          _log.push(`✅ ${eventName}（总数）: ${amount} ~`);
+          _log.push(`🟢${eventName}: ${amount}种优惠券可兑换 ~`);
           resolve(amount);
         } else {
-          throw new Error(error || data);
+          throw error || data;
         }
       } catch (error) {
-        _log.push(`⚠️ ${eventName}: 失败! 原因:\n${error}!`);
-        _desc.push(`获取${eventName}数量时发生错误 ⚠️`);
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
         resolve(0);
       }
     });
@@ -314,27 +287,27 @@ function coupons(queryStr, headers, totalCoins) {
 
 !(async () => {
   const GLOBAL_MEITUAN_QUERY_STR = $.getdata('GLOBAL_MEITUAN_QUERY_STR');
-  const GLOBAL_MEITUAN_HEADERS = JSON.parse($.getdata('GLOBAL_MEITUAN_HEADERS'));
+  const GLOBAL_MEITUAN_HEADERS = $.getdata('GLOBAL_MEITUAN_HEADERS');
 
   if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
-    await checkIn(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-    await share(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-    await takeTask(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-    await doneTasks(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-    totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS);
-    amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, GLOBAL_MEITUAN_HEADERS, totalCoins);
+    await checkIn(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS), totalCoins);
     if (amount > 0) {
-      $.subt = `买菜币:${totalCoins}(+${_coins}), ${amount}种优惠卷可兑`;
+      $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)}), 有优惠卷可兑`;
     } else {
-      $.subt = `买菜币:${totalCoins}(+${_coins})`;
+      $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)})`;
     }
   } else {
-    $.subt = '⚠️ 请先获取会话';
+    $.subt = '🔴 请先获取会话';
     _log.push($.subt);
   }
 
   $.log(..._log);
-  $.desc = _desc.join('\n');
+  $.desc = _desc.join('');
   $.msg($.name, $.subt, $.desc);
 })()
   .catch((e) => $.logErr(e))

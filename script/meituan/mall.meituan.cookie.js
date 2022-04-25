@@ -11,18 +11,18 @@ const $ = Env('美团买菜');
   const COOKIE = GLOBAL_MEITUAN_HEADERS['Cookie'] || GLOBAL_MEITUAN_HEADERS['cookie'];
 
   if (
-    COOKIE.toLocaleLowerCase().indexOf('uuid=') &&
-    COOKIE.toLocaleLowerCase().indexOf('userid=') &&
-    COOKIE.toLocaleLowerCase().indexOf('t=') &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('uuid=') &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('userid=') &&
-    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('t=')
+    COOKIE.toLocaleLowerCase().indexOf('uuid=') !== -1 &&
+    COOKIE.toLocaleLowerCase().indexOf('userid=') !== -1 &&
+    COOKIE.toLocaleLowerCase().indexOf('t=') !== -1 &&
+    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('uuid=') !== -1 &&
+    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('userid=') !== -1 &&
+    GLOBAL_MEITUAN_QUERY_STR.toLocaleLowerCase().indexOf('t=') !== -1
   ) {
     $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
     $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
     $.subt = '✅ 获取会话成功';
   } else {
-    throw '无法获取用户信息';
+    throw '未登录，无法获取用户信息';
   }
 })()
   .catch((e) => {
