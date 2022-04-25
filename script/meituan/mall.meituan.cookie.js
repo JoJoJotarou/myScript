@@ -13,14 +13,14 @@ const $ = Env('美团买菜');
   if (COOKIE.toLocaleLowerCase().indexOf('uuid=') !== -1) {
     $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
     $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
-    $.subt = '🟢获取会话成功';
+    $.subt = '🟢 获取会话成功';
   } else {
     throw '未登录，无法获取用户信息';
   }
 })()
   .catch((e) => {
-    $.subt = '🔴获取会话失败';
-    $.log(`🔴获取会话失败: ${e}`);
+    $.subt = '🔴 获取会话失败';
+    $.log(`🔴 获取会话失败: ${e}`);
   })
   .finally(() => {
     $.msg($.name, $.subt, '');
