@@ -1,5 +1,5 @@
 /**
- * 美团买菜各项活动, 其中浏览商品, 第二次需与第一次间隔至少1小时
+ * 美团买菜买菜币各项活动(签到、分享、浏览商品、3/7天礼包领取), 其中浏览商品, 第二次需与第一次间隔至少1小时
  */
 const $ = Env('美团买菜');
 
@@ -32,7 +32,7 @@ function checkIn(queryStr, headers) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币`);
           _desc.push(`🟢${eventName}`);
         } else if (
           response.statusCode === 200 &&
@@ -66,7 +66,7 @@ function share(queryStr, headers) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币`);
           _desc.push(`🟢${eventName}`);
         } else if (
           response.statusCode === 200 &&
@@ -214,8 +214,93 @@ function browseGoods2(queryStr, headers, task) {
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && JSON.parse(data).data.result === true) {
           _coin = JSON.parse(data).data.rewardValue;
           _coins += Number(_coin) || 0;
-          _log.push(`🟢${eventName}: 获取${_coin}个买菜币 ~`);
+          _log.push(`🟢${eventName}: 获取${_coin}个买菜币`);
           _desc.push(`🟢${eventName}`);
+        } else {
+          throw error || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+
+async function popReward(queryStr, headers) {
+  checkInCount = await isPopReward(queryStr, headers);
+  if (checkInCount) {
+    await getPopReward(queryStr, headers, checkInCount);
+  }
+}
+
+function isPopReward(queryStr, headers) {
+  let eventName = '【查询3/7天礼包】';
+  let option = {
+    url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getCheckInMainView?${queryStr}`,
+    headers: headers,
+  };
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (error, response, data) => {
+      try {
+        if (response.statusCode === 200 && JSON.parse(data).code === 0) {
+          isPopRewarded = JSON.parse(data).data.isPopRewarded;
+          checkInCount = JSON.parse(data).data.checkInCount;
+          rewardPackageTypes = JSON.parse(data).data.rewardPackageTypes || '';
+
+          if (isPopRewarded && a.data.rewardPackageTypes.indexOf(checkInCount) === -1) {
+            _log.push(`🟢${eventName}: ${checkInCount}天礼包可领取`);
+            resolve(checkInCount);
+          } else if (isPopRewarded && a.data.rewardPackageTypes.indexOf(checkInCount) !== -1) {
+            _log.push(`🟡${eventName}: ${checkInCount}天礼包已领取`);
+          } else {
+            _log.push(`🟡${eventName}: 无礼包可领取`);
+          }
+        } else {
+          throw error || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve();
+      }
+    });
+  });
+}
+
+function getPopReward(queryStr, headers, checkInCount) {
+  let eventName = '【领取3/7天礼包】';
+  headers['Content-Type'] = 'application/json';
+  let option = {
+    url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getWeekContinuousRewardNew?${queryStr}`,
+    headers: headers,
+    body: JSON.stringify({
+      userId: queryStr.match(/userId=(\d+)/)[1],
+      rewardDate: checkInCount, // 3/7天礼包
+      riskMap: {
+        platform: 5,
+        app: 95,
+        utm_term: queryStr.match(/utm_term=(\w+)/)[1],
+        uuid: queryStr.match(/uuid=(\w+)/)[1],
+        utm_medium: queryStr.match(/utm_medium=(\w+)/)[1],
+        fingerprint: '',
+      },
+    }),
+  };
+
+  return new Promise((resolve, reject) => {
+    $.post(option, (error, response, data) => {
+      try {
+        if (response.statusCode === 200 && JSON.parse(data).code === 0) {
+          _coin = JSON.parse(data).data.rewardValue;
+          _coins += Number(_coin) || 0;
+          _log.push(`🟢${eventName}: 从${checkInCount}天礼包中获取${_coin}个买菜币`);
+          _desc.push(`🟢${eventName}`);
+        } else if (response.statusCode === 200 && JSON.parse(data).code === 100 && !JSON.parse(data).data) {
+          _log.push(`🟡${eventName}: ${checkInCount}天礼包已领取`);
         } else {
           throw error || data;
         }
@@ -291,7 +376,10 @@ function coupons(queryStr, headers, totalCoins) {
     await checkIn(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    // 模拟浏览15秒
+    await $.wait(16000);
     await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+    await popReward(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
     amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS), totalCoins);
     if (amount > 0) {
