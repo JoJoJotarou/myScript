@@ -1,0 +1,10 @@
+{
+    "name": "京东脚本集合",
+    "description": "Script Gallery",
+    "task": [
+        {
+            "config": "11 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js , img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jddj.png, tag=签到领鲜豆, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jddj.checkin.conf,tag=京东到家CK"
+        }
+    ]
+}
