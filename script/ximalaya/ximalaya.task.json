@@ -3,7 +3,8 @@
     "description": "Script Gallery",
     "task": [
         {
-            "config": "6 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/ximalaya/ximalaya.js, tag=签到积分 , img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/ximalaya/ximalaya.png, enabled=true"
+            "config": "6 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/ximalaya/ximalaya.js, tag=签到领积分 , img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/ximalaya/icon/ximalaya.png, enabled=true",
+            "addons":"https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/ximalaya/rewrite/ximalaya.checkin, tag=喜马拉雅CK"
         }
     ]
 }

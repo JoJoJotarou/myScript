@@ -1,2 +1,4 @@
 hostname = mall.meituan.com
+# 美团买菜买菜币
+# 使用说明：美团APP -> 美团买菜 -> 我的 -> 签到领币，QX提示成功即可
 ^https?:\/\/mall\.meituan\.com\/api\/c\/mallcoin\/checkIn\/queryTaskListInfoV2\? url script-request-header https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.cookie.js

@@ -1,9 +1,16 @@
 {
   "name": "美团脚本集合",
-  "description": "Script Gallery by @JoJoJotarou",
+  "description": "Script Gallery",
   "task": [
     {
-      "config": "0 6,8 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.png, tag=美团买菜, enabled=true"
+      "config": "0 6,8 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/mall.meituan.task.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/icon/mall.meituan.png, tag=买菜币, enabled=true",
+      "addons":"https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/rewrite/mall.meituan,tag=美团买菜CK",
+      "description":"美团买菜-买菜币脚本."
+    },
+    {
+      "config": "10 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/meituan/meituan.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/icon/meituan.png, tag=签到领红包, enabled=true",
+      "addons":"https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/meituan/rewrite/meituan.checkin, tag=美团签到领红包CK",
+      "description":"美团签到领红包."
     }
   ]
 }
