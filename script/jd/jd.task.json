@@ -3,7 +3,7 @@
     "description": "Script Gallery",
     "task": [
         {
-            "config": "11 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js , img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jddj.png, tag=签到领鲜豆, enabled=true",
+            "config": "11 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jddj.png, tag=签到领鲜豆, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jddj.checkin.conf,tag=京东到家CK"
         }
     ]
