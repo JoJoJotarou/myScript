@@ -171,10 +171,10 @@ async function shake(cookie) {
   try {
     let remainLotteryTimes = 0;
     await indexPage(cookie).then((indexPageInfoList) => {
-      console.log(JSON.parse(indexPageInfoList));
+      console.log(JSON.stringify(indexPageInfoList));
       const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
       console.log('================');
-      console.log(JSON.parse(shakingInfo));
+      console.log(JSON.stringify(shakingInfo));
       // 获取摇奖次数
       remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
     });
