@@ -128,7 +128,7 @@ function getTasks(cookie) {
     $.get(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).success) {
-          const tasks = JSON.parse(data).data.taskItems.filter((task) => task.finish !== true);
+          const tasks = JSON.parse(data).data[0].taskItems.filter((task) => task.finish !== true);
           _log.push(`🟢${eventName}: 当前共有${tasks.length}个任务未完成`);
           resolve(tasks);
         } else {
@@ -171,9 +171,10 @@ async function shake(cookie) {
   try {
     let remainLotteryTimes = 0;
     await indexPage(cookie).then((indexPageInfoList) => {
-      console.log(indexPageInfoList);
+      console.log(JSON.parse(indexPageInfoList));
       const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
-      console.log(shakingInfo);
+      console.log('================');
+      console.log(JSON.parse(shakingInfo));
       // 获取摇奖次数
       remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
     });
@@ -241,7 +242,7 @@ function getTotalBeans(cookie) {
           const nickname = _data.nickname;
           const totalBeans = _data.jdNum;
           _log.push(`🟢${eventName}: ${nickname}当前有${totalBeans}个京豆`);
-          resolve(nickname, totalBeans);
+          resolve([nickname, totalBeans]);
         } else {
           throw err || data;
         }
@@ -285,11 +286,11 @@ function ts() {
   return new Date().getTime();
 }
 
-async function randomWait() {
+function randomWait() {
   // 随机等待
   randomTime = ((Math.random() / 5) * 10000 + 1000).toFixed(0);
   _log.push(`⏳ 休息${randomTime}ms`);
-  await $.wait(randomTime);
+  return new Promise((resolve) => setTimeout(resolve, randomTime));
 }
 
 // prettier-ignore
