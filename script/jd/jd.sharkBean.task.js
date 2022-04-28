@@ -64,7 +64,7 @@ async function checkIn(cookie) {
   let eventName = '【签到】';
   const [signStatus, singToken, currSignCursor] = await indexPage(cookie);
 
-  if (signStatus === '-1') {
+  if (signStatus === -1) {
     // 未签到
     const body = { floorToken: singToken, dataSourceCode: 'signIn', argMap: { currSignCursor: currSignCursor } };
     await _checkIn(getOption(cookie, 'sharkBean', 'pg_interact_interface_invoke', body));
