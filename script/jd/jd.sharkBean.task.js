@@ -20,8 +20,7 @@ function getOption(cookie, appid, functionId, body) {
       'Accept-Language': 'zh-cn',
       Connection: 'keep-alive',
       Host: 'api.m.jd.com',
-      Cookie:
-        '__jdv=122270672|direct|-|none|-|1651125433699; __jda=122270672.1651125433698521862329.1651125433.1651125433.1651125433.1; mba_muid=1651125433698521862329; __jdc=122270672; shshshfp=f8eb9e273379cd56b43f30981db7e501; shshshfpa=7a23fecf-7bfa-8ec7-e17e-64c3e979ee29-1651125434; shshshsID=733943647b008918171d90cff654fa00_1_1651125434071; shshshfpb=oJ0e6oWdxBhczl7fTB7TEMg; 3AB9D23F7A4B3C9B=NNZNOB5J4GHEDMXZMAUODEEXMTGS5OX27LKM7UDHQWQMM6Y7VFBZCQ7HT7E5HSP3SV7RKXJE3HADLNTSVLDUF5QDKA; jcap_dvzw_fp=uiyaq4UfFGtILARwtLYqaiV_G9dmQPErJlryZGjKr046JqJ_g7dVJucfmvJkQiVNNDZ2YA==; TrackerID=Sc3X45k-la6uej5syspPxvIdj3RSZ9OsjMhKlN9IfWkMAZ2zCo8qFoj1bAmg9wmZoPGSSSIVo0q9QCT1F8PpYiRqj_JQzigbGT2iX3FKwfo_gjwdn_NPeAL9vHvE4btvLkc-QTeSKZKf82AjpsS70A; pt_key=AAJiaizdADCcteOCRah6lk30449mAPHTWR8Axx1yq0UYztmOaYWH3O1mBfnGni84Oh-8CMmMqmw; pt_pin=jd_640b6c4e6532b; pt_token=6rhfd1zy; pwdt_id=jd_640b6c4e6532b; sfstoken=tk01m00921e47a8sMSsxeDMrMSsxqK+SWAyy+mJvvXNVioDXnutjQlizgzQ8CAahHeEJ8xsny0Ob1XEOIpjrnnS0nlvm; whwswswws=; wxa_level=1; retina=1; cid=9; wqmnx1=MDEyNjM2MXQvY01hKHcxVyBBZTUgTGVvbzA5IGkzLy41M2ZmMjVWRUlVKFI=; jxsid=16511254684032826970; appCode=ms0ca95114; webp=1; __jdb=122270672.2.1651125433698521862329|1.1651125433; mba_sid=16511254337008458246554186328.2; visitkey=7102386444594908; autoOpenApp_downCloseDate_jd_homePage=1651125468910_1; __jd_ref_cls=MCommonBottom_My',
+      Cookie: cookie,
       Origin: 'https://spa.jd.com',
       Referer: 'https://spa.jd.com/home',
       'User-Agent':
@@ -81,7 +80,7 @@ function _checkIn(option) {
       try {
         if (resp.statusCode === 200 && data) {
           console.log(data);
-          _log.push(`🟢${eventName}`);
+          _log.push(`🟢${eventName}: 获得N个京豆`);
           _desc.push(`🟢${eventName}`);
         } else {
           throw err || data;
