@@ -112,7 +112,7 @@ async function doneTasks(cookie) {
   let i = 1;
   const tasks = await getTasks(cookie);
   for (const task of tasks) {
-    await browse(cookie, task.taskId, task.title);
+    await browse(cookie, task.id, task.title);
     if (i !== tasks.length) {
       await randomWait();
     }
@@ -171,12 +171,13 @@ async function shake(cookie) {
   try {
     let remainLotteryTimes = 0;
     await indexPage(cookie).then((indexPageInfoList) => {
-      console.log(JSON.stringify(indexPageInfoList));
       const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
-      console.log('================');
-      console.log(JSON.stringify(shakingInfo));
       // 获取摇奖次数
       remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+
+      if (remainLotteryTimes === 0) {
+        _log.push(`🟡${eventName}: 摇奖次数已用完`);
+      }
     });
 
     for (let index = 0; index < remainLotteryTimes; index++) {
