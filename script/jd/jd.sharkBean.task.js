@@ -48,6 +48,7 @@ function indexPage(cookie) {
       } catch (e) {
         _log.push(`🔴${eventName}: ${err}`);
         _desc.push(`🔴${eventName}`);
+        resolve();
       }
     });
   });
