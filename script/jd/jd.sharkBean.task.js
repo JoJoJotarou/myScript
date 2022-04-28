@@ -10,7 +10,7 @@ let _beans = 0;
 let _desc = [];
 
 function getOption(cookie, appid, functionId, body) {
-  const option = {
+  let option = {
     url: `https://api.m.jd.com/?t=${ts()}&appid=${appid}&functionId=${functionId}&body=${encodeURIComponent(
       JSON.stringify(body)
     )}`,
@@ -31,23 +31,17 @@ function getOption(cookie, appid, functionId, body) {
 }
 
 function indexPage(cookie) {
-  let eventName = '【获取摇京豆首页】';
+  const eventName = '【获取摇京豆首页】';
   const body = { paramData: { token: 'dd2fb032-9fa3-493b-8cd0-0d57cd51812d' } };
   option = getOption(cookie, 'sharkBean', 'pg_channel_page_data', body);
 
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).data) {
-          const _data = JSON.parse(data).data;
-          const signInfo = _data.floorInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
-          const singToken = signInfo.token;
-          const currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
-          const signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
-            (item) => !!item && item.signCursor === currSignCursor
-          )[0].signStatus;
+        const _data = JSON.parse(data).data;
+        if (resp.statusCode === 200 && _data) {
           _log.push(`🟢${eventName}`);
-          resolve([signStatus, singToken, currSignCursor]);
+          resolve(_data.floorInfoList);
         } else {
           throw err || data;
         }
@@ -60,28 +54,172 @@ function indexPage(cookie) {
 }
 
 async function checkIn(cookie) {
-  let eventName = '【签到】';
-  const [signStatus, singToken, currSignCursor] = await indexPage(cookie);
-
+  const eventName = '【签到】';
+  const indexPageInfoList = await indexPage(cookie);
+  const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
+  const singToken = signInfo.token;
+  const currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
+  const signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
+    (item) => !!item && item.signCursor === currSignCursor
+  )[0].signStatus;
   if (signStatus === -1) {
     // 未签到
-    const body = { floorToken: singToken, dataSourceCode: 'signIn', argMap: { currSignCursor: currSignCursor } };
-    await _checkIn(getOption(cookie, 'sharkBean', 'pg_interact_interface_invoke', body));
+    await _checkIn(cookie, singToken, currSignCursor);
   } else {
-    _log.push(`🟡${eventName}: 第${currSignCursor}天已签到`);
+    _log.push(`🟡${eventName}: 本轮第${currSignCursor}次签到已完成`);
   }
 }
 
-function _checkIn(option) {
-  let eventName = '【签到】';
+function _checkIn(cookie, singToken, currSignCursor) {
+  const eventName = '【签到】';
+  const body = { floorToken: singToken, dataSourceCode: 'signIn', argMap: { currSignCursor: currSignCursor } };
+  const option = getOption(cookie, 'sharkBean', 'pg_interact_interface_invoke', body);
 
   return new Promise((resolve, reject) => {
     $.post(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && data) {
-          console.log(data);
-          _log.push(`🟢${eventName}: 获得N个京豆`);
+        const _data = JSON.parse(data).data;
+        if (resp.statusCode === 200 && _data) {
+          const bean = _data.rewardVos[0].jingBeanVo.beanNum;
+          _beans += bean;
+          _log.push(`🟢${eventName}: 本轮第${currSignCursor}次签到成功, 获得${bean}个京豆`);
           _desc.push(`🟢${eventName}`);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve();
+      }
+    });
+  });
+}
+
+async function doneTasks(cookie) {
+  const tasks = await getTasks(cookie);
+  let i = 1;
+  for (const task of tasks) {
+    await browse(cookie, task.taskId, task.title);
+    if (i !== tasks.length) {
+      await randomWait();
+    }
+    i++;
+  }
+}
+
+function getTasks(cookie) {
+  const eventName = '【任务列表】';
+  const option = getOption(cookie, 'vip_h5', 'vvipclub_lotteryTask', { info: 'browseTask', withItem: true });
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).success) {
+          const tasks = JSON.parse(data).data.taskItems.filter((task) => task.finish !== true);
+          _log.push(`🟢${eventName}: 当前共有${tasks.length}个任务未完成`);
+          resolve(tasks);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve([]);
+      }
+    });
+  });
+}
+
+function browse(cookie, taskId, taskName) {
+  let eventName = `【浏览-${taskName}】`;
+  let body = { taskName: 'browseTask', taskItemId: taskId };
+  const option = getOption(cookie, 'vip_h5', 'vvipclub_doTask', body);
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).success && JSON.parse(data).data.isFinish) {
+          _log.push(`🟢${eventName}: 浏览完成`);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+
+async function shake(cookie) {
+  const indexPageInfoList = await indexPage(cookie);
+  const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
+  // 获取摇奖次数
+  const remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+
+  for (let index = 0; index < remainLotteryTimes; index++) {
+    await _shake(cookie);
+    if (index < remainLotteryTimes) {
+      await randomWait();
+    }
+  }
+}
+
+function _shake(cookie) {
+  const eventName = '【摇奖】';
+  let option = getOption(cookie, 'sharkBean', 'vvipclub_shaking_lottery', {});
+  option.url +=
+    '&h5st=20220428170255435%3B7810563172488273%3Bae692%3Btk02wee691d8118nws6sRJuqo6QXnqpgjgHklwsMZEIqKjb1gKlkx%2F4JX5OP%2F0kwGEhmbdOiuOYY3YycmRIAjHvyjg5H%3B830d177a7f231a848ee9a58f182b455c77e2a256785af07466b46b797eb34c5b%3B3.0%3B1651136575435';
+
+  return new Promise((resolve, reject) => {
+    $.post(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).success) {
+          const couponInfo = JSON.parse(data).data.couponInfo;
+          if (couponInfo.couponType === 1) {
+            _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
+          } else {
+            _log.push(`🟢${eventName}: ${couponInfo}`);
+          }
+        } else {
+          throw err | data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      }
+    });
+  });
+}
+
+function getTotalBeans(cookie) {
+  const eventName = '【京豆统计】';
+  const option = {
+    url: 'https://wq.jd.com/user/info/QueryJDUserInfo?g_login_type=1&sceneval=2',
+    headers: {
+      Accept: '*/*',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'Accept-Language': 'zh-cn',
+      Host: 'wq.jd.com',
+      Cookie: cookie,
+      Referer: 'https://wqs.jd.com/',
+      'User-Agent':
+        'jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1',
+    },
+  };
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        const _data = JSON.parse(data).base;
+        if (resp.statusCode === 200 && _data) {
+          const nickname = _data.nickname;
+          const totalBeans = _data.jdNum;
+          _log.push(`🟢${eventName}: ${nickname}当前有${totalBeans}个京豆`);
+          resolve(nickname, totalBeans);
         } else {
           throw err || data;
         }
@@ -99,6 +237,11 @@ function _checkIn(option) {
 
   if (JD_COOKIE) {
     await checkIn(JD_COOKIE);
+    await doneTasks(JD_COOKIE);
+    await shake(JD_COOKIE);
+    const [nickname, totalBeans] = await getTotalBeans(JD_COOKIE);
+
+    $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
   } else {
     $.subt = '🔴 请先获取会话';
     _log.push($.subt);
@@ -118,6 +261,13 @@ function _checkIn(option) {
 function ts() {
   // 获取时间戳
   return new Date().getTime();
+}
+
+async function randomWait() {
+  // 随机等待
+  randomTime = ((Math.random() / 5) * 10000 + 1000).toFixed(0);
+  _log.push(`⏳ 休息${randomTime}ms`);
+  $.wait(randomTime);
 }
 
 // prettier-ignore
