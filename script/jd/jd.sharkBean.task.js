@@ -264,9 +264,10 @@ function getTotalBeans(cookie) {
   const JD_COOKIE = $.getdata('GLOBAL_JD_COOKIE');
 
   if (JD_COOKIE) {
-    await checkIn(JD_COOKIE);
     await doneTasks(JD_COOKIE);
     await shake(JD_COOKIE);
+    // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
+    await checkIn(JD_COOKIE);
     const [nickname, totalBeans] = await getTotalBeans(JD_COOKIE);
 
     $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
