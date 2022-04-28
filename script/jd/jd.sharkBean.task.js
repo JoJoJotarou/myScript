@@ -56,25 +56,29 @@ function indexPage(cookie) {
 
 async function checkIn(cookie) {
   const eventName = '【签到】';
+  try {
+    let singToken = '';
+    let currSignCursor = 0;
+    let signStatus = 0;
 
-  let singToken = '';
-  let currSignCursor = 0;
-  let signStatus = 0;
+    await indexPage(cookie).then((indexPageInfoList) => {
+      const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
+      singToken = signInfo.token;
+      currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
+      signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
+        (item) => !!item && item.signCursor === currSignCursor
+      )[0].signStatus;
+    });
 
-  await indexPage(cookie).then((indexPageInfoList) => {
-    const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
-    singToken = signInfo.token;
-    currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
-    signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
-      (item) => !!item && item.signCursor === currSignCursor
-    )[0].signStatus;
-  });
-
-  if (signStatus === -1) {
-    // 未签到
-    await _checkIn(cookie, singToken, currSignCursor);
-  } else {
-    _log.push(`🟡${eventName}: 本轮第${currSignCursor}次签到已完成`);
+    if (signStatus === -1) {
+      // 未签到
+      await _checkIn(cookie, singToken, currSignCursor);
+    } else {
+      _log.push(`🟡${eventName}: 本轮第${currSignCursor}次签到已完成`);
+    }
+  } catch (error) {
+    _log.push(`🔴${eventName}: ${error}`);
+    _desc.push(`🔴${eventName}`);
   }
 }
 
@@ -163,18 +167,26 @@ function browse(cookie, taskId, taskName) {
 }
 
 async function shake(cookie) {
-  let remainLotteryTimes = 0;
-  await indexPage(cookie).then((indexPageInfoList) => {
-    const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
-    // 获取摇奖次数
-    remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
-  });
+  const eventName = '【摇奖】';
+  try {
+    let remainLotteryTimes = 0;
+    await indexPage(cookie).then((indexPageInfoList) => {
+      console.log(indexPageInfoList);
+      const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
+      console.log(shakingInfo);
+      // 获取摇奖次数
+      remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+    });
 
-  for (let index = 0; index < remainLotteryTimes; index++) {
-    await _shake(cookie);
-    if (index < remainLotteryTimes) {
-      await randomWait();
+    for (let index = 0; index < remainLotteryTimes; index++) {
+      await _shake(cookie);
+      if (index < remainLotteryTimes) {
+        await randomWait();
+      }
     }
+  } catch (error) {
+    _log.push(`🔴${eventName}: ${error}`);
+    _desc.push(`🔴${eventName}`);
   }
 }
 
