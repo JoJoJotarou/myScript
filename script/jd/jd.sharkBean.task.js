@@ -129,7 +129,11 @@ function getTasks(cookie) {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).success) {
           const tasks = JSON.parse(data).data[0].taskItems.filter((task) => task.finish !== true);
-          _log.push(`🟢${eventName}: 当前共有${tasks.length}个任务未完成`);
+          if (tasks.length > 0) {
+            _log.push(`🟢${eventName}: 当前共有${tasks.length}个任务未完成`);
+          } else {
+            _log.push(`🟡${eventName}: 所有任务已完成`);
+          }
           resolve(tasks);
         } else {
           throw err || data;
