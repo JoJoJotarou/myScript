@@ -5,6 +5,10 @@
         {
             "config": "11 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js, img-url=https://raw.githubusercontent.com/Orz-3/mini/master/Color/jddj.png, tag=签到领鲜豆, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jddj.checkin.conf,tag=京东到家CK"
+        },
+        {
+            "config": "11 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/yaojd.png, tag=摇京豆, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookie.conf,tag=京东CK"
         }
     ]
 }
