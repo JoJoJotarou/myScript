@@ -55,13 +55,20 @@ function indexPage(cookie) {
 
 async function checkIn(cookie) {
   const eventName = '【签到】';
-  const indexPageInfoList = await indexPage(cookie);
-  const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
-  const singToken = signInfo.token;
-  const currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
-  const signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
-    (item) => !!item && item.signCursor === currSignCursor
-  )[0].signStatus;
+
+  let singToken = '';
+  let currSignCursor = 0;
+  let signStatus = 0;
+
+  await indexPage(cookie).then((indexPageInfoList) => {
+    const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
+    singToken = signInfo.token;
+    currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
+    signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
+      (item) => !!item && item.signCursor === currSignCursor
+    )[0].signStatus;
+  });
+
   if (signStatus === -1) {
     // 未签到
     await _checkIn(cookie, singToken, currSignCursor);
@@ -97,8 +104,8 @@ function _checkIn(cookie, singToken, currSignCursor) {
 }
 
 async function doneTasks(cookie) {
-  const tasks = await getTasks(cookie);
   let i = 1;
+  const tasks = await getTasks(cookie);
   for (const task of tasks) {
     await browse(cookie, task.taskId, task.title);
     if (i !== tasks.length) {
@@ -155,10 +162,12 @@ function browse(cookie, taskId, taskName) {
 }
 
 async function shake(cookie) {
-  const indexPageInfoList = await indexPage(cookie);
-  const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
-  // 获取摇奖次数
-  const remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+  let remainLotteryTimes = 0;
+  await indexPage(cookie).then((indexPageInfoList) => {
+    const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
+    // 获取摇奖次数
+    remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+  });
 
   for (let index = 0; index < remainLotteryTimes; index++) {
     await _shake(cookie);
@@ -267,7 +276,7 @@ async function randomWait() {
   // 随机等待
   randomTime = ((Math.random() / 5) * 10000 + 1000).toFixed(0);
   _log.push(`⏳ 休息${randomTime}ms`);
-  $.wait(randomTime);
+  await $.wait(randomTime);
 }
 
 // prettier-ignore
