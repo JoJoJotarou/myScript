@@ -251,10 +251,10 @@ function isPopReward(queryStr, headers) {
           checkInCount = JSON.parse(data).data.checkInCount;
           rewardPackageTypes = JSON.parse(data).data.rewardPackageTypes || '';
 
-          if (isPopRewarded && rewardPackageTypes.indexOf(checkInCount) === -1) {
+          if ([3, 7].indexOf(checkInCount) !== -1 && rewardPackageTypes.indexOf(checkInCount) === -1) {
             _log.push(`🟢${eventName}: ${checkInCount}天礼包可领取`);
             resolve(checkInCount);
-          } else if (isPopRewarded && rewardPackageTypes.indexOf(checkInCount) !== -1) {
+          } else if ([3, 7].indexOf(checkInCount) !== -1 && rewardPackageTypes.indexOf(checkInCount) !== -1) {
             _log.push(`🟡${eventName}: ${checkInCount}天礼包已领取`);
             resolve();
           } else {
@@ -354,7 +354,8 @@ function coupons(queryStr, headers, totalCoins) {
       try {
         couponList = JSON.parse(data).data;
         if (response.statusCode === 200 && JSON.parse(data).code === 0 && couponList) {
-          _couponList = couponList.filter((coupon) => coupon.sellPrice <= totalCoins);
+          // checked=true表示符合兑换条件
+          _couponList = couponList.filter((coupon) => coupon.checked);
           amount = _couponList ? _couponList.length : 0;
           _log.push(`🟢${eventName}: ${amount}种优惠券可兑换`);
           resolve(amount);
