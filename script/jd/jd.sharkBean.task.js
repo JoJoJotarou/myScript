@@ -102,6 +102,7 @@ function _checkIn(cookie, singToken, currSignCursor) {
       } catch (error) {
         _log.push(`🔴${eventName}: ${error}`);
         _desc.push(`🔴${eventName}`);
+      } finally {
         resolve();
       }
     });
@@ -212,7 +213,7 @@ function _shake(cookie) {
           // } else {
           //   _log.push(`🟢${eventName}: ${couponInfo}`);
           // }
-          _log.push(`🟢${eventName}: ${JSON.parse(data)}`);
+          _log.push(`🟢${eventName}: ${data}`);
         } else {
           throw err | data;
         }
