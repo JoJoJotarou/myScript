@@ -1,5 +1,4 @@
 /**
- * @author: JoJoJotarou
  * @description: 浏览器访问 `https://plogin.m.jd.com/login/login` 登录后，点击"我的"，QX提示成功即可
  *
  */
@@ -15,7 +14,7 @@ const $ = Env('京东');
     $.setdata(JD_COOKIE, 'GLOBAL_JD_COOKIE');
     $.subt = '🟢 获取会话成功';
   } else {
-    throw '未登录，无法获取用户信息';
+    throw '无法获取用户信息';
   }
 })()
   .catch((e) => {
