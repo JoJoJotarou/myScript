@@ -218,6 +218,8 @@ function _shake(cookie) {
       } catch (error) {
         _log.push(`🔴${eventName}: ${error}`);
         _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
       }
     });
   });
@@ -275,15 +277,15 @@ function getTotalBeans(cookie) {
     $.subt = '🔴 请先获取会话';
     _log.push($.subt);
   }
-
-  $.log(..._log);
-  $.desc = _desc.join('');
-  $.msg($.name, $.subt, $.desc);
 })()
   .catch((e) => {
+    $.subt = '🔴 脚本执行异常';
     $.logErr(e);
   })
   .finally(() => {
+    $.log(..._log);
+    $.desc = _desc.join('');
+    $.msg($.name, $.subt, $.desc);
     $.done();
   });
 
