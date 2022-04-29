@@ -1,6 +1,22 @@
 {
     "name": "京东脚本集合",
-    "description": "Script Gallery",
+    "description": "Script Gallery (仅支持QuanX订阅, BoxJS订阅该脚本可以切换会话)",
+    "apps": [
+        {
+            "id": "JdCookiesSwitch",
+            "name": "京东Cookie切换",
+            "keys": [
+                "GLOBAL_JD_COOKIE"
+            ],
+            "descs_html": [
+                "<h4 align=\"center\">获取Cookie请查看<a href=\"https://github.com/JoJoJotarou/myScript/blob/master/script/jd/jd.cookie.js\">重写脚本注释</a></h4>",
+                "<h4 align=\"center\">⚠️ 直接执行无效 ⚠️</h4>"
+            ],
+            "icons": [
+                "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png"
+            ]
+        }
+    ],
     "task": [
         {
             "config": "11 0 * * * https://raw.githubusercontent.com/chavyleung/scripts/master/jddj/jddj.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jddj.png, tag=签到领鲜豆, enabled=true",
