@@ -9,8 +9,7 @@
                 "GLOBAL_JD_COOKIE"
             ],
             "descs_html": [
-                "<h4 align=\"center\">获取Cookie请查看<a href=\"https://github.com/JoJoJotarou/myScript/blob/master/script/jd/jd.cookie.js\">重写脚本注释</a></h4>",
-                "<h4 align=\"center\">⚠️ 直接执行无效 ⚠️</h4>"
+                "<h4 align=\"center\">⚠️ 该订阅仅用于管理Cookie ⚠️</h4>"
             ],
             "icons": [
                 "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png"
