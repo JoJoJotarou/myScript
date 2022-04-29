@@ -9,6 +9,8 @@ let _log = [];
 let _beans = 0;
 let _desc = [];
 
+let indexPageInfoList;
+
 function getOption(cookie, appid, functionId, body) {
   let option = {
     url: `https://api.m.jd.com/?t=${ts()}&appid=${appid}&functionId=${functionId}&body=${encodeURIComponent(
@@ -40,14 +42,15 @@ function indexPage(cookie) {
       try {
         const _data = JSON.parse(data).data;
         if (resp.statusCode === 200 && _data) {
+          indexPageInfoList = _data.floorInfoList;
           _log.push(`🟢${eventName}`);
-          resolve(_data.floorInfoList);
         } else {
           throw err || data;
         }
       } catch (e) {
         _log.push(`🔴${eventName}: ${err}`);
         _desc.push(`🔴${eventName}`);
+      } finally {
         resolve();
       }
     });
@@ -57,18 +60,15 @@ function indexPage(cookie) {
 async function checkIn(cookie) {
   const eventName = '【签到】';
   try {
-    let singToken = '';
-    let currSignCursor = 0;
-    let signStatus = 0;
-
-    await indexPage(cookie).then((indexPageInfoList) => {
-      const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
-      singToken = signInfo.token;
-      currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
-      signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
-        (item) => !!item && item.signCursor === currSignCursor
-      )[0].signStatus;
-    });
+    if (!indexPageInfoList) {
+      throw '未获取到首页信息';
+    }
+    const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
+    const singToken = signInfo.token;
+    const currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
+    const signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
+      (item) => !!item && item.signCursor === currSignCursor
+    )[0].signStatus;
 
     if (signStatus === -1) {
       // 未签到
@@ -173,16 +173,16 @@ function browse(cookie, taskId, taskName) {
 async function shake(cookie) {
   const eventName = '【摇奖】';
   try {
-    let remainLotteryTimes = 0;
-    await indexPage(cookie).then((indexPageInfoList) => {
-      const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
-      // 获取摇奖次数
-      remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
+    if (!indexPageInfoList) {
+      throw '未获取到首页信息';
+    }
+    const shakingInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SHAKING_BOX_INFO')[0];
+    // 获取摇奖次数
+    let remainLotteryTimes = shakingInfo.floorData.shakingBoxInfo.remainLotteryTimes;
 
-      if (remainLotteryTimes === 0) {
-        _log.push(`🟡${eventName}: 摇奖次数已用完`);
-      }
-    });
+    if (remainLotteryTimes === 0) {
+      _log.push(`🟡${eventName}: 摇奖次数已用完`);
+    }
 
     for (let index = 0; index < remainLotteryTimes; index++) {
       await _shake(cookie);
@@ -206,12 +206,13 @@ function _shake(cookie) {
     $.post(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).success) {
-          const couponInfo = JSON.parse(data).data.couponInfo;
-          if (couponInfo.couponType === 1) {
-            _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
-          } else {
-            _log.push(`🟢${eventName}: ${couponInfo}`);
-          }
+          // const couponInfo = JSON.parse(data).data.couponInfo;
+          // if (couponInfo.couponType === 1) {
+          //   _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
+          // } else {
+          //   _log.push(`🟢${eventName}: ${couponInfo}`);
+          // }
+          _log.push(`🟢${eventName}: ${JSON.parse(data)}`);
         } else {
           throw err | data;
         }
@@ -266,10 +267,12 @@ function getTotalBeans(cookie) {
   const JD_COOKIE = $.getdata('GLOBAL_JD_COOKIE');
 
   if (JD_COOKIE) {
-    await doneTasks(JD_COOKIE);
-    await shake(JD_COOKIE);
     // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
+    // 故这里先做任务，在获取一次首页信息完成签到和摇奖
+    await doneTasks(JD_COOKIE);
+    await indexPage(JD_COOKIE);
     await checkIn(JD_COOKIE);
+    await shake(JD_COOKIE);
     const [nickname, totalBeans] = await getTotalBeans(JD_COOKIE);
 
     $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
