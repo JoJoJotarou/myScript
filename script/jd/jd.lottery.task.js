@@ -30,7 +30,11 @@ function getChances(cookie) {
         if (resp.statusCode === 200 && data) {
           const chances = data.match(/>([0-9])<\/span>次抽奖机会/)[1];
           _log.push(`🟢${eventName}: 当前有${chances}次抽奖机会`);
-          resolve(Number(chances));
+          if (Number(chances) > 0) {
+            resolve(Number(chances));
+          } else {
+            resolve(0);
+          }
         } else {
           throw err || data;
         }
@@ -112,15 +116,13 @@ function getLottery(cookie) {
 
         // 先检查是否有机会，避免非必要请求
         const chances = await getChances(COOKIE.cookie);
-        if (chances) {
-          if (chances > 0) {
-            // 每天应该就一次机会
-            await getLottery(COOKIE.cookie);
-            const [nickname, totalBeans] = await getTotalBeans(COOKIE.cookie);
-            $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
-          } else {
-            _desc.push('没有抽奖机会 ~');
-          }
+        if (chances && chances > 0) {
+          // 每天应该就一次机会
+          await getLottery(COOKIE.cookie);
+          const [nickname, totalBeans] = await getTotalBeans(COOKIE.cookie);
+          $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
+        } else if (chances && chances === 0) {
+          _desc.push('没有抽奖机会 ~');
         }
       } catch (error) {
         _log.push(`🔴${error}`);
