@@ -185,6 +185,7 @@ async function shake(cookie) {
 
     if (remainLotteryTimes === 0) {
       _log.push(`🟡${eventName}: 摇奖次数已用完`);
+      return;
     }
 
     for (let index = 0; index < remainLotteryTimes; index++) {
@@ -193,6 +194,7 @@ async function shake(cookie) {
         await randomWait();
       }
     }
+    _desc.push(`🟢${eventName}`);
   } catch (error) {
     _log.push(`🔴${eventName}: ${error}`);
     _desc.push(`🔴${eventName}`);
