@@ -56,7 +56,7 @@ function getLottery(cookie) {
     encryptAssignmentId: '2x5WEhFsDhmf8JohWQJFYfURTh9w',
   };
   const option = {
-    url: 'https://api.m.jd.com/client.action?functionId=babelGetLottery&body=${encodeURIComponent(JSON.stringify(body))}&client=wh5',
+    url: `https://api.m.jd.com/client.action?functionId=babelGetLottery&body=${encodeURIComponent(JSON.stringify(body))}&client=wh5`,
     headers: {
       Cookie: cookie,
       Accept: '*/*',
