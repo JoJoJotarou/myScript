@@ -24,6 +24,9 @@
         {
             "config": "11 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/yaojd.png, tag=摇京豆, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookie.conf,tag=京东CK"
+        },
+        {
+            "config": "11 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/test.notice.js, tag=通知测试, enabled=true"
         }
     ]
 }
