@@ -5,11 +5,11 @@
  */
 const $ = Env('京东新版摇京豆');
 
-let _log = [];
-let _beans = 0;
-let _desc = [];
+// let _log = [];
+// let _beans = 0;
+// let _desc = [];
 
-let indexPageInfoList;
+let _log, _beans, _desc, indexPageInfoList;
 
 function getOption(cookie, appid, functionId, body) {
   let option = {
@@ -265,31 +265,41 @@ function getTotalBeans(cookie) {
 }
 
 !(async () => {
-  const JD_COOKIE = $.getdata('GLOBAL_JD_COOKIE');
+  const GLOBAL_JD_COOKIE = $.getdata('GLOBAL_JD_COOKIE');
 
-  if (JD_COOKIE) {
-    // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
-    // 故这里先做任务，在获取一次首页信息完成签到和摇奖
-    await doneTasks(JD_COOKIE);
-    await indexPage(JD_COOKIE);
-    await checkIn(JD_COOKIE);
-    await shake(JD_COOKIE);
-    const [nickname, totalBeans] = await getTotalBeans(JD_COOKIE);
-
-    $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
+  if (GLOBAL_JD_COOKIE && JSON.parse(GLOBAL_JD_COOKIE).length > 0) {
+    for (const COOKIE of JSON.parse(GLOBAL_JD_COOKIE)) {
+      try {
+        _beans = 0;
+        _log = [`🤪++++++${COOKIE.userId}++++++🤪`];
+        _desc = [];
+        // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
+        // 故这里先做任务，在获取一次首页信息完成签到和摇奖
+        await doneTasks(GLOBAL_JD_COOKIE);
+        await indexPage(GLOBAL_JD_COOKIE);
+        await checkIn(GLOBAL_JD_COOKIE);
+        await shake(GLOBAL_JD_COOKIE);
+        const [nickname, totalBeans] = await getTotalBeans(GLOBAL_JD_COOKIE);
+        $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
+      } catch (error) {
+        _log.push(`🔴${error}`);
+        _desc.push(`🔴${COOKIE.userId}`);
+      } finally {
+        $.log(..._log);
+        $.desc = _desc.join('');
+        $.msg($.name, $.subt, $.desc);
+      }
+    }
   } else {
-    $.subt = '🔴 请先获取会话';
-    _log.push($.subt);
+    throw '请先获取会话';
   }
 })()
   .catch((e) => {
     $.subt = '🔴 脚本执行异常';
+    $.msg($.name, $.subt, e);
     $.logErr(e);
   })
   .finally(() => {
-    $.log(..._log);
-    $.desc = _desc.join('');
-    $.msg($.name, $.subt, $.desc);
     $.done();
   });
 

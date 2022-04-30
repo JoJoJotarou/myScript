@@ -1,6 +1,6 @@
 /**
  * @description: 浏览器访问 `https://plogin.m.jd.com/login/login` 登录后，点击"我的"，QX提示成功即可
- * @description: 支持多个cookie，目前仅做备份，脚本不支持，推荐用BoxJs切换
+ * @description: 支持多个cookie
  */
 const $ = Env('京东');
 
