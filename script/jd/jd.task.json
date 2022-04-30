@@ -22,15 +22,15 @@
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jddj.checkin.conf,tag=京东到家CK"
         },
         {
+            "config": "1 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.checkin.task.js, tag=签到领京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
+        },
+        {
             "config": "11 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, tag=摇京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdyjd.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
             "config": "5 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.lottery.task.js, tag=抽京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/choujd.png, enabled=true",
-            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
-        },
-        {
-            "config": "1 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.checkin.task.js, tag=签到领京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         }
     ]
