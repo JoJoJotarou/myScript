@@ -20,7 +20,7 @@ const $ = Env('京东');
       cookies = JSON.parse(cookies).filter((cookie) => cookie.userId !== currentUserId);
     }
     cookies.push({ userId: currentUserId, cookie: JD_COOKIE });
-    $.setdata(cookies, 'GLOBAL_JD_COOKIE');
+    $.setdata(JSON.stringify(cookies), 'GLOBAL_JD_COOKIE');
     let currentUsers = cookies.map((cookie) => cookie.userId);
     $.subt = `🟢 获取会话成功, 当前共有${currentUsers.length}个用户`;
     $.desc = currentUsers.join('\n');
