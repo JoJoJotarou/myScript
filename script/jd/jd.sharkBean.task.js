@@ -271,15 +271,15 @@ function getTotalBeans(cookie) {
     for (const COOKIE of JSON.parse(GLOBAL_JD_COOKIE)) {
       try {
         _beans = 0;
-        _log = [`🤪++++++${COOKIE.userId}++++++🤪`];
+        _log = [`\n++++++++++${COOKIE.userId}++++++++++\n`];
         _desc = [];
         // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
         // 故这里先做任务，在获取一次首页信息完成签到和摇奖
-        await doneTasks(GLOBAL_JD_COOKIE);
-        await indexPage(GLOBAL_JD_COOKIE);
-        await checkIn(GLOBAL_JD_COOKIE);
-        await shake(GLOBAL_JD_COOKIE);
-        const [nickname, totalBeans] = await getTotalBeans(GLOBAL_JD_COOKIE);
+        await doneTasks(COOKIE);
+        await indexPage(COOKIE);
+        await checkIn(COOKIE);
+        await shake(COOKIE);
+        const [nickname, totalBeans] = await getTotalBeans(COOKIE);
         $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
       } catch (error) {
         _log.push(`🔴${error}`);
