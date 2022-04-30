@@ -275,11 +275,11 @@ function getTotalBeans(cookie) {
         _desc = [];
         // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
         // 故这里先做任务，在获取一次首页信息完成签到和摇奖
-        await doneTasks(COOKIE);
-        await indexPage(COOKIE);
-        await checkIn(COOKIE);
-        await shake(COOKIE);
-        const [nickname, totalBeans] = await getTotalBeans(COOKIE);
+        await doneTasks(COOKIE.cookie);
+        await indexPage(COOKIE.cookie);
+        await checkIn(COOKIE.cookie);
+        await shake(COOKIE.cookie);
+        const [nickname, totalBeans] = await getTotalBeans(COOKIE.cookie);
         $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
       } catch (error) {
         _log.push(`🔴${error}`);
