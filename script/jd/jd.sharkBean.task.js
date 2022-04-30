@@ -65,14 +65,17 @@ async function checkIn(cookie) {
     }
     const signInfo = indexPageInfoList.filter((item) => !!item && item.code === 'SIGN_ACT_INFO')[0];
     const singToken = signInfo.token;
+    // 当前签到次数
     const currSignCursor = signInfo.floorData.signActInfo.currSignCursor;
+    // 签到累积奖励信息
+    const cursorBeanNum = signInfo.floorData.signActInfo.cursorBeanNum;
     const signStatus = signInfo.floorData.signActInfo.signActCycles.filter(
       (item) => !!item && item.signCursor === currSignCursor
     )[0].signStatus;
 
     if (signStatus === -1) {
       // 未签到
-      await _checkIn(cookie, singToken, currSignCursor);
+      await _checkIn(cookie, singToken, currSignCursor, cursorBeanNum);
     } else {
       _log.push(`🟡${eventName}: 本轮第${currSignCursor}次签到已完成`);
     }
@@ -82,7 +85,7 @@ async function checkIn(cookie) {
   }
 }
 
-function _checkIn(cookie, singToken, currSignCursor) {
+function _checkIn(cookie, singToken, currSignCursor, cursorBeanNum) {
   const eventName = '【签到】';
   const body = { floorToken: singToken, dataSourceCode: 'signIn', argMap: { currSignCursor: currSignCursor } };
   const option = getOption(cookie, 'sharkBean', 'pg_interact_interface_invoke', body);
@@ -92,7 +95,9 @@ function _checkIn(cookie, singToken, currSignCursor) {
       try {
         const _data = JSON.parse(data).data;
         if (resp.statusCode === 200 && _data) {
-          const bean = _data.rewardVos[0].jingBeanVo.beanNum;
+          const bean =
+            _data.rewardVos[0].jingBeanVo.beanNum +
+            (cursorBeanNum && cursorBeanNum[currSignCursor] ? Number(cursorBeanNum[currSignCursor]) : 0);
           _beans += bean;
           _log.push(`🟢${eventName}: 本轮第${currSignCursor}次签到成功, 获得${bean}个京豆`);
           _desc.push(`🟢${eventName}`);
@@ -207,6 +212,7 @@ function _shake(cookie) {
     $.post(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).success) {
+          // 获取摇奖结果（当前未摇到京东，等摇到再改）
           // const couponInfo = JSON.parse(data).data.couponInfo;
           // if (couponInfo.couponType === 1) {
           //   _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
