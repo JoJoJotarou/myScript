@@ -49,8 +49,14 @@ function getChances(cookie) {
 
 function getLottery(cookie) {
   const eventName = '【抽奖】';
+  const body = {
+    enAwardK:
+      'ltvTJ/WYFPZcuWIWHCAjRz/NdrezuUkmfR0ulrrxUVAaqi8FPY5ILAsnodr3lNauuItMTCtt2Dmy\ny4p8d6/bK/bwdZK6Aw80mPSE7ShF/0r28HWSugMPNPm5JQ8b9nflgkMfDwDJiaqThDW7a9IYpL8z\n7mu4l56kMNsaMgLecghsgTYjv+RZ8bosQ6kKx+PNAP61OWarrOeJ2rhtFmhQncw6DQFeBryeMUM1\nw9SpK5iag4uLvHGIZstZMKOALjB/r9TIJDYxHs/sFMU4vtb2jX9DEwleHSLTLeRpLM1w+RakAk8s\nfC4gHoKM/1zPHJXq1xfwXKFh5wKt4jr5hEqddxiI8N28vWT05HuOdPqtP+0EbGMDdSPdisoPmlru\n+CyHR5Kt0js9JUM=_babel',
+    encryptProjectId: '3u4fVy1c75fAdDN6XRYDzAbkXz1E',
+    encryptAssignmentId: '2x5WEhFsDhmf8JohWQJFYfURTh9w',
+  };
   const option = {
-    url: 'https://api.m.jd.com/client.action?functionId=babelGetLottery',
+    url: 'https://api.m.jd.com/client.action?functionId=babelGetLottery&body=${encodeURIComponent(JSON.stringify(body))}&client=wh5',
     headers: {
       Cookie: cookie,
       Accept: '*/*',
@@ -66,15 +72,6 @@ function getLottery(cookie) {
         'jdapp;iPhone;10.5.2;;;M/5.0;JDEbook/openapp.jdreader;appBuild/168069;jdSupportDarkMode/0;ef/1;ep/%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22ud%22%3A%22CQZwZtO3CzGzYtC0DtG1YJG1DJGmY2HuYWHsDzdrENVwDJGyZNvwEK%3D%3D%22%2C%22sv%22%3A%22CJGkDq%3D%3D%22%2C%22iad%22%3A%22%22%7D%2C%22ts%22%3A1651124892%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1;',
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: JSON.stringify({
-      body: {
-        enAwardK:
-          'ltvTJ/WYFPZcuWIWHCAjRz/NdrezuUkmfR0ulrrxUVAaqi8FPY5ILAsnodr3lNauuItMTCtt2Dmy\ny4p8d6/bK/bwdZK6Aw80mPSE7ShF/0r28HWSugMPNPm5JQ8b9nflgkMfDwDJiaqThDW7a9IYpL8z\n7mu4l56kMNsaMgLecghsgTYjv+RZ8bosQ6kKx+PNAP61OWarrOeJ2rhtFmhQncw6DQFeBryeMUM1\nw9SpK5iag4uLvHGIZstZMKOALjB/r9TIJDYxHs/sFMU4vtb2jX9DEwleHSLTLeRpLM1w+RakAk8s\nfC4gHoKM/1zPHJXq1xfwXKFh5wKt4jr5hEqddxiI8N28vWT05HuOdPqtP+0EbGMDdSPdisoPmlru\n+CyHR5Kt0js9JUM=_babel',
-        encryptProjectId: '3u4fVy1c75fAdDN6XRYDzAbkXz1E',
-        encryptAssignmentId: '2x5WEhFsDhmf8JohWQJFYfURTh9w',
-      },
-      client: 'wh5',
-    }),
   };
 
   return new Promise((resolve, reject) => {
