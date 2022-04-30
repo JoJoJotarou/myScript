@@ -21,14 +21,19 @@ $task.fetch(myRequest).then(
   (response) => {
     // response.statusCode, response.headers, response.body
     console.log(response.body);
-    $.msg('Title', 'Subtitle', 'Message1');
-    $.msg('Title', 'Subtitle', 'Message2');
+
+    for (let i in [0, 1]) {
+      $.log(i);
+      $.msg('Title', 'Subtitle', 'success');
+    }
     $done();
   },
   (reason) => {
     // reason.error
-    $.msg('Title', 'Subtitle', 'Message3'); // Error!
-    $.msg('Title', 'Subtitle', 'Message4'); // Error!
+    for (let i in [0, 1]) {
+      $.log(i);
+      $.msg('Title', 'Subtitle', 'error');
+    }
     $done();
   }
 );
