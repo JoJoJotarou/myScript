@@ -6,7 +6,7 @@
             "id": "JdCookiesSwitch",
             "name": "京东Cookie切换",
             "keys": [
-                "GLOBAL_JD_COOKIE"
+                "GLOBAL_JD_COOKIES"
             ],
             "descs_html": [
                 "<h4 align=\"center\">⚠️ 该订阅仅用于管理Cookie ⚠️</h4>"
