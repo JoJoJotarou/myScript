@@ -83,9 +83,9 @@ function getLottery(cookie) {
           if (_data.winner && _data.winner === 'true') {
             const bean = _data.prizeName.match(/([0-9]+)京豆/)[1];
             _beans += Number(bean);
-            _log.push(`🟢${eventName}:  获得${bean}个京豆`);
+            _log.push(`🟢${eventName}: 获得${bean}个京豆`);
           } else if (_data.winner && _data.winner === 'false') {
-            _log.push(`与大奖擦肩而过哦~`);
+            _log.push(`🟢${eventName}: 与大奖擦肩而过哦~`);
           }
           _desc.push(`🟢${eventName}`);
         } else {
@@ -109,7 +109,7 @@ async function main(cookie) {
     await getLottery(cookie.cookie);
     const [nickname, totalBeans] = await getUserInfo(cookie.cookie);
     $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
-  } else if (chances && chances === 0) {
+  } else if (chances === 0) {
     $.subt = `${cookie.nickname}, 没有抽奖机会 ~`;
   }
 }
