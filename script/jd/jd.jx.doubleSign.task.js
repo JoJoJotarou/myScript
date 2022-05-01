@@ -1,28 +1,19 @@
 /**
  * @ZhouStarStar9527
  * @description 支持多账号
- * @description 入口：京东APP -> 首页 -> 领京豆 -> 签到
+ * @description 入口：京东APP -> 首页 -> 领京豆 -> 京喜双签
  */
-const $ = Env('京东签到');
+const $ = Env('京喜双签');
 
-let _log, _beans, _desc;
+let _log, _desc;
+let _beans, _cash;
 
-function jdCheckIn(cookie) {
+function jdSignIn(cookie) {
   const eventName = '【京东签到】';
-  const option = {
-    url: 'https://api.m.jd.com/client.action?functionId=signBeanAct&appid=ld',
-    headers: {
-      Cookie: cookie,
-      Accept: '*/*',
-      'Accept-Encoding': 'gzip, deflate, br',
-      'Accept-Language': 'zh-cn',
-      Connection: 'keep-alive',
-      Host: 'api.m.jd.com',
-      Referer: 'https://wqs.jd.com/',
-      'User-Agent':
-        'jdapp;iPhone;10.5.2;;;M/5.0;JDEbook/openapp.jdreader;appBuild/168069;jdSupportDarkMode/0;ef/1;ep/%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22ud%22%3A%22CQZwZtO3CzGzYtC0DtG1YJG1DJGmY2HuYWHsDzdrENVwDJGyZNvwEK%3D%3D%22%2C%22sv%22%3A%22CJGkDq%3D%3D%22%2C%22iad%22%3A%22%22%7D%2C%22ts%22%3A1651124892%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1;',
-    },
-  };
+  const option = getOption('https://api.m.jd.com/client.action?functionId=signBeanAct&appid=ld', {
+    Cookie: cookie,
+    Referer: 'https://wqs.jd.com/',
+  });
 
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
@@ -34,7 +25,7 @@ function jdCheckIn(cookie) {
             _log.push(`🟢${eventName}: 获得${_data.dailyAward.beanAward.beanCount}个京豆`);
             _desc.push(`🟢${eventName}`);
           } else if (_data.status === '2') {
-            _log.push(`🟡${eventName}:今天已签到`);
+            _log.push(`🟡${eventName}: 今天已签到`);
             _desc.push(`🟡${eventName}`);
           }
         } else {
@@ -50,10 +41,144 @@ function jdCheckIn(cookie) {
   });
 }
 
+function jxSignIn(cookie) {
+  const eventName = '【京喜财富小岛签到】';
+  const option = getOption(
+    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=1651401473798&ptag=138631.77.28&taskId=3108&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 1) {
+          let prize = JSON.parse(JSON.parse(data).data.prizeInfo).strPrizeName;
+          _cash += Number(prize.match(/([\d\.]+)/)[1]);
+          _log.push(`🟢${eventName}: 获得${prize}现金奖励`);
+          _desc.push(`🟢${eventName}`);
+        } else if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 0) {
+          _log.push(`🟡${eventName}: 今天已签到`);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+
+function jdJxDoubleSignReward(cookie) {
+  const eventName = '【京喜双签领奖】';
+  const option = getOption(
+    `https://wq.jd.com/jxjdsignin/IssueReward?_t=${ts()}&_stk=_t&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
+    {
+      Cookie: cookie,
+      Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
+      Origin: 'https://wqs.jd.com',
+      Accept: 'application/json',
+    }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (
+          resp.statusCode === 200 &&
+          JSON.parse(data).retCode === 0 &&
+          JSON.parse(data).data.double_sign_status === 0
+        ) {
+          _beans += JSON.parse(data).data.jx_award;
+          _log.push(`🟢${eventName}: 获得${JSON.parse(data).data.jx_award}个京豆`);
+          _desc.push(`🟢${eventName}`);
+        } else if (
+          resp.statusCode === 200 &&
+          JSON.parse(data).retCode === 0 &&
+          JSON.parse(data).data.double_sign_status === 1
+        ) {
+          _log.push(`🟡${eventName}: 今天已领取`);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+
+function jdJxDoubleSignInfo(cookie) {
+  const eventName = '【京喜双签信息】';
+  const option = getOption(
+    `https://wq.jd.com/jxjdsignin/SignedInfo?_t=${ts()}&_stk=_t&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
+    {
+      Cookie: cookie,
+      Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
+      Origin: 'https://wqs.jd.com',
+      Accept: 'application/json',
+    }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).retCode === 0 && JSON.parse(data).data) {
+          _log.push(`🟢${eventName}`);
+          resolve(JSON.parse(data).data);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve();
+      }
+    });
+  });
+}
+
 async function main(cookie) {
-  await jdCheckIn(cookie.cookie);
-  const [nickname, totalBeans] = await getUserInfo(cookie.cookie);
-  $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
+  _beans = _cash = 0;
+  _log = [`\n++++++++++${cookie.nickname}++++++++++\n`];
+  _desc = [];
+
+  let doubleSignInfo = await jdJxDoubleSignInfo(cookie);
+  if (doubleSignInfo) {
+    if (doubleSignInfo.double_sign_status !== 1) {
+      if (
+        doubleSignInfo.jd_sign_status === 1 &&
+        doubleSignInfo.jx_sign_status === 1 &&
+        doubleSignInfo.double_sign_status !== 1
+      ) {
+        await jdJxDoubleSignReward(cookie);
+        await randomWait();
+      } else {
+        if (doubleSignInfo.jd_sign_status !== 1) {
+          await jdSignIn(cookie);
+          await randomWait();
+        }
+        if (doubleSignInfo.jx_sign_status !== 1) {
+          await jxSignIn(cookie);
+          await randomWait();
+        }
+        await jdJxDoubleSignReward(cookie);
+        await randomWait();
+      }
+
+      const [nickname, totalBeans] = await getUserInfo(cookie.cookie);
+      $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})，红包: +${_cash}`;
+    } else {
+      $.subt = `${cookie.nickname}，今日已完成，请勿重复执行`;
+    }
+  } else {
+    throw '获取京喜双签信息失败';
+  }
 }
 
 !(async () => {
@@ -63,9 +188,6 @@ async function main(cookie) {
     let i = 1;
     for (const cookie of JSON.parse(cookies)) {
       try {
-        _beans = 0;
-        _log = [`\n++++++++++${cookie.nickname}++++++++++\n`];
-        _desc = [];
         await main(cookie);
       } catch (error) {
         _log.push(`🔴${error}`);
@@ -95,6 +217,33 @@ async function main(cookie) {
     $.done();
   });
 
+function getOption(url, headers, body = '') {
+  // 默认的option
+  let _headers = {
+    Accept: '*/*',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'zh-cn',
+    Connection: 'keep-alive',
+    Host: url.match(/\/\/([\w\.]*)/)[1],
+    'User-Agent': userAgent('jd'),
+  };
+
+  return {
+    url: url + (body ? `&body=${encodeURIComponent(JSON.stringify(body))}` : ''), // 'https://api.m.jd.com/client.action?functionId=signBeanAct&appid=ld',
+    headers: Object.assign({}, _headers, headers),
+  };
+}
+
+function userAgent(app) {
+  // 获取不同app的user-agent
+  return {
+    jd: 'jdapp;iPhone;10.5.2;;;M/5.0;JDEbook/openapp.jdreader;appBuild/168069;jdSupportDarkMode/0;ef/1;ep/%7B%22ciphertype%22%3A5%2C%22cipher%22%3A%7B%22ud%22%3A%22CQZwZtO3CzGzYtC0DtG1YJG1DJGmY2HuYWHsDzdrENVwDJGyZNvwEK%3D%3D%22%2C%22sv%22%3A%22CJGkDq%3D%3D%22%2C%22iad%22%3A%22%22%7D%2C%22ts%22%3A1651124892%2C%22hdid%22%3A%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw%3D%22%2C%22version%22%3A%221.0.3%22%2C%22appname%22%3A%22com.360buy.jdmobile%22%2C%22ridx%22%3A-1%7D;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1;',
+    jx: 'jdpingou;iPhone;5.25.0;appBuild/100934;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/4;pap/JA2019_3111789;supportJDSHWK/1;ef/1;ep/%7B%22ciphertype%22:5,%22cipher%22:%7B%22ud%22:%22ENO0ZNunDtc0CwPtCtHwZQPtDtU2DWUnYtO0Dzu5DwDsZWGyYzTsZq==%22,%22bd%22:%22YXLmbQU=%22,%22iad%22:%22%22,%22sv%22:%22CJGkDq==%22%7D,%22ts%22:1651399595,%22hdid%22:%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=%22,%22version%22:%221.0.3%22,%22appname%22:%22com.360buy.jdpingou%22,%22ridx%22:-1%7D;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
+  }[app];
+}
+
+// prettier-ignore
+function ts(){return new Date().getTime()}
 // prettier-ignore
 function randomWait(min) { randomTime = ((Math.random() / 5) * 10000 + (min || 1000)).toFixed(0); _log.push(`⏳休息${randomTime}ms`); return new Promise((resolve) => setTimeout(resolve, randomTime)) }
 // prettier-ignore
