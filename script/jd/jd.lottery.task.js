@@ -87,7 +87,6 @@ function getLottery(cookie) {
           } else if (_data.winner && _data.winner === 'false') {
             _log.push(`🟢${eventName}: 与大奖擦肩而过哦~`);
           }
-          _desc.push(`🟢${eventName}`);
         } else {
           throw err || data;
         }
