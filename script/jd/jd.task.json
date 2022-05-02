@@ -44,7 +44,7 @@
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
-            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京融双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdjr.png, enabled=true",
+            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jr.doubleSign.task.js, tag=京融双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdjr.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjr.sign.conf,tag=京东金融SignBody",
             "description": "添加重写规则addons中的重写规则，并手动签到一次"
         },
