@@ -63,10 +63,9 @@ function getNickname(cookie) {
     $.setdata(JSON.stringify(cookies), 'GLOBAL_JD_COOKIES');
     $.subt = `获取会话成功, 当前共有${cookies.length}个用户`;
 
+    _desc.push(`${nickname} ◀`);
     for (const _cookie of cookies) {
-      if (_cookie.userId === currentUserId) {
-        _desc.push(`${_cookie.nickname} ◀`);
-      } else {
+      if (_cookie.userId !== currentUserId) {
         _desc.push(`${_cookie.nickname}`);
       }
     }
