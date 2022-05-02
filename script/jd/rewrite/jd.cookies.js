@@ -1,8 +1,10 @@
 /**
  * @description: 浏览器访问 `https://plogin.m.jd.com/login/login` 登录后，点击"我的"，QX提示成功即可
- * @description: 支持多个cookie
+ * @description: 支持多账号
+ * @description: cookieObjs = [ {userId: 'xxx', nickname: 'yyy', cookie: 'zzz', ...}, ...]
+ * @description: 对于已存在的cookieObj务必更新，不是删除新增，避免导致其他的key-value丢失（例如：京东金融的 signBody）
  */
-const $ = Env('京东');
+const $ = Env('京东 CK');
 
 let _log = [];
 let _desc = [];
@@ -49,24 +51,33 @@ function getNickname(cookie) {
     cookie.toLocaleLowerCase().indexOf('pt_pin') !== -1
   ) {
     let currentUserId = cookie.match(/pt_pin=(\w+)/)[1];
-    let cookies = $.getdata('GLOBAL_JD_COOKIES');
-    if (!cookies) {
-      cookies = [];
-    } else {
-      // 去除当前用户的旧cookie
-      cookies = JSON.parse(cookies).filter((cookie) => cookie.userId !== currentUserId);
-    }
-
+    let cookieObjs = [];
+    let currentCookieObj;
     // 获取昵称好分辨
     const nickname = await getNickname(cookie);
-    cookies.push({ userId: currentUserId, nickname: nickname || currentUserId, cookie: cookie });
-    $.setdata(JSON.stringify(cookies), 'GLOBAL_JD_COOKIES');
-    $.subt = `获取会话成功, 当前共有${cookies.length}个用户`;
+
+    if ($.getdata('GLOBAL_JD_COOKIES') && JSON.parse($.getdata('GLOBAL_JD_COOKIES').length > 0)) {
+      cookieObjs = JSON.parse($.getdata('GLOBAL_JD_COOKIES'));
+      currentCookieObj = JSON.parse(cookieObjs).filter((cookie) => cookie.userId === currentUserId)[0];
+      // 去除当前用户的旧cookie
+      cookieObjs = JSON.parse(cookieObjs).filter((cookie) => cookie.userId !== currentUserId);
+    }
+
+    if (currentCookieObj) {
+      currentCookieObj.cookie = cookie;
+      currentCookieObj.nickname = nickname;
+    } else {
+      currentCookieObj = { userId: currentUserId, nickname: nickname || currentUserId, cookie: cookie };
+    }
+
+    cookieObjs.push(currentCookieObj);
+    $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+    $.subt = `获取成功, 当前共有${cookieObjs.length}个用户`;
 
     _desc.push(`${nickname} ◀`);
-    for (const _cookie of cookies) {
-      if (_cookie.userId !== currentUserId) {
-        _desc.push(`${_cookie.nickname}`);
+    for (const cookieObj of cookieObjs) {
+      if (cookieObj.userId !== currentUserId) {
+        _desc.push(`${cookieObj.nickname}`);
       }
     }
     $.desc = _desc.join('\n');
@@ -75,11 +86,12 @@ function getNickname(cookie) {
   }
 })()
   .catch((e) => {
-    $.subt = '获取会话失败';
-    $.desc = '';
-    $.log(`🔴 获取会话失败: ${e}`);
+    $.subt = '获取失败';
+    $.desc = e;
+    _log.push(`🔴 获取会话失败: ${e}`);
   })
   .finally(() => {
+    $.log(..._log);
     $.msg($.name, $.subt, $.desc);
     $.done();
   });

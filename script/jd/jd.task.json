@@ -1,19 +1,37 @@
 {
     "name": "京东脚本集合",
-    "description": "Script Gallery (仅支持QuanX订阅, BoxJS订阅该脚本可以切换会话)",
+    "description": "Script Gallery (仅支持QuanX订阅, BoxJS订阅该脚本可管理环境变量)",
     "apps": [
         {
-            "id": "JdCookiesSwitch",
-            "name": "京东Cookie切换",
+            "id": "JDScriptEnvManager",
+            "name": "JD Script Env Manager",
             "keys": [
                 "GLOBAL_JD_COOKIES"
             ],
             "descs_html": [
-                "<h4 align=\"center\">⚠️ 该订阅仅用于管理Cookie ⚠️</h4>"
+                "<h4 align=\"center\">⚠️ 该订阅仅用于管理京东脚本环境变量 ⚠️</h4>"
             ],
             "icons": [
                 "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png"
-            ]
+            ],
+            "settings": [
+                {
+                "id": "GLOBAL_SPECIFY_USER_ID",
+                "name": "指定执行用户",
+                "val": "",
+                "type": "text",
+                "placeholder": "默认不指定，为所有用户执行脚本(点击以展开说明)",
+                "desc": "指定执行用户，请填写以'jd_'开头的唯一用户名，脚本执行将作用于指定的的用户，一般为了测试使用，避免修改CK的麻烦 ~"
+              }, {
+                "id": "GLOBAL_JD_COOKIES",
+                "name": "账户(CK)列表",
+                "val": "",
+                "type": "textarea",
+                "autoGrow": false,
+                "rows": 9,
+                "placeholder": "[{ \"userId\": \"jd_xxx\",\"nickname\": \"xxx\",\"cookie\": \"xxx\", \"jrSignBody\": \"reqData=xxx\" }]",
+                "desc": "京东账户的CK信息和京东金融金贴签到的Body信息列表"
+              }]
         }
     ],
     "task": [
@@ -26,7 +44,12 @@
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
-            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京喜双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jd.png, enabled=true",
+            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京融双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdjr.png, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjr.sign.conf,tag=京东金融SignBody",
+            "description": "添加重写规则addons中的重写规则，并手动签到一次"
+        },
+        {
+            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京喜双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {

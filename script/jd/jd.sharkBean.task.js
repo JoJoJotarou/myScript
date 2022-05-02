@@ -244,35 +244,41 @@ function _shake(cookie) {
   });
 }
 
-async function main(cookie) {
+async function main(cookieObj) {
   // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
   // 故这里先做任务，在获取一次首页信息完成签到和摇奖
-  await doneTasks(cookie.cookie);
-  await indexPage(cookie.cookie);
-  await checkIn(cookie.cookie);
-  await shake(cookie.cookie);
+  await doneTasks(cookieObj.cookie);
+  await indexPage(cookieObj.cookie);
+  await checkIn(cookieObj.cookie);
+  await shake(cookieObj.cookie);
   if (_desc.length > 0) {
-    const [nickname, totalBeans] = await getUserInfo(cookie.cookie);
+    const [nickname, totalBeans] = await getUserInfo(cookieObj.cookie);
     $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
   } else {
-    $.subt = `${cookie.nickname}, Nothing to do ~`;
+    $.subt = `${cookieObj.nickname}, Nothing to do ~`;
   }
 }
 
 !(async () => {
-  const cookies = $.getdata('GLOBAL_JD_COOKIES');
+  const cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
+  const specifyUserId = $.getdata('GLOBAL_SPECIFY_USER_ID');
 
-  if (cookies && JSON.parse(cookies).length > 0) {
+  if (cookieObjs && JSON.parse(cookieObjs).length > 0) {
+    if (specifyUserId && specifyUserId.indexOf('jd_') !== -1) {
+      // 实现一次执行一个账号
+      cookieObjs = cookieObjs.filter((cookie) => cookie.userId === specifyUserId);
+    }
     let i = 1;
-    for (const cookie of JSON.parse(cookies)) {
+    for (const cookieObj of JSON.parse(cookieObjs)) {
       try {
         _beans = 0;
-        _log = [`\n++++++++++${cookie.nickname}++++++++++\n`];
+        _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];
         _desc = [];
-        await main(cookie);
+        await main(cookieObj);
       } catch (error) {
         _log.push(`🔴${error}`);
-        _desc.push(`🔴${cookie.nickname}`);
+        _desc.push(`🔴${error}`);
+        $.subt = `${cookieObj.nickname}`;
       } finally {
         $.log(..._log);
         $.desc = _desc.join('');
@@ -280,7 +286,7 @@ async function main(cookie) {
       }
 
       // 切换账号等待至少5秒
-      if (i < JSON.parse(cookies).length) {
+      if (i < JSON.parse(cookieObjs).length) {
         await randomWait(5000);
       }
       i++;

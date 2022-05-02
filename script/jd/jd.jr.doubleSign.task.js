@@ -1,12 +1,13 @@
 /**
  * @ZhouStarStar9527
  * @description 支持多账号
- * @description 入口：京东APP -> 首页 -> 领京豆 -> 京喜双签
+ * @description 入口：京东APP -> 首页 -> 领京豆 -> 双签领豆
+ * @description 必须添加重写规则，并手动签到一次，否则无法签到成功
  */
-const $ = Env('京喜双签');
+const $ = Env('京东金融双签');
 
 let _log, _desc;
-let _beans, _cash;
+let _beans;
 
 function jdSignIn(cookie) {
   const eventName = '【京东签到】';
@@ -40,65 +41,27 @@ function jdSignIn(cookie) {
   });
 }
 
-function jxSignIn(cookie) {
-  const eventName = '【京喜财富小岛签到】';
-  const option = getOption(
-    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=1651401473798&ptag=138631.77.28&taskId=3108&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
-    { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
-  );
-
-  return new Promise((resolve, reject) => {
-    $.get(option, (err, resp, data) => {
-      try {
-        if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 1) {
-          let prize = JSON.parse(JSON.parse(data).data.prizeInfo).strPrizeName;
-          _cash += Number(prize.match(/([\d\.]+)/)[1]);
-          _log.push(`🟢${eventName}: 获得${prize}现金奖励`);
-          _desc.push(`🟢${eventName}`);
-        } else if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 0) {
-          _log.push(`🟡${eventName}: 今天已签到`);
-        } else {
-          throw err || data;
-        }
-      } catch (error) {
-        error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
-        _desc.push(`🔴${eventName}`);
-      } finally {
-        resolve();
-      }
-    });
+function jrSignIn(cookie, signBody) {
+  const eventName = '【金融签到】';
+  const option = getOption(`https://ms.jr.jd.com/gw/generic/hy/h5/m/jrSign?_=${ts()}&${signBody}`, {
+    Cookie: cookie,
+    'User-Agent': userAgent('jr'),
+    Accept: 'application/json',
+    Origin: 'https://member.jr.jd.com',
+    Referer:
+      'https://member.jr.jd.com/activity/sign/v5/indexV2.html?channelLv=shuangqian&sid=dace0970cf046301400564834161022w',
   });
-}
-
-function jdJxDoubleSignReward(cookie) {
-  const eventName = '【京喜双签领奖】';
-  const option = getOption(
-    `https://wq.jd.com/jxjdsignin/IssueReward?_t=${ts()}&_stk=_t&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
-    {
-      Cookie: cookie,
-      Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
-      Origin: 'https://wqs.jd.com',
-      Accept: 'application/json',
-    }
-  );
 
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
         if (
           resp.statusCode === 200 &&
-          JSON.parse(data).retCode === 0 &&
-          JSON.parse(data).data.double_sign_status === 0
+          JSON.parse(data).resultCode === 0 &&
+          JSON.parse(data).resultData.resBusiCode === 0
         ) {
-          _beans += JSON.parse(data).data.jx_award;
-          _log.push(`🟢${eventName}: 获得${JSON.parse(data).data.jx_award}个京豆`);
+          _log.push(`🟢${eventName}: 数据加密，故这里不知道具体获取多少金贴，请到京东金融App查看`);
           _desc.push(`🟢${eventName}`);
-        } else if (
-          resp.statusCode === 200 &&
-          JSON.parse(data).retCode === 0 &&
-          JSON.parse(data).data.double_sign_status === 1
-        ) {
-          _log.push(`🟡${eventName}: 今天已领取`);
         } else {
           throw err || data;
         }
@@ -112,24 +75,67 @@ function jdJxDoubleSignReward(cookie) {
   });
 }
 
-function jdJxDoubleSignInfo(cookie) {
-  const eventName = '【京喜双签状态】';
+function jdJrDoubleSignReward(cookie) {
+  const eventName = '【京融双签领奖】';
   const option = getOption(
-    `https://wq.jd.com/jxjdsignin/SignedInfo?_t=${ts()}&_stk=_t&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
+    `https://nu.jr.jd.com/gw/generic/jrm/h5/m/process?_=${ts()}&reqData=%7B%22actCode%22%3A%22F68B2C3E71%22%2C%22type%22%3A4%2C%22frontParam%22%3A%7B%22belong%22%3A%22jingdou%22%7D%2C%22riskDeviceParam%22%3A%22%7B%5C%22fp%5C%22%3A%5C%229847ae780d67b91a200f87e5b0307ead%5C%22%2C%5C%22eid%5C%22%3A%5C%22PK7BGV22IJOGPW3RIR37RVVQAOL5MA5WG546B63HZIG7QIRJM4XZZHFT2UYT57ZL5EOKRLPDA3F6NWU2HIGXIVDUFY%5C%22%2C%5C%22sdkToken%5C%22%3A%5C%22%5C%22%2C%5C%22sid%5C%22%3A%5C%22%5C%22%7D%22%7D`,
     {
       Cookie: cookie,
-      Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
-      Origin: 'https://wqs.jd.com',
+      Referer: 'https://m.jr.jd.com/integrate/signin/index.html',
+      Origin: 'https://m.jr.jd.com',
       Accept: 'application/json',
     }
   );
 
   return new Promise((resolve, reject) => {
-    $.get(option, (err, resp, data) => {
+    $.post(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).retCode === 0 && JSON.parse(data).data) {
-          _log.push(`🟢${eventName}`);
-          resolve(JSON.parse(data).data);
+        if (
+          resp.statusCode === 200 &&
+          JSON.parse(data).resultData &&
+          JSON.parse(data).resultData.data &&
+          JSON.parse(data).resultData.data.businessMsg === '成功'
+        ) {
+          bean = JSON.parse(data).resultData.data.businessData.businessData.awardListVo[0].count;
+          _beans += bean;
+          _log.push(`🟢${eventName}: 获得${bean}个京豆`);
+          _desc.push(`🟢${eventName}`);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+      } finally {
+        resolve();
+      }
+    });
+  });
+}
+
+function jdJrDoubleSignInfo(cookie) {
+  const eventName = '【京融双签状态】';
+  const option = getOption(
+    `https://nu.jr.jd.com/gw/generic/jrm/h5/m/process?_=${ts()}&reqData=%7B%22actCode%22%3A%22F68B2C3E71%22%2C%22type%22%3A9%2C%22frontParam%22%3A%7B%22channel%22%3A%22JD%22%2C%22belong%22%3A%22jingdou%22%7D%7D`,
+    {
+      Cookie: cookie,
+      Referer: 'https://m.jr.jd.com/integrate/signin/index.html',
+      Origin: 'https://m.jr.jd.com',
+      Accept: 'application/json',
+    }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.post(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).resultData && JSON.parse(data).resultData.code === 200) {
+          signStatus = JSON.parse(data).resultData.data.businessData;
+          _log.push(
+            `🟢${eventName}: ${signStatus.signInJd ? '✓ 京东签到完成' : '⨉ 京东签到未完成'} ${
+              signStatus.signInJr ? '✓ 金融签到完成' : '⨉ 金融签到未完成'
+            } ${signStatus.get ? '✓ 签礼包已领' : '⨉ 双签礼包未领'} `
+          );
+          resolve(signStatus);
         } else {
           throw err || data;
         }
@@ -143,40 +149,41 @@ function jdJxDoubleSignInfo(cookie) {
 }
 
 async function main(cookieObj) {
-  _beans = _cash = 0;
+  _beans = 0;
   _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];
   _desc = [];
 
-  let doubleSignInfo = await jdJxDoubleSignInfo(cookieObj.cookie);
-  if (doubleSignInfo) {
-    if (doubleSignInfo.double_sign_status !== 1) {
-      if (
-        doubleSignInfo.jd_sign_status === 1 &&
-        doubleSignInfo.jx_sign_status === 1 &&
-        doubleSignInfo.double_sign_status !== 1
-      ) {
-        await jdJxDoubleSignReward(cookieObj.cookie);
+  if (!cookieObj.jrSignBody) {
+    throw '请按照重写规则说明手动完成一次京东金融中签到';
+  }
+
+  const signStatus = await jdJrDoubleSignInfo(cookieObj.cookie);
+
+  if (signStatus) {
+    if (!signStatus.get) {
+      if (signStatus.signInJd && signStatus.signInJr && !signStatus.double_sign_status) {
+        await jdJrDoubleSignReward(cookieObj.cookie);
         await randomWait();
       } else {
-        if (doubleSignInfo.jd_sign_status !== 1) {
+        if (!signStatus.signInJd) {
           await jdSignIn(cookieObj.cookie);
           await randomWait();
         }
-        if (doubleSignInfo.jx_sign_status !== 1) {
-          await jxSignIn(cookieObj.cookie);
+        if (!signStatus.signInJr) {
+          await jrSignIn(cookieObj.cookie, cookieObj.jrSignBody);
           await randomWait();
         }
-        await jdJxDoubleSignReward(cookieObj.cookie);
+        await jdJrDoubleSignReward(cookieObj.cookie);
         await randomWait();
       }
 
       const [nickname, totalBeans] = await getUserInfo(cookieObj.cookie);
-      $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})，红包: +${_cash}`;
+      $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})`;
     } else {
       $.subt = `${cookieObj.nickname}，今日已完成 ~`;
     }
   } else {
-    throw '获取京喜双签信息失败';
+    throw '获取京融双签状态失败';
   }
 }
 
@@ -246,6 +253,7 @@ function userAgent(app) {
     jx: 'jdpingou;iPhone;5.25.0;appBuild/100934;supportApplePay/1;hasUPPay/0;pushNoticeIsOpen/0;hasOCPay/0;supportBestPay/0;session/4;pap/JA2019_3111789;supportJDSHWK/1;ef/1;ep/%7B%22ciphertype%22:5,%22cipher%22:%7B%22ud%22:%22ENO0ZNunDtc0CwPtCtHwZQPtDtU2DWUnYtO0Dzu5DwDsZWGyYzTsZq==%22,%22bd%22:%22YXLmbQU=%22,%22iad%22:%22%22,%22sv%22:%22CJGkDq==%22%7D,%22ts%22:1651399595,%22hdid%22:%22JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=%22,%22version%22:%221.0.3%22,%22appname%22:%22com.360buy.jdpingou%22,%22ridx%22:-1%7D;Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148',
     safari:
       'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1',
+    jr: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148/application=JDJR-App&deviceId=5383333424033364d243836433d243643373-d293831473d2938334544313542464145403&eufv=1&clientType=ios&iosType=iphone&clientVersion=6.3.40&HiClVersion=6.3.40&isUpdate=0&osVersion=14.6&osName=iOS&screen=896*414&src=App Store&netWork=1&netWorkType=1&CpayJS=UnionPay/1.0 JDJR&stockSDK=stocksdk-iphone_4.1.0&sPoint=MTAwMDcjI2RpYW9xaTQwMDI%3D&jdPay=(*#@jdPaySDK*#@jdPayChannel=jdfinance&jdPayChannelVersion=6.3.40&jdPaySdkVersion=4.00.35.01&jdPayClientName=iOS*#@jdPaySDK*#@)',
   }[app];
 }
 
