@@ -111,7 +111,7 @@ async function main(cookie) {
       }
 
       // 切换账号等待至少5秒
-      if (i < JSON.parse(cookieObjs).length) {
+      if (i < cookieObjs.length) {
         await randomWait(5000);
       }
       i++;
