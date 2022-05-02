@@ -181,7 +181,7 @@ async function main(cookieObj) {
 }
 
 !(async () => {
-  const cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
+  let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
   const specifyUserId = $.getdata('GLOBAL_SPECIFY_USER_ID');
 
   if (cookieObjs && JSON.parse(cookieObjs).length > 0) {
