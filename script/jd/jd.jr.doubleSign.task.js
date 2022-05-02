@@ -133,7 +133,7 @@ function jdJrDoubleSignInfo(cookie) {
           _log.push(
             `🟢${eventName}: ${signStatus.signInJd ? '✓ 京东签到完成' : '⨉ 京东签到未完成'} ${
               signStatus.signInJr ? '✓ 金融签到完成' : '⨉ 金融签到未完成'
-            } ${signStatus.get ? '✓ 签礼包已领' : '⨉ 双签礼包未领'} `
+            } ${signStatus.get ? '✓ 双签礼包已领' : '⨉ 双签礼包未领'} `
           );
           resolve(signStatus);
         } else {

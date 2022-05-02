@@ -128,7 +128,11 @@ function jdJxDoubleSignInfo(cookie) {
     $.get(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).retCode === 0 && JSON.parse(data).data) {
-          _log.push(`🟢${eventName}`);
+          _log.push(
+            `🟢${eventName}: ${JSON.parse(data).data.jd_sign_status === 1 ? '✓ 京东签到完成' : '⨉ 京东签到未完成'} ${
+              JSON.parse(data).data.jx_sign_status === 1 ? '✓ 京喜签到完成' : '⨉ 京喜签到未完成'
+            } ${JSON.parse(data).data.double_sign_status === 1 ? '✓ 双签礼包已领' : '⨉ 双签礼包未领'} `
+          );
           resolve(JSON.parse(data).data);
         } else {
           throw err || data;
