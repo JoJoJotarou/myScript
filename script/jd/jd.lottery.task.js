@@ -118,12 +118,13 @@ async function main(cookieObj) {
   const specifyUserId = $.getdata('GLOBAL_SPECIFY_USER_ID');
 
   if (cookieObjs && JSON.parse(cookieObjs).length > 0) {
+    cookieObjs = JSON.parse(cookieObjs);
     if (specifyUserId && specifyUserId.indexOf('jd_') !== -1) {
       // 实现一次执行一个账号
       cookieObjs = cookieObjs.filter((cookie) => cookie.userId === specifyUserId);
     }
     let i = 1;
-    for (const cookieObj of JSON.parse(cookieObjs)) {
+    for (const cookieObj of cookieObjs) {
       try {
         _beans = 0;
         _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];

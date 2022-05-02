@@ -17,14 +17,14 @@
             "settings": [
                 {
                 "id": "GLOBAL_SPECIFY_USER_ID",
-                "name": "指定执行用户",
+                "name": "指定执行账户",
                 "val": "",
                 "type": "text",
-                "placeholder": "默认不指定，为所有用户执行脚本(点击以展开说明)",
+                "placeholder": "默认不指定，为所有用户执行脚本",
                 "desc": "指定执行用户，请填写以'jd_'开头的唯一用户名，脚本执行将作用于指定的的用户，一般为了测试使用，避免修改CK的麻烦 ~"
               }, {
                 "id": "GLOBAL_JD_COOKIES",
-                "name": "账户(CK)列表",
+                "name": "账户信息列表",
                 "val": "",
                 "type": "textarea",
                 "autoGrow": false,
