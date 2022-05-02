@@ -57,7 +57,6 @@ function jdSignIn(cookie) {
             _desc.push(`🟢${eventName}`);
           } else if (JSON.parse(data).data.status === '2') {
             _log.push(`🟡${eventName}: 今天已签到`);
-            _desc.push(`🟡${eventName}`);
           }
         } else {
           throw err || data;
