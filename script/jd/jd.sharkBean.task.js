@@ -203,7 +203,7 @@ async function shake(cookie) {
         s++;
       }
       if (index < remainLotteryTimes) {
-        await randomWait();
+        await randomWait(500);
       }
     }
     _desc.push(`🟢${eventName} ${s}/${remainLotteryTimes}`);
@@ -223,14 +223,20 @@ function _shake(cookie) {
     $.post(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).success) {
-          // 获取摇奖结果（当前未摇到京东，等摇到再改）
-          // const couponInfo = JSON.parse(data).data.couponInfo;
-          // if (couponInfo.couponType === 1) {
-          //   _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
-          // } else {
-          //   _log.push(`🟢${eventName}: ${couponInfo}`);
-          // }
-          _log.push(`🟢${eventName}: ${data}`);
+          if (JSON.parse(data).data.lotteryType === 5) {
+            _log.push(`🟢${eventName}: 收到一则广告`);
+          } else if (JSON.parse(data).data.lotteryType === 2) {
+            const couponInfo = JSON.parse(data).data.couponInfo;
+            if (couponInfo.couponType === 1) {
+              _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
+            } else {
+              // 摇奖得京豆的概率很低，导致不知道怎么写
+              _log.push(`🟢${eventName}: ${data}`);
+            }
+          } else {
+            // 摇奖得京豆的概率很低，导致不知道怎么写
+            _log.push(`🟢${eventName}: ${data}`);
+          }
           resolve(true);
         } else {
           throw err | data;
@@ -245,11 +251,10 @@ function _shake(cookie) {
 }
 
 async function main(cookieObj) {
-  // 如果签到放在首位执行，会导致摇奖时获取不到摇奖次数
-  // 故这里先做任务，在获取一次首页信息完成签到和摇奖
-  await doneTasks(cookieObj.cookie);
   await indexPage(cookieObj.cookie);
   await checkIn(cookieObj.cookie);
+  await doneTasks(cookieObj.cookie);
+  await indexPage(cookieObj.cookie);
   await shake(cookieObj.cookie);
   if (_desc.length > 0) {
     const [nickname, totalBeans] = await getUserInfo(cookieObj.cookie);
