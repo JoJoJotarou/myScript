@@ -87,7 +87,8 @@ function getNickname(cookie) {
 })()
   .catch((e) => {
     $.subt = '获取失败';
-    $.desc = e;
+    console.log(typeof e);
+    $.desc = String(e);
     _log.push(`🔴 获取会话失败: ${e}`);
   })
   .finally(() => {
