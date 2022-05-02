@@ -73,7 +73,7 @@ function jxSignIn(cookie) {
 function jdJxDoubleSignReward(cookie) {
   const eventName = '【京喜双签领奖】';
   const option = getOption(
-    `https://wq.jd.com/jxjdsignin/IssueReward?_t=${ts()}&_stk=_t&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
+    `https://wq.jd.com/jxjdsignin/IssueReward?_t=${ts()}&h5st=${geth5st()}&_stk=_t&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
     {
       Cookie: cookie,
       Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
