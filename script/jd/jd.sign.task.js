@@ -121,8 +121,8 @@ async function main(cookie) {
   }
 })()
   .catch((e) => {
-    $.subt = '🔴 脚本执行异常';
-    $.msg($.name, $.subt, e);
+    $.subt = '脚本执行异常';
+    $.msg($.name, $.subt, `🔴 ${String(e)}`);
     $.logErr(e);
   })
   .finally(() => {

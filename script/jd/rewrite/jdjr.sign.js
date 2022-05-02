@@ -43,7 +43,7 @@ let _desc = [];
 })()
   .catch((e) => {
     $.subt = '获取失败';
-    $.desc = e;
+    $.desc = `🔴 ${String(e)}`;
     _log.push(`🔴 获取失败: ${e}`);
   })
   .finally(() => {

@@ -56,11 +56,11 @@ function getNickname(cookie) {
     // 获取昵称好分辨
     const nickname = await getNickname(cookie);
 
-    if ($.getdata('GLOBAL_JD_COOKIES') && JSON.parse($.getdata('GLOBAL_JD_COOKIES').length > 0)) {
+    if ($.getdata('GLOBAL_JD_COOKIES') && JSON.parse($.getdata('GLOBAL_JD_COOKIES')).length > 0) {
       cookieObjs = JSON.parse($.getdata('GLOBAL_JD_COOKIES'));
-      currentCookieObj = JSON.parse(cookieObjs).filter((cookie) => cookie.userId === currentUserId)[0];
+      currentCookieObj = cookieObjs.filter((cookie) => cookie.userId === currentUserId)[0];
       // 去除当前用户的旧cookie
-      cookieObjs = JSON.parse(cookieObjs).filter((cookie) => cookie.userId !== currentUserId);
+      cookieObjs = cookieObjs.filter((cookie) => cookie.userId !== currentUserId);
     }
 
     if (currentCookieObj) {
@@ -87,8 +87,7 @@ function getNickname(cookie) {
 })()
   .catch((e) => {
     $.subt = '获取失败';
-    console.log(typeof e);
-    $.desc = String(e);
+    $.desc = `🔴 ${String(e)}`;
     _log.push(`🔴 获取会话失败: ${e}`);
   })
   .finally(() => {
