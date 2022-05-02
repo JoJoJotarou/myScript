@@ -74,10 +74,11 @@ function getNickname(cookie) {
     $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
     $.subt = `获取成功, 当前共有${cookieObjs.length}个用户`;
 
-    _desc.push(`${nickname} ◀`);
     for (const cookieObj of cookieObjs) {
       if (cookieObj.userId !== currentUserId) {
         _desc.push(`${cookieObj.nickname}`);
+      } else {
+        _desc.push(`${nickname} ◀`);
       }
     }
     $.desc = _desc.join('\n');
