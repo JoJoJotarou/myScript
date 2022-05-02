@@ -43,7 +43,7 @@ function jdSignIn(cookie) {
 function jxSignIn(cookie) {
   const eventName = '【京喜财富小岛签到】';
   const option = getOption(
-    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=1651401473798&ptag=138631.77.28&taskId=3108&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=1651401473798&ptag=138631.77.28&taskId=3108&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
     { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
   );
 
@@ -115,7 +115,7 @@ function jdJxDoubleSignReward(cookie) {
 function jdJxDoubleSignInfo(cookie) {
   const eventName = '【京喜双签状态】';
   const option = getOption(
-    `https://wq.jd.com/jxjdsignin/SignedInfo?_t=${ts()}&_stk=_t&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
+    `https://wq.jd.com/jxjdsignin/SignedInfo?_t=${ts()}&h5st=${geth5st()}&_stk=_t&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ajax&appCode=msc588d6d5`,
     {
       Cookie: cookie,
       Referer: 'https://wqs.jd.com/pingou/double_signin_bean/index.html',
@@ -144,6 +144,49 @@ function jdJxDoubleSignInfo(cookie) {
       }
     });
   });
+}
+
+Date.prototype.Format = function (fmt) {
+  // 从faker2 京喜财富岛脚本中拷贝过来的
+  var e,
+    n = this,
+    d = fmt,
+    l = {
+      'M+': n.getMonth() + 1,
+      'd+': n.getDate(),
+      'D+': n.getDate(),
+      'h+': n.getHours(),
+      'H+': n.getHours(),
+      'm+': n.getMinutes(),
+      's+': n.getSeconds(),
+      'w+': n.getDay(),
+      'q+': Math.floor((n.getMonth() + 3) / 3),
+      'S+': n.getMilliseconds(),
+    };
+  /(y+)/i.test(d) && (d = d.replace(RegExp.$1, ''.concat(n.getFullYear()).substr(4 - RegExp.$1.length)));
+  for (var k in l) {
+    if (new RegExp('('.concat(k, ')')).test(d)) {
+      var t,
+        a = 'S+' === k ? '000' : '00';
+      d = d.replace(RegExp.$1, 1 == RegExp.$1.length ? l[k] : (''.concat(a) + l[k]).substr(''.concat(l[k]).length));
+    }
+  }
+  return d;
+};
+
+function geth5st() {
+  const timestamp = ts();
+  return encodeURIComponent(
+    [
+      String(new Date(timestamp).Format('yyyyMMddhhmmssSSS')),
+      '8302800516333237',
+      '0f6ed',
+      'tk02w38741f1918nVipfh3wPzyiXfhrzKXjjwRqhjqfkn4YdXllfxWcPejtr8ySYdqBmgyPq3YmC0zn95n2XZgfpGUlX',
+      'd03a669606215327a47d83cf63ea68bbf4ca5c5c9edac81f7ebd46814d9c3111',
+      '3.0',
+      String(timestamp),
+    ].join(';')
+  );
 }
 
 async function main(cookieObj) {
