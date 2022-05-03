@@ -206,7 +206,8 @@ async function shake(cookie) {
         await randomWait(500);
       }
     }
-    _desc.push(`🟢${eventName} ${s}/${remainLotteryTimes}`);
+    let icon = s === remainLotteryTimes ? '🟢' : '🟡';
+    _desc.push(`${icon}${eventName} ${s}/${remainLotteryTimes}`);
   } catch (error) {
     error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
     _desc.push(`🔴${eventName}`);
@@ -228,7 +229,7 @@ function _shake(cookie) {
           } else if (JSON.parse(data).data.lotteryType === 2) {
             const couponInfo = JSON.parse(data).data.couponInfo;
             if (couponInfo.couponType === 1) {
-              _log.push(`🟢${eventName}: 获得优惠券: 满${couponQuota}减${couponDiscount}, ${limitStr}, ${endTime}失效`);
+              _log.push(`🟢${eventName}: 获得优惠券: 满${couponInfo.couponQuota}减${couponInfo.couponDiscount}, ${couponInfo.limitStr}, ${couponInfo.endTime}失效`);
             } else {
               // 摇奖得京豆的概率很低，导致不知道怎么写
               _log.push(`🟢${eventName}: ${data}`);
@@ -243,7 +244,6 @@ function _shake(cookie) {
         }
       } catch (error) {
         error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
-        _desc.push(`🔴${eventName}`);
         resolve(false);
       }
     });
@@ -254,6 +254,7 @@ async function main(cookieObj) {
   await indexPage(cookieObj.cookie);
   await checkIn(cookieObj.cookie);
   await doneTasks(cookieObj.cookie);
+  await randomWait();
   await indexPage(cookieObj.cookie);
   await shake(cookieObj.cookie);
   if (_desc.length > 0) {
