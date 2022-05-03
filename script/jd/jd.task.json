@@ -22,16 +22,6 @@
                     "type": "text",
                     "placeholder": "默认不指定，为所有用户执行脚本",
                     "desc": "指定执行用户，请填写以'jd_'开头的唯一用户名，脚本执行将作用于指定的的用户，一般为了测试使用，避免修改CK的麻烦 ~"
-                },
-                {
-                    "id": "GLOBAL_JD_COOKIES",
-                    "name": "账户信息列表",
-                    "val": "",
-                    "type": "textarea",
-                    "autoGrow": false,
-                    "rows": 9,
-                    "placeholder": "[{ \"userId\": \"jd_xxx\",\"nickname\": \"xxx\",\"cookie\": \"xxx\", \"jrSignBody\": \"reqData=xxx\" }]",
-                    "desc": "京东账户的CK信息和京东金融金贴签到的Body信息列表"
                 }
             ]
         },
@@ -68,7 +58,7 @@
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB",
                     "name": "开启赚京币脚本",
-                    "val": "true",
+                    "val": "false",
                     "type": "boolean",
                     "desc": "是否开启赚京币脚本(默认关闭，目前版本未实现)"
                 },
