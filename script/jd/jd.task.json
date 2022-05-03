@@ -97,15 +97,19 @@
             "description": "添加重写规则addons中的重写规则，并手动签到一次"
         },
         {
-            "config": "3 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京喜双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
+            "config": "5 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.doubleSign.task.js, tag=京喜双签, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
-            "config": "5 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.lottery.task.js, tag=抽京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/choujd.png, enabled=true",
+            "config": "7 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.lottery.task.js, tag=抽京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/choujd.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
-            "config": "11 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, tag=摇京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdyjd.png, enabled=true",
+            "config": "8 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, tag=摇京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdyjd.png, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
+        },
+        {
+            "config": "10 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.cfd.task.js, tag=京喜财富岛, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         }
     ]
