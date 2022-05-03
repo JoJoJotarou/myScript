@@ -16,22 +16,70 @@
             ],
             "settings": [
                 {
-                "id": "GLOBAL_SPECIFY_USER_ID",
-                "name": "指定执行账户",
-                "val": "",
-                "type": "text",
-                "placeholder": "默认不指定，为所有用户执行脚本",
-                "desc": "指定执行用户，请填写以'jd_'开头的唯一用户名，脚本执行将作用于指定的的用户，一般为了测试使用，避免修改CK的麻烦 ~"
-              }, {
-                "id": "GLOBAL_JD_COOKIES",
-                "name": "账户信息列表",
-                "val": "",
-                "type": "textarea",
-                "autoGrow": false,
-                "rows": 9,
-                "placeholder": "[{ \"userId\": \"jd_xxx\",\"nickname\": \"xxx\",\"cookie\": \"xxx\", \"jrSignBody\": \"reqData=xxx\" }]",
-                "desc": "京东账户的CK信息和京东金融金贴签到的Body信息列表"
-              }]
+                    "id": "GLOBAL_SPECIFY_USER_ID",
+                    "name": "指定执行账户",
+                    "val": "",
+                    "type": "text",
+                    "placeholder": "默认不指定，为所有用户执行脚本",
+                    "desc": "指定执行用户，请填写以'jd_'开头的唯一用户名，脚本执行将作用于指定的的用户，一般为了测试使用，避免修改CK的麻烦 ~"
+                },
+                {
+                    "id": "GLOBAL_JD_COOKIES",
+                    "name": "账户信息列表",
+                    "val": "",
+                    "type": "textarea",
+                    "autoGrow": false,
+                    "rows": 9,
+                    "placeholder": "[{ \"userId\": \"jd_xxx\",\"nickname\": \"xxx\",\"cookie\": \"xxx\", \"jrSignBody\": \"reqData=xxx\" }]",
+                    "desc": "京东账户的CK信息和京东金融金贴签到的Body信息列表"
+                }
+            ]
+        },
+        {
+            "id": "JDJXCFD",
+            "name": "京喜财富岛",
+            "keys": [
+                "GLOBAL_JX_CFD_OPEN_PICKSHELL",
+                "GLOBAL_JX_CFD_OPEN_ZCF",
+                "GLOBAL_JX_CFD_OPEN_ZJB",
+                "GLOBAL_JX_CFD_OPEN_BUILD"
+            ],
+            "descs_html": [
+                "<h4 align=\"center\">⚠️ 该订阅仅用于控制京喜财富岛相关变量 ⚠️</h4>"
+            ],
+            "icons": [
+                "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png"
+            ],
+            "settings": [
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_PICKSHELL",
+                    "name": "开启捡贝壳脚本",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启捡贝壳脚本(默认开启，并非一次性捡20个贝壳，当前有多少捡多少最多20个)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_ZCF",
+                    "name": "开启赚财富脚本",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启赚财富脚本(默认开启)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_ZJB",
+                    "name": "开启赚京币脚本",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启赚京币脚本(默认关闭，目前版本未实现)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_BUILD",
+                    "name": "开启升建筑脚本",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启升建筑脚本(默认开启，每次执行4中建筑各升级一次)"
+                }
+            ]
         }
     ],
     "task": [

@@ -56,7 +56,7 @@ function jxCfdTaskList(cookie) {
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.TaskList) {
+        if (resp.statusCode === 200 && JSON.parse(data).iRet === 0) {
           const taskList = JSON.parse(data).data.TaskList;
           let unfinishedTasks = taskList.filter((task) => task.dwAwardStatus === 2) || [];
           let finishedTasks = taskList.filter((task) => task.dwAwardStatus === 1) || [];
