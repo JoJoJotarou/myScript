@@ -2,11 +2,12 @@
  * @ZhouStarStar9527
  * @description 支持多账号
  * @description 入口：京东APP -> 首页 -> 领京豆 -> 京喜双签
+ * @description 目前该脚本仅会完成京喜财富岛任务(特指“财富岛->赚财富”中的任务)中的签到任务，其他任务是支持完成，但是这里不会调用完成
  */
 const $ = Env('京喜双签');
 
 let _log, _desc;
-let _beans, _cash;
+let _beans, _cash, _jxCoins;
 
 function jdSignIn(cookie) {
   const eventName = '【京东签到】';
@@ -40,23 +41,112 @@ function jdSignIn(cookie) {
   });
 }
 
-function jxSignIn(cookie) {
-  const eventName = '【京喜财富小岛签到】';
+function jxCfdTaskList(cookie) {
+  /**
+   * Data.TaskList.dwCompleteNum = 0:表示任务未完成
+   * Data.TaskList.dwCompleteNum = 1:表示任务已完成
+   * Data.TaskList.dwAwardStatus = 1:表示任务完成并领取奖励
+   * Data.TaskList.dwCompleteNum = 1 & Data.TaskList.dwAwardStatus = 2:表示任务完成可领奖
+   */
+  const eventName = '【京喜财富岛任务列表】';
   const option = getOption(
-    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=1651401473798&ptag=138631.77.28&taskId=3108&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    `https://m.jingxi.com/jxbfd/story/GetActTask?strZone=jxbfd&source=jxbfd&dwEnv=7&ptag=7155.9.47&_ste=1&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198&bizCode=jxbfd&_cfd_t=${ts}&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone&h5st=${geth5st()}&_=${ts}`,
     { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
   );
 
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 1) {
+        if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.TaskList) {
+          const taskList = JSON.parse(data).data.TaskList;
+          let unfinishedTasks = taskList.filter((task) => task.dwAwardStatus === 2) || [];
+          let finishedTasks = taskList.filter((task) => task.dwAwardStatus === 1) || [];
+          _log.push(
+            `🟢${eventName}: 总任务数: ${taskList.length}, 未完成任务数: ${unfinishedTasks.length}, 已完成任务数: ${finishedTasks.length}`
+          );
+          resolve(taskList);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve([]);
+      }
+    });
+  });
+}
+
+async function jxCfdCompleteTask(cookie, task) {
+  let eventName = `【京喜财富岛完成任务-${task.strTaskName}】`;
+  if (task.dwCompleteNum === 0) {
+    // 做任务并领取奖励
+    const res = await jxCfdDoTask(cookie, task);
+    if (res) {
+      await jxCfdGetTaskReward(cookie, task);
+    }
+  } else if (task.dwCompleteNum === 1 && task.dwAwardStatus === 2) {
+    // 仅领取奖励
+    _log.push(`🟢${eventName}: 任务已完成，直接领取任务奖励`);
+    await jxCfdGetTaskReward(cookie, task);
+  } else if (task.dwCompleteNum === 1 && task.dwAwardStatus === 1) {
+    _log.push(`🟢${eventName}: 任务已完成并领取过任务奖励`);
+  } else {
+    _log.push(`🟡${eventName}: 任务状态异常 ${JSON.stringify(task)}`);
+  }
+}
+
+function jxCfdDoTask(cookie, task) {
+  let eventName = `【京喜财富岛做任务-${task.strTaskName}】`;
+  const option = getOption(
+    `https://m.jingxi.com/newtasksys/newtasksys_front/DoTask?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=${ts}&ptag=7155.9.47&taskId=${
+      task.ddwTaskId
+    }&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).ret === 0) {
+          _log.push(`🟢${eventName}: 成功完成任务`);
+          _desc.push(`🟢${eventName}`);
+          resolve(true);
+        } else {
+          throw err || data;
+        }
+      } catch (error) {
+        error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
+        _desc.push(`🔴${eventName}`);
+        resolve(false);
+      }
+    });
+  });
+}
+
+function jxCfdGetTaskReward(cookie, task) {
+  let eventName = `【京喜财富岛领任务奖励-${task.strTaskName}】`;
+  const option = getOption(
+    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=${ts()}&ptag=138631.77.28&taskId=${
+      task.ddwTaskId
+    }&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
+  );
+
+  return new Promise((resolve, reject) => {
+    $.get(option, (err, resp, data) => {
+      try {
+        if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && task.ddwTaskId === 3108) {
+          // “签到抽红包”任务特殊处理
           let prize = JSON.parse(JSON.parse(data).data.prizeInfo).strPrizeName;
           _cash += Number(prize.match(/([\d\.]+)/)[1]);
-          _log.push(`🟢${eventName}: 获得${prize}现金奖励`);
+          _log.push(`🟢${eventName}: 获得${prize}现金红包奖励`);
           _desc.push(`🟢${eventName}`);
-        } else if (resp.statusCode === 200 && JSON.parse(data).data && JSON.parse(data).data.awardStatus === 0) {
-          _log.push(`🟡${eventName}: 今天已签到`);
+        } else if (resp.statusCode === 200 && JSON.parse(data).ret === 0) {
+          let coin = JSON.parse(JSON.parse(data).data.prizeInfo).ddwCoin / 10000;
+          _jxCoins += coin;
+          _log.push(`🟢${eventName}: 获得${coin}万个京币奖励`);
+          _desc.push(`🟢${eventName}`);
         } else {
           throw err || data;
         }
@@ -190,7 +280,7 @@ function geth5st() {
 }
 
 async function main(cookieObj) {
-  _beans = _cash = 0;
+  _beans = _cash = _jxCoins = 0;
   _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];
   _desc = [];
 
@@ -210,7 +300,10 @@ async function main(cookieObj) {
           await randomWait();
         }
         if (doubleSignInfo.jx_sign_status !== 1) {
-          await jxSignIn(cookieObj.cookie);
+          // 仅完成签到任务
+          const taskList = await jxCfdTaskList(cookieObj.cookie);
+          const signTask = taskList.filter((task) => task.ddwTaskId === 3108)[0];
+          await jxCfdCompleteTask(cookieObj.cookie, signTask);
           await randomWait();
         }
         await jdJxDoubleSignReward(cookieObj.cookie);
