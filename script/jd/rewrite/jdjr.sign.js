@@ -25,15 +25,15 @@ let _desc = [];
       if (!currentCookieObj) {
         _desc.push('浏览器访问 https://plogin.m.jd.com/login/login 登录后，点击"我的"更新京东CK');
         currentCookieObj = { userId: currentUserId, nickname: currentUserId, cookie: cookie, jrSignBody: signBody };
+        cookieObjs.push(currentCookieObj);
       } else {
         currentCookieObj['jrSignBody'] = signBody;
       }
-      cookieObjs = cookieObjs.filter((cookie) => cookie.userId !== currentUserId);
     } else {
       _desc.push('浏览器访问 https://plogin.m.jd.com/login/login 登录后，点击"我的"更新京东CK');
       currentCookieObj = { userId: currentUserId, nickname: currentUserId, cookie: cookie, jrSignBody: signBody };
+      cookieObjs.push(currentCookieObj);
     }
-    cookieObjs.push(currentCookieObj);
     $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
     $.subt = `获取成功, 当前用户: ${currentCookieObj.nickname}`;
     $.desc = _desc.join('\n');
