@@ -18,7 +18,7 @@ let _desc = [];
     let currentUserId = cookie.match(/pt_pin=(\w+)/)[1];
     let cookieObjs = [];
     let currentCookieObj;
-    if ($.getdata('GLOBAL_JD_COOKIES') && JSON($.getdata('GLOBAL_JD_COOKIES')).length > 0) {
+    if ($.getdata('GLOBAL_JD_COOKIES') && JSON.parse($.getdata('GLOBAL_JD_COOKIES')).length > 0) {
       cookieObjs = JSON.parse($.getdata('GLOBAL_JD_COOKIES'));
       // 获取当前用户
       currentCookieObj = cookieObjs.filter((cookie) => cookie.userId === currentUserId)[0];
