@@ -43,10 +43,9 @@ function jdSignIn(cookie) {
 
 function jxCfdTaskList(cookie) {
   /**
-   * Data.TaskList.dwCompleteNum = 0:表示任务未完成
-   * Data.TaskList.dwCompleteNum = 1:表示任务已完成
+   * Data.TaskList.dwCompleteNum = Data.TaskList.dwTargetNum:表示任务已完成
    * Data.TaskList.dwAwardStatus = 1:表示任务完成并领取奖励
-   * Data.TaskList.dwCompleteNum = 1 & Data.TaskList.dwAwardStatus = 2:表示任务完成可领奖
+   * Data.TaskList.dwCompleteNum = Data.TaskList.dwTargetNum & Data.TaskList.dwAwardStatus = 2:表示任务完成可领奖
    */
   const eventName = '【京喜财富岛任务列表】';
   const option = getOption(
@@ -75,25 +74,6 @@ function jxCfdTaskList(cookie) {
       }
     });
   });
-}
-
-async function jxCfdCompleteTask(cookie, task) {
-  let eventName = `【京喜财富岛完成任务-${task.strTaskName}】`;
-  if (task.dwCompleteNum === 0) {
-    // 做任务并领取奖励
-    const res = await jxCfdDoTask(cookie, task);
-    if (res) {
-      await jxCfdGetTaskReward(cookie, task);
-    }
-  } else if (task.dwCompleteNum === 1 && task.dwAwardStatus === 2) {
-    // 仅领取奖励
-    _log.push(`🟢${eventName}: 任务已完成，直接领取任务奖励`);
-    await jxCfdGetTaskReward(cookie, task);
-  } else if (task.dwCompleteNum === 1 && task.dwAwardStatus === 1) {
-    _log.push(`🟢${eventName}: 任务已完成并领取过任务奖励`);
-  } else {
-    _log.push(`🟡${eventName}: 任务状态异常 ${JSON.stringify(task)}`);
-  }
 }
 
 function jxCfdDoTask(cookie, task) {
@@ -303,7 +283,13 @@ async function main(cookieObj) {
           // 仅完成签到任务
           const taskList = await jxCfdTaskList(cookieObj.cookie);
           const signTask = taskList.filter((task) => task.ddwTaskId === 3108)[0];
-          await jxCfdCompleteTask(cookieObj.cookie, signTask);
+          if (!signTask) {
+            throw `无法找到签到领红包任务(taskId=3108), 请检查任务列表是否正常:\n${taskList}`;
+          }
+          const res = await jxCfdDoTask(cookieObj.cookie, signTask);
+          if (res) {
+            await jxCfdGetTaskReward(cookieObj.cookie, signTask);
+          }
           await randomWait();
         }
         await jdJxDoubleSignReward(cookieObj.cookie);
