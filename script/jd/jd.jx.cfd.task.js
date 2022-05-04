@@ -393,7 +393,7 @@ async function jxCfdBuildsLvlUp(cookie, targetTiems) {
   const eventName = '【建筑群升级】';
   // https://m.jingxi.com/jxbfd/user/QueryUserInfo 这个请求无法模拟，这里只能写死，这个请求响应中包含京币、财富、建筑等等。
   const buildsIndex = ['food', 'sea', 'shop', 'fun'];
-  !targetTiems ? buildsIndex.length : targetTiems;
+  targetTiems = !targetTiems ? buildsIndex.length : targetTiems;
   let s = 0;
   let notCanLvlUp = 0;
   for (const buildIndex of buildsIndex) {
@@ -678,7 +678,7 @@ async function main(cookieObj) {
       await jxCfdZjbGetAchieveReward(cookieObj.cookie);
     }
   } else {
-    throw '请先按照重写规则说明获取一次PhoneId';
+    _desc.push('请先按照重写规则说明获取一次PhoneId');
   }
 
   if (_desc.length > 0) {

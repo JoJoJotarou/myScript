@@ -46,17 +46,17 @@
             "settings": [
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_PICKSHELL",
-                    "name": "捡20个捡贝壳",
+                    "name": "去海边捡贝壳",
                     "val": true,
                     "type": "boolean",
-                    "desc": "是否开启捡贝壳脚本(默认开启)"
+                    "desc": "是否开启去海边捡贝壳(20个贝壳)脚本(默认开启，当成就任务“去海边捡贝壳”完成后重复执行不会捡贝壳)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_BUILD",
-                    "name": "升建筑",
-                    "val": true,
+                    "name": "升级建筑群",
+                    "val": false,
                     "type": "boolean",
-                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次，不开启会升级一次)"
+                    "desc": "是否开启升级建筑群脚本(默认关闭，每次执行会将4种建筑各升级一次，不开启但是启用“赚财富”会升级一次，仅能升级才会升级！！！)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZCF",
@@ -117,7 +117,7 @@
         },
         {
             "config": "10 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.cfd.task.js, tag=京喜财富岛, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
-            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjx.cfd.sign.conf,tag=京喜PhoneId"
         }
     ]
 }
