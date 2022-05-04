@@ -552,12 +552,15 @@ async function jxCfdZcfGetFinalReward(cookie) {
   const eventName = `【赚财富终奖】`;
   let tasksInfo = await jxCfdZcfTaskList(cookie);
 
-  if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum && tasksInfo.dwIsShowIcon === 0) {
+  // NOTE 这里不还知道怎么判断是否已经领取过终奖了，暂时每次都请求一次
+  if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum) {
     let res = await _jxCfdZcfGetFinalReward(cookie);
     res ? _log.push(`🟢${eventName}`) : _log.push(`🔴${eventName}`);
-  } else if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum && tasksInfo.dwIsShowIcon === 1) {
-    _log.push(`🟢${eventName} 今日已领取`);
-  } else {
+  }
+  // else if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum && tasksInfo.dwIsShowIcon === 1) {
+  //   _log.push(`🟢${eventName} 今日已领取`);
+  // }
+  else {
     _log.push(`🔴${eventName} 数据异常 ${tasksInfo}`);
     _desc.push(`🔴${eventName}`);
   }
