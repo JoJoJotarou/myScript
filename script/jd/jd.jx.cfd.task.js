@@ -506,20 +506,20 @@ async function main(cookieObj) {
   _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];
   _desc = [];
 
-  if ($.getdata('GLOBAL_JX_CFD_OPEN_PICKSHELL') === true) {
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_PICKSHELL') === 'true') {
     // 赚京币成就任务 - 捡20个贝壳（同时顺带完成赚财富捡3个贝壳任务）
     await jxCfdPickShells(cookieObj.cookie);
   }
-  if ($.getdata('GLOBAL_JX_CFD_OPEN_BUILD') === true) {
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_BUILD') === 'true') {
     // 升级一轮建筑
     await jxCfdBuildsLvlUp(cookieObj.cookie);
   }
-  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === true) {
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === 'true') {
     // 赚财富所有任务
     await jxCfdZcfCompleteTask(cookieObj.cookie);
     await jxCfdZcfGetFinalReward(cookieObj.cookie);
   }
-  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB') === true) {
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB') === 'true') {
     // 赚京币所有任务
     await jxCfdZjbCompleteTask(cookieObj.cookie);
   }
