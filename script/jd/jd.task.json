@@ -47,42 +47,42 @@
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_PICKSHELL",
                     "name": "捡20个捡贝壳",
-                    "val": "true",
+                    "val": true,
                     "type": "boolean",
                     "desc": "是否开启捡贝壳脚本(默认开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_BUILD",
                     "name": "升建筑",
-                    "val": "true",
+                    "val": true,
                     "type": "boolean",
                     "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次，不开启会升级一次)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZCF",
                     "name": "赚财富",
-                    "val": "true",
+                    "val": true,
                     "type": "boolean",
                     "desc": "是否开启赚财富脚本(默认开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_SIGN",
                     "name": "连续营业赢红包",
-                    "val": "false",
+                    "val": false,
                     "type": "boolean",
                     "desc": "是否开启赚京币-连续营业赢红包(京喜App&微信小程序)脚本(默认关闭，获取phoneID后手动开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_TASK",
                     "name": "营业赚京币",
-                    "val": "false",
+                    "val": false,
                     "type": "boolean",
                     "desc": "是否开启赚京币-营业赚京币脚本(默认关闭，目前版本未实现，获取phoneID后手动开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD",
                     "name": "成就赚财富(领)",
-                    "val": "false",
+                    "val": false,
                     "type": "boolean",
                     "desc": "是否开启赚京币-成就赚财富(领)脚本(默认关闭)"
                 }
