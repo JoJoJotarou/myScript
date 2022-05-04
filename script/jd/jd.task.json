@@ -75,16 +75,16 @@
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_TASK",
                     "name": "营业赚京币",
-                    "val": false,
+                    "val": true,
                     "type": "boolean",
-                    "desc": "是否开启赚京币-营业赚京币脚本(默认关闭，目前版本未实现，获取phoneID后手动开启)"
+                    "desc": "是否开启赚京币-营业赚京币脚本(默认开启，目前版本未实现)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD",
                     "name": "成就赚财富(领)",
-                    "val": false,
+                    "val": true,
                     "type": "boolean",
-                    "desc": "是否开启赚京币-成就赚财富(领)脚本(默认关闭)"
+                    "desc": "是否开启赚京币-成就赚财富(领)脚本(默认开启)"
                 }
             ]
         }
