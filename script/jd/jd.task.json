@@ -35,7 +35,8 @@
                 "GLOBAL_JX_CFD_OPEN_BUILD"
             ],
             "descs_html": [
-                "<h4 align=\"center\">⚠️ 该订阅仅用于控制京喜财富岛相关变量 ⚠️</h4>"
+                "<h4 align=\"center\">⚠️ 该订阅仅用于控制京喜财富岛相关变量 ⚠️</h4>",
+                "<h4 align=\"center\">⚠️ 若要启用“赚京币”相关脚本, 必须先获取phoneID, 如何获取请查看<a href=\"https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjx.cfd.sign.conf\">重写规则注释</a> ⚠️</h4>"
             ],
             "icons": [
                 "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png"
@@ -56,18 +57,32 @@
                     "desc": "是否开启赚财富脚本(默认开启)"
                 },
                 {
-                    "id": "GLOBAL_JX_CFD_OPEN_ZJB",
-                    "name": "赚京币",
+                    "id": "GLOBAL_JX_CFD_OPEN_ZJB_SIGN",
+                    "name": "连续营业赢红包",
                     "val": "false",
                     "type": "boolean",
-                    "desc": "是否开启赚京币脚本(默认关闭，目前版本未实现)"
+                    "desc": "是否开启赚京币-连续营业赢红包(京喜App&微信小程序)脚本(默认关闭，获取phoneID后手动开启)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_ZJB_TASK",
+                    "name": "营业赚京币",
+                    "val": "false",
+                    "type": "boolean",
+                    "desc": "是否开启赚京币-营业赚京币脚本(默认关闭，目前版本未实现，获取phoneID后手动开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_BUILD",
                     "name": "升建筑",
                     "val": "true",
                     "type": "boolean",
-                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次)"
+                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次，不开启会升级一次)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD",
+                    "name": "成就赚财富(领)",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启赚京币-成就赚财富(领)脚本(默认开启)"
                 }
             ]
         }
