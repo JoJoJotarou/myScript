@@ -121,7 +121,7 @@ function jxCfdPickShell(cookie, dwType) {
 }
 
 async function jxCfdPickShells(cookie) {
-  const eventName = `【捡很多贝壳】`;
+  const eventName = `【捡20个贝壳】`;
   let taskList = await jxCfdZjbTaskList(cookie);
   // taskName 去海边捡贝壳
   let pickShellsTask =
