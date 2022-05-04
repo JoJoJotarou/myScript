@@ -213,15 +213,12 @@ async function jxCfdPickShells(cookie) {
     return;
   }
 
-  if (pickShellsTask.configTargetTimes === pickShellsTask.completedTimes) {
-    _log.push(`🟢${eventName}: 任务已完成, 后续脚本将检查`);
-    pickShellsTask.awardStatus === 1
-      ? _log.push(`🟢${eventName}: 任务已完成, 并领取过任务奖励`)
-      : _log.push(`🟢${eventName}: 任务已完成, 稍后领取任务奖励`);
+  if (pickShellsTask.completedTimes === pickShellsTask.targetTimes) {
+    _log.push(`🟢${eventName}: 任务已完成`);
     return;
   }
 
-  const remainTimes = pickShellsTask.configTargetTimes - pickShellsTask.completedTimes;
+  const remainTimes = pickShellsTask.targetTimes - pickShellsTask.completedTimes;
   let successTimes = 0;
   successTimes += await jxCfdPickShellByTimes(cookie, remainTimes);
 
@@ -234,14 +231,10 @@ async function jxCfdPickShells(cookie) {
   let icon = remainTimes === successTimes ? '🟢' : '🟡';
   _log.push(
     `${icon}${eventName}: 捡起${successTimes}个贝壳 (${pickShellsTask.completedTimes + successTimes}/${
-      pickShellsTask.configTargetTimes
+      pickShellsTask.targetTimes
     })`
   );
-  _desc.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.configTargetTimes}`);
-  if (remainTimes === successTimes) {
-    // TODO 领奖励
-    _log.push(`🟢${eventName}: 任务已完成, 并领取了任务奖励`);
-  }
+  _desc.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes}`);
 }
 
 // **********************
