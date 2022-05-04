@@ -146,15 +146,18 @@ async function jxCfdPickShells(cookie) {
   }
 }
 
-async function jxCfdPickShellByTimes(cookie, times) {
+async function jxCfdPickShellByTimes(cookie, times = 0) {
   // 捡N次贝壳
   // 冗余3次
   let maxPickTimes = times + 3;
-  let s;
+  let s = 0;
   const shellInfo = await jxCfdQueryShell(cookie);
 
   for (const shellList of [shellInfo.NormShell, shellInfo.CollShell]) {
-    if (times > pickTimes && shellList.length > 0) {
+    if (times === s || maxPickTimes === 0) {
+      break;
+    }
+    if (shellList.length > 0) {
       for (const shell of shellList) {
         if (shell.dwNum > 0) {
           for (let index = 0; index < shell.dwNum; index++) {

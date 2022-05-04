@@ -43,31 +43,31 @@
             "settings": [
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_PICKSHELL",
-                    "name": "开启捡贝壳脚本",
-                    "val": "true",
+                    "name": "捡20个捡贝壳",
+                    "val": true,
                     "type": "boolean",
                     "desc": "是否开启捡贝壳脚本(默认开启，并非一次性捡20个贝壳，当前有多少捡多少最多20个)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZCF",
-                    "name": "开启赚财富脚本",
-                    "val": "true",
+                    "name": "赚财富",
+                    "val": true,
                     "type": "boolean",
                     "desc": "是否开启赚财富脚本(默认开启)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB",
-                    "name": "开启赚京币脚本",
-                    "val": "false",
+                    "name": "赚京币",
+                    "val": false,
                     "type": "boolean",
                     "desc": "是否开启赚京币脚本(默认关闭，目前版本未实现)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_BUILD",
-                    "name": "开启升建筑脚本",
-                    "val": "true",
+                    "name": "升建筑",
+                    "val": true,
                     "type": "boolean",
-                    "desc": "是否开启升建筑脚本(默认开启，每次执行4中建筑各升级一次)"
+                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次)"
                 }
             ]
         }
