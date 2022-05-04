@@ -217,8 +217,7 @@ async function shake(cookie) {
 function _shake(cookie) {
   const eventName = '【摇奖】';
   let option = getOption(cookie, 'sharkBean', 'vvipclub_shaking_lottery', {});
-  option.url +=
-    '&h5st=20220428170255435%3B7810563172488273%3Bae692%3Btk02wee691d8118nws6sRJuqo6QXnqpgjgHklwsMZEIqKjb1gKlkx%2F4JX5OP%2F0kwGEhmbdOiuOYY3YycmRIAjHvyjg5H%3B830d177a7f231a848ee9a58f182b455c77e2a256785af07466b46b797eb34c5b%3B3.0%3B1651136575435';
+  option.url += `&h5st=${geth5st()}`;
 
   return new Promise((resolve, reject) => {
     $.post(option, (err, resp, data) => {
@@ -229,9 +228,12 @@ function _shake(cookie) {
           } else if (JSON.parse(data).data.lotteryType === 2) {
             const couponInfo = JSON.parse(data).data.couponInfo;
             if (couponInfo.couponType === 1) {
-              _log.push(`🟢${eventName}: 获得优惠券: 满${couponInfo.couponQuota}减${couponInfo.couponDiscount}, ${couponInfo.limitStr}, ${couponInfo.endTime}失效`);
+              _log.push(
+                `🟢${eventName}: 获得优惠券: 满${couponInfo.couponQuota}减${couponInfo.couponDiscount}, ${couponInfo.limitStr}, ${couponInfo.endTime}失效`
+              );
             } else {
               // 摇奖得京豆的概率很低，导致不知道怎么写
+              _desc.push(`🔥${eventName} 解锁新奖励，查看日志并反馈给作者`);
               _log.push(`🟢${eventName}: ${data}`);
             }
           } else {
@@ -314,6 +316,21 @@ async function main(cookieObj) {
 function ts() {
   // 获取时间戳
   return new Date().getTime();
+}
+
+function geth5st() {
+  const timestamp = ts();
+  return encodeURIComponent(
+    [
+      $.time('yyyyMMddHHmmssS'),
+      '7810563172488273',
+      'ae692',
+      'tk02wee691d8118nws6sRJuqo6QXnqpgjgHklwsMZEIqKjb1gKlkx/4JX5OP/0kwGEhmbdOiuOYY3YycmRIAjHvyjg5H',
+      '830d177a7f231a848ee9a58f182b455c77e2a256785af07466b46b797eb34c5b',
+      '3.0',
+      String(timestamp),
+    ].join(';')
+  );
 }
 
 // prettier-ignore

@@ -216,39 +216,11 @@ function jdJxDoubleSignInfo(cookie) {
   });
 }
 
-Date.prototype.Format = function (fmt) {
-  // 从faker2 京喜财富岛脚本中拷贝过来的
-  var e,
-    n = this,
-    d = fmt,
-    l = {
-      'M+': n.getMonth() + 1,
-      'd+': n.getDate(),
-      'D+': n.getDate(),
-      'h+': n.getHours(),
-      'H+': n.getHours(),
-      'm+': n.getMinutes(),
-      's+': n.getSeconds(),
-      'w+': n.getDay(),
-      'q+': Math.floor((n.getMonth() + 3) / 3),
-      'S+': n.getMilliseconds(),
-    };
-  /(y+)/i.test(d) && (d = d.replace(RegExp.$1, ''.concat(n.getFullYear()).substr(4 - RegExp.$1.length)));
-  for (var k in l) {
-    if (new RegExp('('.concat(k, ')')).test(d)) {
-      var t,
-        a = 'S+' === k ? '000' : '00';
-      d = d.replace(RegExp.$1, 1 == RegExp.$1.length ? l[k] : (''.concat(a) + l[k]).substr(''.concat(l[k]).length));
-    }
-  }
-  return d;
-};
-
 function geth5st() {
   const timestamp = ts();
   return encodeURIComponent(
     [
-      String(new Date(timestamp).Format('yyyyMMddhhmmssSSS')),
+      $.time('yyyyMMddHHmmssS'),
       '8302800516333237',
       '0f6ed',
       'tk02w38741f1918nVipfh3wPzyiXfhrzKXjjwRqhjqfkn4YdXllfxWcPejtr8ySYdqBmgyPq3YmC0zn95n2XZgfpGUlX',
