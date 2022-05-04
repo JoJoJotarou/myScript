@@ -30,9 +30,11 @@
             "name": "京喜财富岛",
             "keys": [
                 "GLOBAL_JX_CFD_OPEN_PICKSHELL",
+                "GLOBAL_JX_CFD_OPEN_BUILD",
                 "GLOBAL_JX_CFD_OPEN_ZCF",
-                "GLOBAL_JX_CFD_OPEN_ZJB",
-                "GLOBAL_JX_CFD_OPEN_BUILD"
+                "GLOBAL_JX_CFD_OPEN_ZJB_SIGN",
+                "GLOBAL_JX_CFD_OPEN_ZJB_TASK",
+                "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD"
             ],
             "descs_html": [
                 "<h4 align=\"center\">⚠️ 该订阅仅用于控制京喜财富岛相关变量 ⚠️</h4>",
@@ -48,6 +50,13 @@
                     "val": "true",
                     "type": "boolean",
                     "desc": "是否开启捡贝壳脚本(默认开启)"
+                },
+                {
+                    "id": "GLOBAL_JX_CFD_OPEN_BUILD",
+                    "name": "升建筑",
+                    "val": "true",
+                    "type": "boolean",
+                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次，不开启会升级一次)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZCF",
@@ -71,18 +80,11 @@
                     "desc": "是否开启赚京币-营业赚京币脚本(默认关闭，目前版本未实现，获取phoneID后手动开启)"
                 },
                 {
-                    "id": "GLOBAL_JX_CFD_OPEN_BUILD",
-                    "name": "升建筑",
-                    "val": "true",
-                    "type": "boolean",
-                    "desc": "是否开启升建筑脚本(默认开启，每次执行会将4种建筑各升级一次，不开启会升级一次)"
-                },
-                {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD",
                     "name": "成就赚财富(领)",
-                    "val": "true",
+                    "val": "false",
                     "type": "boolean",
-                    "desc": "是否开启赚京币-成就赚财富(领)脚本(默认开启)"
+                    "desc": "是否开启赚京币-成就赚财富(领)脚本(默认关闭)"
                 }
             ]
         }
