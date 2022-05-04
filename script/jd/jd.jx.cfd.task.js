@@ -2,6 +2,17 @@
  * @ZhouStarStar9527
  * @description 支持多账号
  * @description 入口：京喜APP -> 首页 -> 财富小岛
+ * @date 2022-05
+ *
+ * ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
+ * ⭐            Support Info            ⭐
+ * ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
+ *
+ * ✅赚京币 - 成就赚财富 - 捡20贝壳
+ * ❌赚京币 - 成就赚财富 - 领成就奖励
+ * ❌赚京币 - 任务赚京币 - 经营赚京币
+ * ✅赚财富
+ * ✅赚财富
  */
 const $ = Env('京喜财富小岛');
 
@@ -93,9 +104,9 @@ function jxCfdPickShell(cookie, dwType) {
           resp.statusCode === 200 &&
           JSON.parse(data).iRet === 0 &&
           JSON.parse(data).Data &&
-          JSON.parse(data).Data.dwNew > 0
+          JSON.parse(data).Data.strFirstDesc
         ) {
-          _log.push(`🟢${eventName}: 成功捡到${JSON.parse(data).Data.dwNew}个贝壳`);
+          _log.push(`🟢${eventName}: ${JSON.parse(data).Data.strFirstDesc}`);
           resolve(true);
         } else {
           throw err || data;
@@ -117,32 +128,39 @@ async function jxCfdPickShells(cookie) {
     taskList.filter((task) => task.taskId === 1309)[0] ||
     taskList.filter((task) => task.taskName === '去海边捡贝壳')[0];
 
-  if (pickShellsTask) {
-    if (pickShellsTask.configTargetTimes === pickShellsTask.completedTimes && pickShellsTask.awardStatus === 1) {
-      _log.push(`🟢${eventName}: 任务已完成并领取过任务奖励`);
-    } else if (pickShellsTask.configTargetTimes === pickShellsTask.completedTimes && pickShellsTask.awardStatus === 2) {
-      _log.push(`🟢${eventName}: 任务已完成，直接领取任务奖励`);
-      // TODO: 领取任务奖励
-    } else {
-      const remainTimes = pickShellsTask.configTargetTimes - pickShellsTask.completedTimes;
-      let successTimes = await jxCfdPickShellByTimes(cookie, remainTimes);
-      let icon = remainTimes === successTimes ? '🟢' : '🟡';
-      _log.push(
-        `${icon}${eventName}: 捡起${successTimes}个贝壳 (${pickShellsTask.completedTimes + successTimes}/${
-          pickShellsTask.configTargetTimes
-        })`
-      );
-      _desc.push(
-        `${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.configTargetTimes}`
-      );
-      if (remainTimes === successTimes) {
-        // TODO: 领取任务奖励
-        _log.push(`🟢${eventName}: 领取任务奖励暂未实现`);
-      }
-    }
-  } else {
+  if (!pickShellsTask) {
     _log.push(`🔴${eventName}: 没有找到捡贝壳任务 ${taskList}`);
     _desc.push(`🔴${eventName}`);
+    return;
+  }
+
+  if (pickShellsTask.configTargetTimes === pickShellsTask.completedTimes) {
+    _log.push(`🟢${eventName}: 任务已完成, 后续脚本将检查`);
+    pickShellsTask.awardStatus === 1
+      ? _log.push(`🟢${eventName}: 任务已完成, 并领取过任务奖励`)
+      : _log.push(`🟢${eventName}: 任务已完成, 稍后领取任务奖励`);
+    return;
+  }
+
+  const remainTimes = pickShellsTask.configTargetTimes - pickShellsTask.completedTimes;
+  let successTimes = 0;
+  successTimes += await jxCfdPickShellByTimes(cookie, remainTimes);
+
+  // 正常情况下，海边每次刷新10个贝壳，所以2次循环即可领取20个贝壳
+  if (remainTimes > successTimes) {
+    await randomWait(3000);
+    successTimes += await jxCfdPickShellByTimes(cookie, remainTimes);
+  }
+
+  let icon = remainTimes === successTimes ? '🟢' : '🟡';
+  _log.push(
+    `${icon}${eventName}: 捡起${successTimes}个贝壳 (${pickShellsTask.completedTimes + successTimes}/${
+      pickShellsTask.configTargetTimes
+    })`
+  );
+  _desc.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.configTargetTimes}`);
+  if (remainTimes === successTimes) {
+    _log.push(`🟢${eventName}: 任务已完成, 稍后领取任务奖励`);
   }
 }
 
