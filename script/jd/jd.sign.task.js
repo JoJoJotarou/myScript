@@ -101,8 +101,8 @@ async function main(cookie) {
       try {
         await main(cookieObj);
       } catch (error) {
-        _log.push(`🔴${error}`);
-        _desc.push(`🔴${error}`);
+        _log.push(`🔴 ${error}`);
+        _desc.push(`🔴 ${error}`);
         $.subt = `${cookieObj.nickname}`;
       } finally {
         $.log(..._log);

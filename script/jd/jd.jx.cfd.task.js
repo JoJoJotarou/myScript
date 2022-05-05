@@ -36,8 +36,8 @@ function jxCfdZjbTaskList(cookie, isAchievement = true) {
         if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && JSON.parse(data).data) {
           // task.taskType=11表示成就任务
           const taskList = isAchievement
-            ? JSON.parse(data).data.userTaskStatusList.filter(task.taskType === 11)
-            : JSON.parse(data).data.userTaskStatusList.filter(task.taskType !== 11);
+            ? JSON.parse(data).data.userTaskStatusList.filter((task) => task.taskType === 11)
+            : JSON.parse(data).data.userTaskStatusList.filter((task) => task.taskType !== 11);
           let unfinishedTasks = taskList.filter((task) => task.completedTimes < task.targetTimes) || [];
           let finishedTasks = taskList.filter((task) => task.completedTimes === task.targetTimes) || [];
           _log.push(
@@ -93,7 +93,7 @@ async function jxCfdZjbCompleteTask(cookie) {
   _log.push(
     `${icon}${eventName}: 总共${taskList.length}个任务, 本次完成${s}个任务，跳过${shopTasks.length}购物任务, 已完成${finishedTasks.length}个任务`
   );
-  _desc.push(`${icon}${eventName}${s + shopTasks.length + finishedTasks.length}/${taskList.length}`);
+  _desc.push(`${icon}${eventName}${s + shopTasks.length + finishedTasks.length}/${taskList.length} `);
 }
 
 // *************************
@@ -115,7 +115,7 @@ async function jxCfdZjbSignIn(cookie, jxPhoneId) {
   }
   if (jxToday.dwStatus === 0) {
     res = await jxCfdZjbAppOrWxSignIn(cookie, jxToday, jxPhoneId);
-    res ? _desc.push(`🟢${eventName} App`) : _desc.push(`🔴${eventName} App`);
+    res ? _desc.push(`🟢${eventName} App `) : _desc.push(`🔴${eventName} App `);
   } else {
     _log.push(`🟢${eventName}: 京喜App今日已签到`);
   }
@@ -123,7 +123,7 @@ async function jxCfdZjbSignIn(cookie, jxPhoneId) {
   // 微信小程序签到
   let wxSignInfo = await jxCfdZjbAppOrWxSignPage(cookie, 6);
   let wxToday =
-    wxToday.Sign.SignList.length > 0
+    wxSignInfo.Sign.SignList.length > 0
       ? wxSignInfo.Sign.SignList.filter((sign) => sign.dwDayId === wxSignInfo.Sign.dwTodayId)[0]
       : undefined;
   if (!wxToday) {
@@ -132,7 +132,7 @@ async function jxCfdZjbSignIn(cookie, jxPhoneId) {
   }
   if (wxToday.dwStatus === 0) {
     res = await jxCfdZjbAppOrWxSignIn(cookie, wxToday, jxPhoneId, 6);
-    res ? _desc.push(`🟢${eventName} 微信`) : _desc.push(`🔴${eventName} 微信`);
+    res ? _desc.push(`🟢${eventName} 微信 `) : _desc.push(`🔴${eventName} 微信 `);
   } else {
     _log.push(`🟢${eventName}: 微信小程序今日已签到`);
   }
@@ -240,7 +240,7 @@ async function jxCfdZjbGetAchieveReward(cookie) {
     }
     let icon = s === completedAchievementTasks.length ? '🟢' : '🟡';
     _log.push(`${icon}${eventName}: 成功领取${s}个成就奖励，总共有${completedAchievementTasks.length}个成就奖励可领取`);
-    _desc.push(`${icon}${eventName}: ${s}/${completedAchievementTasks.length}`);
+    _desc.push(`${icon}${eventName}: ${s}/${completedAchievementTasks.length} `);
   } else {
     _log.push(`🟢${eventName}: 没有可领取的成就奖励`);
   }
@@ -256,7 +256,7 @@ async function jxCfdPickShells(cookie) {
     taskList.filter((task) => task.taskName === '去海边捡贝壳')[0];
 
   if (!pickShellsTask) {
-    _log.push(`🔴${eventName}: 没有找到捡贝壳任务 ${taskList}`);
+    _log.push(`🔴${eventName}: 没有找到捡贝壳任务 ${JSON.stringify(taskList)}`);
     _desc.push(`🔴${eventName}`);
     return;
   }
@@ -283,7 +283,7 @@ async function jxCfdPickShells(cookie) {
       pickShellsTask.targetTimes
     })`
   );
-  _desc.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes}`);
+  _desc.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes} `);
 }
 
 // **********************
@@ -420,7 +420,7 @@ async function jxCfdBuildsLvlUp(cookie, targetTimes) {
   }
   let icon = s === targetTimes ? '🟢' : '🟡';
   _log.push(`${icon}${eventName}: 共升级${s}个建筑 ${s}/${targetTimes}`);
-  _desc.push(`${icon}${eventName}${s}/${targetTimes}`);
+  _desc.push(`${icon}${eventName}${s}/${targetTimes} `);
   return s;
 }
 
@@ -527,19 +527,22 @@ async function jxCfdZcfCompleteTask(cookie) {
     const eventName = `【赚财富】`;
     // 本次执行成功完成任务数量
     let num = 0;
-    let tasksInfo = await jxCfdZcfTaskList(cookie);
-    let taskList = tasksInfo.TaskList;
-    const totalTaskNum = taskList.length;
-    // 获取所有未全部完成的任务
-    taskList = taskList.filter((task) => task.dwAwardStatus !== 1);
-    const finishedTaskNum = totalTaskNum - taskList.length;
+    const tasksInfo = await jxCfdZcfTaskList(cookie);
 
-    if (taskList.length === 0) {
-      _log.push(`🟢${eventName}: 所有任务已经完成`);
-      return true;
+    if (tasksInfo.dwTotalTaskNum === tasksInfo.dwCompleteTaskNum && tasksInfo.dwStatus === 4) {
+      _log.push(`🟢${eventName}: 所有任务已经完成并领取了最终奖励`);
+      return;
+    } else if (tasksInfo.dwTotalTaskNum === tasksInfo.dwCompleteTaskNum && tasksInfo.dwStatus !== 4) {
+      _log.push(`🟢${eventName}: 所有任务已经完成但未领取最终奖励`);
+      await jxCfdZcfGetFinalReward(cookie);
+      return;
     }
 
-    for (const task of taskList) {
+    // 获取所有未全部完成的任务
+    const unfinishedTasks = tasksInfo.TaskList.filter((task) => task.dwAwardStatus !== 1);
+    const finishedTaskNum = tasksInfo.TaskList.length - unfinishedTasks.length;
+
+    for (const task of unfinishedTasks) {
       let res = false;
       // 未完成任务
       if (task.dwCompleteNum !== task.dwTargetNum) {
@@ -556,39 +559,25 @@ async function jxCfdZcfCompleteTask(cookie) {
           _log.push(`🟢${eventName}【${task.strTaskName}】: 任务已完成，直接领取任务奖励`);
           res = await jxCfdGetTaskReward(cookie, task);
           res ? num++ : num + 0;
-        } else if (task.dwAwardStatus === 1) {
-          _log.push(`🟢${eventName}【${task.strTaskName}】: 任务已完成并领取过任务奖励`);
         } else {
           _log.push(`🔴${eventName}【${task.strTaskName}】: 任务数据异常 ${JSON.stringify(task)}`);
         }
       }
     }
 
-    let icon = num + finishedTaskNum === totalTaskNum ? '🟢' : '🟡';
-    _desc.push(`${icon}${eventName}${num + finishedTaskNum}/${totalTaskNum}`);
-    return num + finishedTaskNum === totalTaskNum ? true : false;
+    let icon = '🟡';
+    if (num + finishedTaskNum === tasksInfo.TaskList.length) {
+      await jxCfdZcfGetFinalReward(cookie);
+      icon = '🟢';
+    }
+    _desc.push(`${icon}${eventName}${num + finishedTaskNum}/${tasksInfo.TaskList.length} `);
   } catch (error) {
     _log.push(`🔴${eventName}: ${error}`);
     _desc.push(`🔴${eventName}`);
   }
 }
 
-async function jxCfdZcfGetFinalReward(cookie) {
-  const eventName = `【赚财富终奖】`;
-  let tasksInfo = await jxCfdZcfTaskList(cookie);
-
-  if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum && tasksInfo.dwStatus !== 4) {
-    _log.push(`🟢${eventName} 所有任务已完成，开始领奖`);
-    await _jxCfdZcfGetFinalReward(cookie);
-  } else if (tasksInfo.dwCompleteTaskNum === tasksInfo.dwTotalTaskNum && tasksInfo.dwStatus === 4) {
-    _log.push(`🟢${eventName} 今日已领取`);
-  } else {
-    _log.push(`🔴${eventName} 数据异常 ${JSON.stringify(tasksInfo)}`);
-    _desc.push(`🔴${eventName}`);
-  }
-}
-
-function _jxCfdZcfGetFinalReward(cookie) {
+function jxCfdZcfGetFinalReward(cookie) {
   const eventName = `【赚财富终奖】`;
   const option = getOption(
     `https://m.jingxi.com/jxbfd/story/ActTaskAward?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=7&_cfd_t=${ts()}&ptag=138631.77.28&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
@@ -599,9 +588,10 @@ function _jxCfdZcfGetFinalReward(cookie) {
     $.get(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).iRet === 0 && JSON.parse(data).Data) {
-          // “签到抽红包”任务特殊处理
           _rich += JSON.parse(data).Data.ddwBigReward;
           _log.push(`🟢${eventName}: 获得${JSON.parse(data).Data.ddwBigReward}财富奖励`);
+        } else if (JSON.parse(data).sErrMsg.indexOf('已经领过奖') !== -1) {
+          _log.push(`🟡${eventName}: 今日已领取`);
         } else {
           throw err || data;
         }
@@ -771,9 +761,7 @@ async function main(cookieObj) {
   }
   if ($.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === undefined) {
     // 赚财富所有任务
-    if (await jxCfdZcfCompleteTask(cookieObj.cookie)) {
-      await jxCfdZcfGetFinalReward(cookieObj.cookie);
-    }
+    jxCfdZcfCompleteTask(cookieObj.cookie);
   }
 
   if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === undefined) {
@@ -781,7 +769,7 @@ async function main(cookieObj) {
       // 赚京币京喜App&微信小程序双签
       await jxCfdZjbSignIn(cookieObj.cookie, cookieObj.jxPhoneId);
     } else {
-      _desc.push('如需完成京喜App&微信小程序双签请先按照重写规则说明获取一次PhoneId');
+      _desc.push('如需完成京喜App&微信小程序双签请先按照重写规则说明获取一次PhoneId ');
     }
   }
 
@@ -819,8 +807,8 @@ async function main(cookieObj) {
       try {
         await main(cookieObj);
       } catch (error) {
-        _log.push(`🔴${error}`);
-        _desc.push(`🔴${error}`);
+        _log.push(`🔴 ${error}`);
+        _desc.push(`🔴 ${error}`);
         $.subt = `${cookieObj.nickname}`;
       } finally {
         $.log(..._log);
