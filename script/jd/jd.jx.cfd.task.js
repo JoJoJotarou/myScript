@@ -197,6 +197,7 @@ function jxCfdZjbAppOrWxSignIn(cookie, sign, jxPhoneId, dwEnv = 7) {
           resolve(true);
         } else if (resp.statusCode === 200 && JSON.parse(data).iRet !== 0) {
           _log.push(`🟡${eventName}: ${JSON.parse(data).sErrMsg}`);
+          resolve(false);
         } else {
           throw err || data;
         }
@@ -544,22 +545,7 @@ async function jxCfdZcfCompleteTask(cookie) {
       if (task.dwCompleteNum !== task.dwTargetNum) {
         // 做任务并领取奖励
         await randomWait(task.dwLookTime * 1000);
-        if (task.dwTargetNum === 1) {
-          res = await jxCfdDoTask(cookie, task);
-        } else {
-          if (task.ddwTaskId === 1630) {
-            let successTimes = await jxCfdPickShellByTimes(cookie, task.dwTargetNum - task.dwCompleteNum);
-            res = successTimes === task.dwTargetNum - task.dwCompleteNum ? true : false;
-            let icon = res ? '🟢' : '🟡';
-            _log.push(
-              `${icon}${eventName}: 捡起${successTimes}个贝壳 ${task.dwCompleteNum + successTimes}/${task.dwTargetNum}`
-            );
-            // _desc.push(`${icon}${eventName}${task.dwCompleteNum + successTimes}/${task.dwTargetNum}`);
-          } else {
-            _log.push(`🔴${eventName}【${task.strTaskName}】: 任务数据异常 ${task}`);
-          }
-        }
-
+        res = await jxCfdDoTask(cookie, task);
         if (res) {
           res = await jxCfdGetTaskReward(cookie, task);
           res ? num++ : num + 0;
@@ -629,10 +615,19 @@ function _jxCfdZcfGetFinalReward(cookie) {
 }
 
 async function jxCfdDoTask(cookie, task, isZcf = true) {
-  let eventName = `【做任务-${task.strTaskName}】`;
-  if (task.ddwTaskId === 1634) {
+  let eventName = `【做任务-${task.strTaskName || task.taskName}】`;
+  if (isZcf && task.ddwTaskId === 1634) {
     _log.push(`🟢${eventName}: 开始`);
     return (await jxCfdBuildsLvlUp(cookie, 1)) === 1 ? true : false;
+  } else if (isZcf && task.ddwTaskId === 1634) {
+    _log.push(`🟢${eventName}: 开始`);
+    let successTimes = await jxCfdPickShellByTimes(cookie, task.dwTargetNum - task.dwCompleteNum);
+    let res = successTimes === task.dwTargetNum - task.dwCompleteNum ? true : false;
+    let icon = res ? '🟢' : '🟡';
+    _log.push(
+      `${icon}${eventName}: 捡起${successTimes}个贝壳 ${task.dwCompleteNum + successTimes}/${task.dwTargetNum}`
+    );
+    return res;
   } else {
     return await _jxCfdDoTask(cookie, task, isZcf);
   }
@@ -708,7 +703,7 @@ function jxCfdGetTaskReward(cookie, task, isZcf = true) {
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && task.ddwTaskId === 3108) {
+        if (isZcf && resp.statusCode === 200 && JSON.parse(data).ret === 0 && task.ddwTaskId === 3108) {
           // “签到抽红包”任务特殊处理
           let prize = JSON.parse(JSON.parse(data).data.prizeInfo).strPrizeName;
           _cash += Number(prize.match(/([\d\.]+)/)[1]);
