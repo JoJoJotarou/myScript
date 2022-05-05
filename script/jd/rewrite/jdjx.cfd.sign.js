@@ -9,7 +9,9 @@ let _desc = [];
 
 !(async () => {
   const cookie = $request.headers['Cookie'] || $request.headers['cookie'];
-  const phoneId = $request.url.match(/strPhoneID=(\w+)/)[1];
+  const strPhoneID = $request.url.match(/strPhoneID=(\w+)/)[1];
+  const strPgUUNum = $request.url.match(/strPgUUNum=(\w+)/)[1];
+  const h5st = $request.url.match(/h5st=(.+)&/)[1];
   if (
     cookie &&
     cookie.toLocaleLowerCase().indexOf('pt_key') !== -1 &&
@@ -24,14 +26,24 @@ let _desc = [];
       currentCookieObj = cookieObjs.filter((cookie) => cookie.userId === currentUserId)[0];
       if (!currentCookieObj) {
         _desc.push('浏览器访问 https://plogin.m.jd.com/login/login 登录后，点击"我的"更新京东CK');
-        currentCookieObj = { userId: currentUserId, nickname: currentUserId, cookie: cookie, jxPhoneId: phoneId };
+        currentCookieObj = {
+          userId: currentUserId,
+          nickname: currentUserId,
+          cookie: cookie,
+          jx: { cfd: { strPhoneID: strPhoneID, strPgUUNum: strPgUUNum, h5st: h5st } },
+        };
         cookieObjs.push(currentCookieObj);
       } else {
-        currentCookieObj['jxPhoneId'] = phoneId;
+        currentCookieObj['jx'] = { cfd: { strPhoneID: strPhoneID, strPgUUNum: strPgUUNum, h5st: h5st } };
       }
     } else {
       _desc.push('浏览器访问 https://plogin.m.jd.com/login/login 登录后，点击"我的"更新京东CK');
-      currentCookieObj = { userId: currentUserId, nickname: currentUserId, cookie: cookie, jxPhoneId: phoneId };
+      currentCookieObj = {
+        userId: currentUserId,
+        nickname: currentUserId,
+        cookie: cookie,
+        jx: { cfd: { strPhoneID: strPhoneID, strPgUUNum: strPgUUNum, h5st: h5st } },
+      };
       cookieObjs.push(currentCookieObj);
     }
     $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
