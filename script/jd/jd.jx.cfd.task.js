@@ -688,32 +688,32 @@ async function main(cookieObj) {
   if ($.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === undefined) {
     // 赚财富所有任务
     await jxCfdZcfCompleteTask(cookieObj.cookie);
-    await randomWait();
     await jxCfdZcfGetFinalReward(cookieObj.cookie);
   }
 
-  if (cookieObj.jxPhoneId) {
-    if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === undefined) {
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === undefined) {
+    if (cookieObj.jxPhoneId) {
       // 赚京币京喜App&微信小程序双签
       jxCfdZjbSignIn(cookieObj.cookie, cookieObj.jxPhoneId);
+    } else {
+      _desc.push('如需完成京喜App&微信小程序双签请先按照重写规则说明获取一次PhoneId');
     }
-    if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_TASK') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_TASK') === undefined) {
-      // 赚京币所有任务
-      await jxCfdZjbCompleteTask(cookieObj.cookie);
-    }
-    if (
-      $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD') === 'true' ||
-      $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD') === undefined
-    ) {
-      // 领成就奖励
-      await jxCfdZjbGetAchieveReward(cookieObj.cookie);
-    }
-  } else {
-    _desc.push('请先按照重写规则说明获取一次PhoneId');
+  }
+
+  if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_TASK') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_TASK') === undefined) {
+    // 赚京币所有任务
+    await jxCfdZjbCompleteTask(cookieObj.cookie);
+  }
+  if (
+    $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD') === 'true' ||
+    $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD') === undefined
+  ) {
+    // 领成就奖励
+    await jxCfdZjbGetAchieveReward(cookieObj.cookie);
   }
 
   if (_desc.length > 0) {
-    $.subt = `${cookieObj.nickname}, 京币: +${_jxCoins}万个, 财富: + ${_rich}点，红包: +${_cash}元`;
+    $.subt = `${cookieObj.nickname}, 京币: +${_jxCoins}万个, 财富: +${_rich}点，红包: +${_cash}元`;
   } else {
     $.subt = `${cookieObj.nickname}, 一切安好，查看日志了解详情`;
   }
