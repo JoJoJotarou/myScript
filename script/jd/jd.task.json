@@ -68,16 +68,16 @@
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_SIGN",
                     "name": "连续营业赢红包",
-                    "val": false,
+                    "val": true,
                     "type": "boolean",
-                    "desc": "是否开启赚京币-连续营业赢红包(京喜App&微信小程序)脚本(默认关闭，获取phoneID后手动开启)"
+                    "desc": "是否开启赚京币-连续营业赢红包(京喜App&微信小程序)脚本(默认开启，需要获取phoneID)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_TASK",
                     "name": "营业赚京币",
                     "val": true,
                     "type": "boolean",
-                    "desc": "是否开启赚京币-营业赚京币脚本(默认开启，目前版本未实现)"
+                    "desc": "是否开启赚京币-营业赚京币脚本(默认开启，购物任务自动跳过)"
                 },
                 {
                     "id": "GLOBAL_JX_CFD_OPEN_ZJB_ACHIEVE_REWARD",

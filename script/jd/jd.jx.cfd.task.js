@@ -22,9 +22,9 @@ const $ = Env('京喜财富小岛');
 let _log, _desc;
 let _cash, _jxCoins, _rich;
 
-function jxCfdZjbTaskList(cookie) {
+function jxCfdZjbTaskList(cookie, isAchievement = true) {
   // 赚京币任务列表(成就赚财富任务9个，经营赚京币11个)
-  const eventName = '【赚京币-任务列表】';
+  const eventName = `【赚京币-${isAchievement ? '成就' : '经营'}任务列表】`;
   const option = getOption(
     `https://m.jingxi.com/newtasksys/newtasksys_front/GetUserTaskStatusList?strZone=jxbfd&bizCode=jxbfd&source=jxbfd&dwEnv=7&_cfd_t=${ts()}&ptag=138631.77.28&taskId=0&showAreaTaskFlag=0&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2CshowAreaTaskFlag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
     { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
@@ -34,7 +34,10 @@ function jxCfdZjbTaskList(cookie) {
     $.get(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && JSON.parse(data).data) {
-          const taskList = JSON.parse(data).data.userTaskStatusList;
+          // task.taskType=11表示成就任务
+          const taskList = isAchievement
+            ? JSON.parse(data).data.userTaskStatusList.filter(task.taskType === 11)
+            : JSON.parse(data).data.userTaskStatusList.filter(task.taskType !== 11);
           let unfinishedTasks = taskList.filter((task) => task.completedTimes < task.targetTimes) || [];
           let finishedTasks = taskList.filter((task) => task.completedTimes === task.targetTimes) || [];
           _log.push(
@@ -53,11 +56,44 @@ function jxCfdZjbTaskList(cookie) {
   });
 }
 
-// ************************
-// ***任务赚京币相关函数***
-// ************************
+// ******************************
+// ***经营赚京币(任务)相关函数***
+// ******************************
 async function jxCfdZjbCompleteTask(cookie) {
-  _log.push('🟡【赚京币】: 当前模块暂未开发');
+  const eventName = '【经营赚京币】';
+  const taskList = await jxCfdZjbTaskList(cookie, false);
+  let s = 0;
+
+  const shopTasks = taskList.filter((task) => task.taskType === 20);
+  const finishedTasks = taskList.filter(
+    (task) => task.taskType !== 20 && task.completedTimes === task.targetTimes && task.prizeInfo.length > 0
+  );
+  if (shopTasks.length + finishedTasks.length === taskList.length) {
+    _log.push(`🟢${eventName}: ${shopTasks.length}个消费任务跳过, 所有任务已完成`);
+    return;
+  }
+
+  const unfinishedTasks = taskList.filter((task) => task.taskType !== 20 && task.prizeInfo.length === 0);
+  for (const task of unfinishedTasks) {
+    let res = false;
+    if (task.completedTimes === task.targetTimes && task.prizeInfo.length === 0) {
+      res = await jxCfdGetTaskReward(cookie, task, false);
+    } else if (task.completedTimes < task.targetTimes) {
+      await randomWait(4000);
+      if (await jxCfdDoTask(cookie, task, false)) {
+        await randomWait(200);
+        res = await jxCfdGetTaskReward(cookie, task, false);
+      }
+    } else {
+      _log.push(`🔴${eventName}: 数据异常 ${JSON.stringify(task)}`);
+    }
+    res ? s++ : s;
+  }
+  let icon = s + shopTasks.length + finishedTasks.length === taskList.length ? '🟢' : '🟡';
+  _log.push(
+    `${icon}${eventName}: 总共${taskList.length}个任务, 本次完成${s}个任务，跳过${shopTasks.length}购物任务, 已完成${finishedTasks.length}个任务`
+  );
+  _desc.push(`${icon}${eventName}${s + shopTasks.length + finishedTasks.length}/${taskList.length}`);
 }
 
 // *************************
@@ -509,7 +545,7 @@ async function jxCfdZcfCompleteTask(cookie) {
         // 做任务并领取奖励
         await randomWait(task.dwLookTime * 1000);
         if (task.dwTargetNum === 1) {
-          res = await jxCfdZcfDoTask(cookie, task);
+          res = await jxCfdDoTask(cookie, task);
         } else {
           if (task.ddwTaskId === 1630) {
             let successTimes = await jxCfdPickShellByTimes(cookie, task.dwTargetNum - task.dwCompleteNum);
@@ -592,22 +628,37 @@ function _jxCfdZcfGetFinalReward(cookie) {
   });
 }
 
-async function jxCfdZcfDoTask(cookie, task) {
-  let eventName = `【赚财富-做任务-${task.strTaskName}】`;
+async function jxCfdDoTask(cookie, task, isZcf = true) {
+  let eventName = `【做任务-${task.strTaskName}】`;
   if (task.ddwTaskId === 1634) {
-    _log.push(`🟢${eventName}: 即将开始`);
+    _log.push(`🟢${eventName}: 开始`);
     return (await jxCfdBuildsLvlUp(cookie, 1)) === 1 ? true : false;
   } else {
-    return await _jxCfdZcfDoTask(cookie, task);
+    return await _jxCfdDoTask(cookie, task, isZcf);
   }
 }
 
-function _jxCfdZcfDoTask(cookie, task) {
-  let eventName = `【赚财富-做任务-${task.strTaskName}】`;
+function _jxCfdDoTask(cookie, task, isZcf) {
+  let eventName = `【做任务-${task.strTaskName || task.taskName}】`;
   const option = getOption(
-    `https://m.jingxi.com/newtasksys/newtasksys_front/DoTask?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=${ts()}&ptag=7155.9.47&taskId=${
-      task.ddwTaskId
-    }&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    'https://m.jingxi.com/newtasksys/newtasksys_front/DoTask?' +
+      [
+        'strZone=jxbfd',
+        `bizCode=${isZcf ? 'jxbfddch' : 'jxbfd'}`,
+        'source=jxbfd',
+        'dwEnv=7',
+        `_cfd_t=${ts()}`,
+        `ptag=${isZcf ? '7155.9.47' : '138631.77.28'}`,
+        `taskId=${task.ddwTaskId || task.taskId}`,
+        '_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId',
+        '_ste=1',
+        `h5st=${geth5st()}`,
+        `_=${ts()}`,
+        'sceneval=2',
+        'g_login_type=1',
+        'g_ty=ls',
+        'appCode=msd1188198',
+      ].join('&'),
     { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
   );
 
@@ -629,13 +680,28 @@ function _jxCfdZcfDoTask(cookie, task) {
   });
 }
 
-function jxCfdGetTaskReward(cookie, task) {
+function jxCfdGetTaskReward(cookie, task, isZcf = true) {
   // 领任务完成奖（适用于赚财富任务/成就任务/赚京币任务）
-  let eventName = `【领任务奖-${task.strTaskName}】`;
+  let eventName = `【领任务奖-${task.strTaskName || task.taskName}】`;
   const option = getOption(
-    `https://m.jingxi.com/newtasksys/newtasksys_front/Award?strZone=jxbfd&bizCode=jxbfddch&source=jxbfd&dwEnv=7&_cfd_t=${ts()}&ptag=138631.77.28&taskId=${
-      task.ddwTaskId
-    }&_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId&_ste=1&h5st=${geth5st()}&_=${ts()}&sceneval=2&g_login_type=1&g_ty=ls&appCode=msd1188198`,
+    'https://m.jingxi.com/newtasksys/newtasksys_front/Award?' +
+      [
+        'strZone=jxbfd',
+        `bizCode=${isZcf ? 'jxbfddch' : 'jxbfd'}`,
+        'source=jxbfd',
+        'dwEnv=7',
+        `_cfd_t=${ts()}`,
+        'ptag=138631.77.28',
+        `taskId=${task.ddwTaskId || task.taskId}`,
+        '_stk=_cfd_t%2CbizCode%2CdwEnv%2Cptag%2Csource%2CstrZone%2CtaskId',
+        '_ste=1',
+        `h5st=${geth5st()}`,
+        `_=${ts()}`,
+        'sceneval=2',
+        'g_login_type=1',
+        'g_ty=ls',
+        'appCode=msd1188198',
+      ].join('&'),
     { Cookie: cookie, 'User-Agent': userAgent('jx'), Referer: 'https://st.jingxi.com/fortune_island/index2.html' }
   );
 
@@ -650,6 +716,12 @@ function jxCfdGetTaskReward(cookie, task) {
           resolve(true);
         } else if (resp.statusCode === 200 && JSON.parse(data).ret === 0) {
           const prizeInfo = JSON.parse(JSON.parse(data).data.prizeInfo);
+          if (prizeInfo.CardInfo && prizeInfo.CardInfo.CardList && prizeInfo.CardInfo.CardList.length > 0) {
+            for (const card of prizeInfo.CardInfo.CardList) {
+              // 加成卡
+              _log.push(`🟢${eventName}: 获得${card.strCardName}`);
+            }
+          }
           if (prizeInfo.ddwCoin > 0) {
             _jxCoins += prizeInfo.ddwCoin / 10000;
             _log.push(`🟢${eventName}: 获得${prizeInfo.ddwCoin / 10000}万个京币奖励`);
