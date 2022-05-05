@@ -11,7 +11,7 @@ let _desc = [];
   const cookie = $request.headers['Cookie'] || $request.headers['cookie'];
   const strPhoneID = $request.url.match(/strPhoneID=(\w+)/)[1];
   const strPgUUNum = $request.url.match(/strPgUUNum=(\w+)/)[1];
-  const h5st = $request.url.match(/h5st=(.+)&/)[1];
+  const h5st = $request.url.match(/h5st=([\d|%|\w|.])&/)[1];
   if (
     cookie &&
     cookie.toLocaleLowerCase().indexOf('pt_key') !== -1 &&
