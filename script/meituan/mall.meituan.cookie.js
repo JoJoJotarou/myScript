@@ -14,10 +14,11 @@ const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', '
     .split('&')
     .filter((param) => generalQueryParams.includes(param.split('=')[0]))
     .join('&');
-  const xuuid = $request.url
-    .match(/queryTaskListInfoV2\?(.*)/)[1]
-    .split('&')
-    .filter((param) => 'xuuid' === param.split('=')[0]);
+  const xuuid =
+    $request.url
+      .match(/queryTaskListInfoV2\?(.*)/)[1]
+      .split('&')
+      .filter((param) => 'xuuid' === param.split('=')[0])[0] || '';
 
   if (cookie.toLocaleLowerCase().indexOf('token=') !== -1) {
     $.setdata(
