@@ -861,7 +861,7 @@ async function main(cookieObj) {
       }(+${_rich})，红包: +${_cash}`
     );
   } else {
-    _desc.push(`京币: +${_jxCoins}万, 财富: +${_rich}，红包: +${_cash}`);
+    _desc.push(`京币: +${_jxCoins.toFixed(2)}万, 财富: +${_rich}，红包: +${_cash}`);
   }
 }
 
