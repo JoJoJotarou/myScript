@@ -19,11 +19,11 @@ function jdSignIn(cookie) {
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        _data = JSON.parse(data).data;
-        if (resp.statusCode === 200 && _data) {
-          if (_data.status === '1') {
-            _beans += Number(_data.dailyAward.beanAward.beanCount) || 0;
-            _log.push(`🟢${eventName}: 获得${_data.dailyAward.beanAward.beanCount}个京豆`);
+        if (resp.statusCode === 200 && JSON.parse(data).data) {
+          if (JSON.parse(data).data.status === '1') {
+            const award = JSON.parse(data).data.dailyAward || JSON.parse(data).data.continuityAward;
+            _beans += Number(award.beanAward.beanCount) || 0;
+            _log.push(`🟢${eventName}: 获得${award.beanAward.beanCount}个京豆`);
             _desc.push(`🟢${eventName}`);
           } else if (_data.status === '2') {
             _log.push(`🟡${eventName}: 今天已签到`);
