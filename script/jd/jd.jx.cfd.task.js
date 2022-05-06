@@ -10,10 +10,10 @@
  *
  * 🚨务必通过重写脚本获取一次关键信息，使用请查看https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjx.cfd.sign.conf
  *
- * ✅ 赚京币 - 成就赚财富 - 捡20贝壳
+ * ✅ 赚京币 - 成就赚财富 - 捡20贝壳 (一次可能完不成)
  * ✅ 赚财富
  * ✅ 赚京币 - 成就赚财富 - 领成就奖励
- * ❌ 赚京币 - 任务赚京币 - 经营赚京币
+ * ✅ 赚京币 - 任务赚京币 - 经营赚京币
  * ✅ 赚京币 - 任务赚京币 - 连续营业赢红包(京喜App&微信小程序双签)
  * ❌ 故事任务
  */
@@ -113,7 +113,17 @@ async function jxCfdZjbCompleteTask(cookie) {
       res = await jxCfdGetTaskReward(cookie, task, false);
     } else if (task.completedTimes < task.targetTimes) {
       await randomWait(4000);
-      if (await jxCfdDoTask(cookie, task, false)) {
+      let _i = 0;
+      // 有浏览多次的情况
+      for (let i = 0; i < task.targetTimes; i++) {
+        if (await jxCfdDoTask(cookie, task, false)) {
+          _i++;
+          if (i < task.targetTimes - 1) {
+            await randomWait(4000);
+          }
+        }
+      }
+      if (_i === task.targetTimes) {
         await randomWait(200);
         res = await jxCfdGetTaskReward(cookie, task, false);
       }
@@ -122,11 +132,15 @@ async function jxCfdZjbCompleteTask(cookie) {
     }
     res ? s++ : s;
   }
-  let icon = s + shopTasks.length + finishedTasks.length === taskList.length ? '🟢' : '🟡';
+
+  let icon = '🟢';
+  if (s + shopTasks.length + finishedTasks.length !== taskList.length) {
+    icon = '🟡';
+    _errEvents.push(`${icon}${eventName}${s + shopTasks.length + finishedTasks.length}/${taskList.length} `);
+  }
   _log.push(
     `${icon}${eventName}: 总共${taskList.length}个任务, 本次完成${s}个任务，跳过${shopTasks.length}购物任务, 已完成${finishedTasks.length}个任务`
   );
-  _errEvents.push(`${icon}${eventName}${s + shopTasks.length + finishedTasks.length}/${taskList.length} `);
 }
 
 // *************************
@@ -143,14 +157,14 @@ async function jxCfdZjbSignIn(cookie) {
       ? jxSignInfo.Sign.SignList.filter((sign) => sign.dwDayId === jxSignInfo.Sign.dwTodayId)[0]
       : undefined;
   if (!jxToday) {
-    _log.push(`🟢${eventName}: 找不到京喜App签到信息 ${JSON.stringify(jxSignInfo)}`);
+    _log.push(`🔴${eventName}: 找不到京喜App签到信息 ${JSON.stringify(jxSignInfo)}`);
     throw '找不到京喜App签到信息';
   }
   if (jxToday.dwStatus === 0) {
     res = await jxCfdZjbAppOrWxSignIn(cookie, jxToday);
-    res ? _errEvents.push(`🟢${eventName} App `) : _errEvents.push(`🔴${eventName} App `);
+    res ? _log.push(`🟢${eventName} App 签到成功`) : _errEvents.push(`🔴${eventName} App 签到失败`);
   } else {
-    _log.push(`🟢${eventName}: 京喜App今日已签到`);
+    _log.push(`🟡${eventName}: 京喜App今日已签到`);
   }
   await randomWait();
   // 微信小程序签到
@@ -165,9 +179,9 @@ async function jxCfdZjbSignIn(cookie) {
   }
   if (wxToday.dwStatus === 0) {
     res = await jxCfdZjbAppOrWxSignIn(cookie, wxToday, 6);
-    res ? _errEvents.push(`🟢${eventName} 微信 `) : _errEvents.push(`🔴${eventName} 微信 `);
+    res ? _log.push(`🟢${eventName} 微信签到成功 `) : _errEvents.push(`🔴${eventName} 微信签到失败 `);
   } else {
-    _log.push(`🟢${eventName}: 微信小程序今日已签到`);
+    _log.push(`🟡${eventName}: 微信小程序今日已签到`);
   }
 }
 
@@ -259,7 +273,7 @@ async function jxCfdZjbGetAchieveReward(cookie) {
   let completedAchievementTasks = [];
 
   // 完成的每日成就任务(每日成就任务dateType=2，领取后prizeInfo有数据)
-  completedAchievementTasks.concat(
+  completedAchievementTasks = completedAchievementTasks.concat(
     taskList.filter(
       (task) =>
         task.taskType === 11 &&
@@ -269,7 +283,7 @@ async function jxCfdZjbGetAchieveReward(cookie) {
     )
   );
   // 完成的长期成就任务(长期成就任务dateType=1，prizeInfo一直有数据，所以只要当前目标完成就可以领取奖励，领取后当前目标数值增加)
-  completedAchievementTasks.concat(
+  completedAchievementTasks = completedAchievementTasks.concat(
     taskList.filter((task) => task.taskType === 11 && task.dateType === 1 && task.completedTimes === task.targetTimes)
   );
 
@@ -277,11 +291,14 @@ async function jxCfdZjbGetAchieveReward(cookie) {
     for (const achieveCompleteTask of completedAchievementTasks) {
       (await jxCfdGetTaskReward(cookie, achieveCompleteTask)) ? s++ : null;
     }
-    let icon = s === completedAchievementTasks.length ? '🟢' : '🟡';
+    let icon = '🟢';
+    if (s !== completedAchievementTasks.length) {
+      icon = '🟡';
+      _errEvents.push(`${icon}${eventName}: ${s}/${completedAchievementTasks.length} `);
+    }
     _log.push(`${icon}${eventName}: 成功领取${s}个成就奖励，总共有${completedAchievementTasks.length}个成就奖励可领取`);
-    _errEvents.push(`${icon}${eventName}: ${s}/${completedAchievementTasks.length} `);
   } else {
-    _log.push(`🟢${eventName}: 没有可领取的成就奖励`);
+    _log.push(`🟡${eventName}: 没有可领取的成就奖励`);
   }
 }
 
@@ -309,20 +326,25 @@ async function jxCfdPickShells(cookie) {
   let successTimes = 0;
   successTimes += await jxCfdPickShellByTimes(cookie, remainTimes);
 
-  // 正常情况下，海边每次刷新10个贝壳，所以2次循环即可领取20个贝壳
+  // 海边每次最多刷新10个贝壳，2次有可能直接捡20个贝壳
   if (remainTimes > successTimes) {
     _log.push(`🟢${eventName}: 等待刷新贝壳`);
-    await randomWait(9000);
+    await randomWait(15000);
     successTimes += await jxCfdPickShellByTimes(cookie, remainTimes);
   }
 
-  let icon = remainTimes === successTimes ? '🟢' : '🟡';
+  let icon = '🟢';
+  if (remainTimes === successTimes) {
+    icon = '🟡';
+    _errEvents.push(
+      `${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes} `
+    );
+  }
   _log.push(
     `${icon}${eventName}: 捡起${successTimes}个贝壳 (${pickShellsTask.completedTimes + successTimes}/${
       pickShellsTask.targetTimes
     })`
   );
-  _errEvents.push(`${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes} `);
 }
 
 // **********************
@@ -330,7 +352,7 @@ async function jxCfdPickShells(cookie) {
 // **********************
 /**
  * @name 海边贝壳列表
- * @description 每次刷新出10个贝壳（非收藏家的贝壳，收藏家也是10个）
+ * @description 最多刷新出10个贝壳（收藏家也是最多10个）
  * @param {*} cookie
  * @returns
  */
@@ -460,9 +482,12 @@ async function jxCfdBuildsLvlUp(cookie, targetTimes) {
   if (notCanLvlUp === buildsIndex.length) {
     _log.push(`🟡${eventName}: 所有建筑都不能升级`);
   }
-  let icon = s === targetTimes ? '🟢' : '🟡';
+  let icon = '🟢';
+  if (s === targetTimes) {
+    icon = '🟡';
+    _errEvents.push(`${icon}${eventName}${s}/${targetTimes} `);
+  }
   _log.push(`${icon}${eventName}: 共升级${s}个建筑 ${s}/${targetTimes}`);
-  _errEvents.push(`${icon}${eventName}${s}/${targetTimes} `);
   return s;
 }
 
@@ -576,10 +601,10 @@ async function jxCfdZcfCompleteTask(cookie) {
     const tasksInfo = await jxCfdZcfTaskList(cookie);
 
     if (tasksInfo.dwTotalTaskNum === tasksInfo.dwCompleteTaskNum && tasksInfo.dwStatus === 4) {
-      _log.push(`🟢${eventName}: 所有任务已经完成并领取了最终奖励`);
+      _log.push(`🟡${eventName}: 所有任务已经完成并领取了最终奖励`);
       return;
     } else if (tasksInfo.dwTotalTaskNum === tasksInfo.dwCompleteTaskNum && tasksInfo.dwStatus !== 4) {
-      _log.push(`🟢${eventName}: 所有任务已经完成但未领取最终奖励`);
+      _log.push(`🟡${eventName}: 所有任务已经完成但未领取最终奖励`);
       await jxCfdZcfGetFinalReward(cookie);
       return;
     }
@@ -602,7 +627,7 @@ async function jxCfdZcfCompleteTask(cookie) {
       } else {
         if (task.dwAwardStatus === 2) {
           // 仅领取奖励
-          _log.push(`🟢${eventName}【${task.strTaskName}】: 任务已完成，直接领取任务奖励`);
+          _log.push(`🟡${eventName}【${task.strTaskName}】: 任务已完成，直接领取任务奖励`);
           res = await jxCfdGetTaskReward(cookie, task);
           res ? num++ : num + 0;
         } else {
@@ -611,11 +636,14 @@ async function jxCfdZcfCompleteTask(cookie) {
       }
     }
 
-    let icon = '🟡';
+    let icon = '🟢';
     if (num + finishedTaskNum === tasksInfo.TaskList.length) {
+      _log.push(`${icon}${eventName}: 总共${tasksInfo.TaskList.length}个任务, 完成${num + finishedTaskNum}个任务`);
+      await randomWait();
       await jxCfdZcfGetFinalReward(cookie);
-      icon = '🟢';
+      return;
     }
+    icon = '🟡';
     _errEvents.push(`${icon}${eventName}${num + finishedTaskNum}/${tasksInfo.TaskList.length} `);
   } catch (error) {
     _log.push(`🔴${eventName}: ${error}`);
@@ -781,16 +809,16 @@ function jxCfdGetTaskReward(cookie, task, isZcf = true) {
 
 async function main(cookieObj) {
   _cash = _jxCoins = _rich = 0;
-  _log = [`\n++++++++++${cookieObj.nickname}++++++++++\n`];
-  _errEvents = ['++++++++++🔻错误事件🔻++++++++++'];
+  _log = [`\n++++++++++⭐${cookieObj.nickname}⭐++++++++++\n`];
+  _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
   $.strPhoneID = cookieObj.jx.cfd.strPhoneID;
-  $.strPgUUNum = cookieObj.jx.cfd.strPhoneID;
+  $.strPgUUNum = cookieObj.jx.cfd.strPgUUNum;
   $.h5st = cookieObj.jx.cfd.h5st;
 
-  if (!$.strPhoneID || $.strPgUUNum || !$.h5st) {
-    _errEvents.push('🔴 请先按照重写规则说明获取财富岛所需关键信息 ');
+  if (!$.strPhoneID || !$.strPgUUNum || !$.h5st) {
+    throw '请先按照重写规则说明获取财富岛所需关键信息 ';
   }
 
   if ($.getdata('GLOBAL_JX_CFD_OPEN_PICKSHELL') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_PICKSHELL') === undefined) {
@@ -803,7 +831,7 @@ async function main(cookieObj) {
   }
   if ($.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZCF') === undefined) {
     // 赚财富所有任务
-    jxCfdZcfCompleteTask(cookieObj.cookie);
+    await jxCfdZcfCompleteTask(cookieObj.cookie);
   }
 
   if ($.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === 'true' || $.getdata('GLOBAL_JX_CFD_OPEN_ZJB_SIGN') === undefined) {
@@ -825,15 +853,14 @@ async function main(cookieObj) {
 
   const userInfo = await jxCfdUserInfo(cookieObj.cookie);
 
-  _desc.push(
-    `京币: ${(userInfo.ddwCoinBalance / 1000000).toFixed(2)}亿(+${_jxCoins}万), 财富: ${
-      userInfo.ddwRichBalance
-    }(+${_rich})，红包: +${_cash}`
-  );
-  if (_errEvents.length > 0) {
-    _desc.push(`❗查看日志了解详情>>`);
+  if (userInfo) {
+    _desc.push(
+      `京币: ${(userInfo.ddwCoinBalance / 1000000).toFixed(2)}亿(+${_jxCoins}万), 财富: ${
+        userInfo.ddwRichBalance
+      }(+${_rich})，红包: +${_cash}`
+    );
   } else {
-    _desc.push(`🆗, 查看日志了解详情>>`);
+    _desc.push(`京币: +${_jxCoins}万, 财富: +${_rich}，红包: +${_cash}`);
   }
 }
 
@@ -854,10 +881,15 @@ async function main(cookieObj) {
         await main(cookieObj);
       } catch (error) {
         _log.push(`🔴 ${error}`);
-        _errEvents.push(`🔴 ${error}`);
+        _desc.push(`🔴 ${error}`);
       } finally {
         $.log(..._log);
         $.log(..._errEvents);
+        if (_errEvents.length > 0) {
+          _desc.push(`❗ 查看日志了解详情>>`);
+        } else {
+          _desc.push(`🆗 查看日志了解详情>>`);
+        }
         $.desc = _desc.join('\n');
         $.msg($.name, $.subt || '', $.desc);
       }
