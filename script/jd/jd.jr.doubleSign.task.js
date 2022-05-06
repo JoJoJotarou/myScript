@@ -60,7 +60,7 @@ function jrSignIn(cookie, signBody) {
           JSON.parse(data).resultCode === 0 &&
           JSON.parse(data).resultData.resBusiCode === 0
         ) {
-          _log.push(`🟢${eventName}: 数据加密，故这里不知道具体获取多少金贴，请到京东金融App查看`);
+          _log.push(`🟢${eventName}: 数据加密，故这里不知道具体获取多少金贴，请到京东金融App查看${data}`);
           _desc.push(`🟢${eventName}`);
         } else {
           throw err || data;
