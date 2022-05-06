@@ -14,7 +14,7 @@
  * ✅ 赚财富
  * ✅ 赚京币 - 成就赚财富 - 领成就奖励
  * ✅ 赚京币 - 任务赚京币 - 经营赚京币
- * ✅ 赚京币 - 任务赚京币 - 连续营业赢红包(京喜App&微信小程序双签)
+ * ❌ 赚京币 - 任务赚京币 - 连续营业赢红包(京喜App&微信小程序双签)
  * ❌ 故事任务
  */
 const $ = Env('京喜财富小岛');
@@ -71,11 +71,11 @@ function jxCfdZjbTaskList(cookie, isAchievement = true) {
           const taskList = isAchievement
             ? JSON.parse(data).data.userTaskStatusList.filter((task) => task.taskType === 11)
             : JSON.parse(data).data.userTaskStatusList.filter((task) => task.taskType !== 11);
-          let unfinishedTasks = taskList.filter((task) => task.completedTimes < task.targetTimes) || [];
-          let finishedTasks = taskList.filter((task) => task.completedTimes === task.targetTimes) || [];
-          _log.push(
-            `🟢${eventName}: 总任务数: ${taskList.length}, 未完成任务数: ${unfinishedTasks.length}, 已完成任务数: ${finishedTasks.length}`
-          );
+          // let unfinishedTasks = taskList.filter((task) => task.completedTimes < task.targetTimes) || [];
+          // let finishedTasks = taskList.filter((task) => task.completedTimes === task.targetTimes) || [];
+          // _log.push(
+          //   `🟢${eventName}: 总任务数: ${taskList.length}, 未完成任务数: ${unfinishedTasks.length}, 已完成任务数: ${finishedTasks.length}`
+          // );
           resolve(taskList);
         } else {
           throw err || data;
@@ -288,6 +288,7 @@ async function jxCfdZjbGetAchieveReward(cookie) {
   );
 
   if (completedAchievementTasks.length > 0) {
+    _log.push(`🟢${eventName}: 共有${completedAchievementTasks.length}个成就任务可以领取奖励`);
     for (const achieveCompleteTask of completedAchievementTasks) {
       (await jxCfdGetTaskReward(cookie, achieveCompleteTask, false)) ? s++ : null;
     }
@@ -574,12 +575,12 @@ function jxCfdZcfTaskList(cookie) {
     $.get(option, (err, resp, data) => {
       try {
         if (resp.statusCode === 200 && JSON.parse(data).iRet === 0) {
-          const taskList = JSON.parse(data).Data.TaskList;
-          let unfinishedTasks = taskList.filter((task) => task.dwAwardStatus === 2) || [];
-          let finishedTasks = taskList.filter((task) => task.dwAwardStatus === 1) || [];
-          _log.push(
-            `🟢${eventName}: 总任务数: ${taskList.length}, 未完成任务数: ${unfinishedTasks.length}, 已完成任务数: ${finishedTasks.length}`
-          );
+          // const taskList = JSON.parse(data).Data.TaskList;
+          // let unfinishedTasks = taskList.filter((task) => task.dwAwardStatus === 2) || [];
+          // let finishedTasks = taskList.filter((task) => task.dwAwardStatus === 1) || [];
+          // _log.push(
+          //   `🟢${eventName}: 总任务数: ${taskList.length}, 未完成任务数: ${unfinishedTasks.length}, 已完成任务数: ${finishedTasks.length}`
+          // );
           resolve(JSON.parse(data).Data);
         } else {
           throw err || data;
