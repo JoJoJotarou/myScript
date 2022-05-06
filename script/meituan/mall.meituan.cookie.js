@@ -1,21 +1,41 @@
 /**
- * @author: JoJoJotarou
- * @description: 美团APP -> 美团买菜 -> 我的 -> 签到领币，QX提示成功即可
+ * @author: @ZhouStarStar9527
+ * @description: 方式1：美团APP -> 美团买菜 -> 我的 -> 买菜币 -> 去使用 -> 在退回上一级，QX提示成功即可
+ * @description: 方式2：美团APP -> 美团买菜 -> 我的 -> 买菜币 -> 左滑一半做推出手势再松手（不要真的左滑退出） -> QX提示成功即可
  *
  */
-const $ = Env('美团买菜');
+const $ = Env('美团买菜Token');
+const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', 'utm_term', 'uuid', 'app_tag', 'userid'];
 
 !(async () => {
-  const GLOBAL_MEITUAN_HEADERS = $request.headers;
-  const GLOBAL_MEITUAN_QUERY_STR = $request.url.match(/queryTaskListInfoV2\?(.*)/)[1];
-  const COOKIE = GLOBAL_MEITUAN_HEADERS['Cookie'] || GLOBAL_MEITUAN_HEADERS['cookie'];
+  const cookie = $request.headers['Cookie'] || $request.headers['cookie'];
+  const queryStr = $request.url
+    .match(/queryTaskListInfoV2\?(.*)/)[1]
+    .split('&')
+    .filter((param) => generalQueryParams.includes(param.split('=')[0]))
+    .join('&');
+  const xuuid = $request.url
+    .match(/queryTaskListInfoV2\?(.*)/)[1]
+    .split('&')
+    .filter((param) => 'xuuid' === param.split('=')[0]);
 
-  if (COOKIE.toLocaleLowerCase().indexOf('uuid=') !== -1) {
-    $.setdata(GLOBAL_MEITUAN_QUERY_STR, 'GLOBAL_MEITUAN_QUERY_STR');
-    $.setdata(JSON.stringify(GLOBAL_MEITUAN_HEADERS), 'GLOBAL_MEITUAN_HEADERS');
+  if (cookie.toLocaleLowerCase().indexOf('token=') !== -1) {
+    $.setdata(
+      JSON.stringify({
+        queryStr: queryStr,
+        xuuid: xuuid,
+        headers: {
+          'X-Titans-User': $request.headers['X-Titans-User'],
+          t: $request.headers['t'],
+          Cookie: cookie,
+          'User-Agent': $request.headers['User-Agent'],
+        },
+      }),
+      'zss_mall_meituan'
+    );
     $.subt = '🟢 获取会话成功';
   } else {
-    throw '未登录，无法获取用户信息';
+    throw '无法获取token信息';
   }
 })()
   .catch((e) => {
