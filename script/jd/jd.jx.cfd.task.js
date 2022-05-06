@@ -289,7 +289,7 @@ async function jxCfdZjbGetAchieveReward(cookie) {
 
   if (completedAchievementTasks.length > 0) {
     for (const achieveCompleteTask of completedAchievementTasks) {
-      (await jxCfdGetTaskReward(cookie, achieveCompleteTask)) ? s++ : null;
+      (await jxCfdGetTaskReward(cookie, achieveCompleteTask, false)) ? s++ : null;
     }
     let icon = '🟢';
     if (s !== completedAchievementTasks.length) {
