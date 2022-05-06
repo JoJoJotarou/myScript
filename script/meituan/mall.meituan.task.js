@@ -330,6 +330,9 @@ function totalCoins(queryStr, headers) {
           let totalCoins = JSON.parse(data).data.balance;
           _log.push(`🟢${eventName}: 当前共有${totalCoins}个买菜币`);
           resolve(totalCoins);
+        } else if (response.statusCode === 200 && JSON.parse(data).error.msg === '请重新登录') {
+          _log.push(`🔴${eventName}: ${response.statusCode} ${JSON.parse(data).error.msg}`);
+          resolve(-1);
         } else {
           throw error || data;
         }
@@ -376,19 +379,23 @@ function coupons(queryStr, headers, totalCoins) {
   const GLOBAL_MEITUAN_HEADERS = $.getdata('GLOBAL_MEITUAN_HEADERS');
 
   if (GLOBAL_MEITUAN_QUERY_STR && GLOBAL_MEITUAN_HEADERS) {
-    await checkIn(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    // 模拟浏览15秒
-    // await $.wait(16000);
-    await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    await popReward(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
-    amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS), totalCoins);
-    if (amount > 0) {
-      $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)}), 有优惠卷可兑`;
+    if ((await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS))) === -1) {
+      $.subt = '登录已失效,请重新登录,并通过重写规则重写获取关键信息';
     } else {
-      $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)})`;
+      await checkIn(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      await share(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      await takeTask(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      // 模拟浏览15秒
+      // await $.wait(16000);
+      await doneTasks(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      await popReward(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      totalCoins = await totalCoins(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS));
+      amount = await coupons(GLOBAL_MEITUAN_QUERY_STR, JSON.parse(GLOBAL_MEITUAN_HEADERS), totalCoins);
+      if (amount > 0) {
+        $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)}), 有优惠卷可兑`;
+      } else {
+        $.subt = `买菜币: ${totalCoins}(+${_coins.toFixed(2)})`;
+      }
     }
   } else {
     $.subt = '🔴 请先获取会话';
