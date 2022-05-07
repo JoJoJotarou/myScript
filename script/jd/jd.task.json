@@ -118,6 +118,9 @@
         {
             "config": "10 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.jx.cfd.task.js, tag=京喜财富岛, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jx.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jdjx.cfd.sign.conf,tag=京喜PhoneId"
+        },{
+            "config": "1 7-21/2 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.plantBean.task.js, tag=京东种豆得豆, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jdzd.png, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         }
     ]
 }
