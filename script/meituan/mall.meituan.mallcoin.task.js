@@ -288,7 +288,7 @@ function getPopReward(queryStr, headers, checkInCount) {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getWeekContinuousRewardNew?${queryStr}`,
     headers: headers,
     body: JSON.stringify({
-      userId: queryStr.match(/userId=(\d+)/)[1],
+      userId: userId,
       rewardDate: checkInCount, // 3/7天礼包
       riskMap: {
         platform: 5,
