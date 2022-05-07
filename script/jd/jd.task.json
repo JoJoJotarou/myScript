@@ -121,6 +121,9 @@
         },{
             "config": "1 7-21/2 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.plantBean.task.js, tag=京东种豆得豆, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jdzd.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
+        },{
+            "config": "50 7,17 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.plantBean.help.task.js, tag=京东种豆得豆内部互助, img-url=https://raw.githubusercontent.com/58xinian/icon/master/jdzd.png, enabled=true",
+            "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         }
     ]
 }
