@@ -439,50 +439,12 @@ async function main(cookieObj) {
   });
 
 function request(eventName, cookie, function_id, body = {}, method = 'get') {
-  const option = taskUrl(cookie, function_id, body);
-  return new Promise((resolve, reject) => {
-    if (method === 'post') {
-      $.post(option, (err, resp, data) => {
-        try {
-          if (resp.statusCode === 200 && JSON.parse(data) && JSON.parse(data).code === '0') {
-            // _log.push(`🟢${eventName}: 请求成功`);
-            resolve(JSON.parse(data));
-          } else {
-            throw err || data;
-          }
-        } catch (error) {
-          error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
-          _errEvents.push(`🔴${eventName}`);
-          resolve();
-        }
-      });
-    } else {
-      $.get(option, (err, resp, data) => {
-        try {
-          if (resp.statusCode === 200 && JSON.parse(data) && JSON.parse(data).code === '0') {
-            // _log.push(`🟢${eventName}: 请求成功`);
-            resolve(JSON.parse(data));
-          } else {
-            throw err || data;
-          }
-        } catch (error) {
-          error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
-          _errEvents.push(`🔴${eventName}`);
-          resolve();
-        }
-      });
-    }
-  });
-}
-
-function taskUrl(cookie, function_id, body) {
   let _body = {
     version: '9.2.4.1',
     monitor_source: 'plant_m_plant_index',
     monitor_refer: '',
   };
-
-  return {
+  let option = {
     url: 'https://api.m.jd.com/client.action',
     body: `functionId=${function_id}&body=${encodeURIComponent(
       JSON.stringify(Object.assign(_body, body))
@@ -501,6 +463,49 @@ function taskUrl(cookie, function_id, body) {
     },
     timeout: 10000,
   };
+  if (method === 'post') {
+    option.url = 'https://api.m.jd.com/client.action';
+    option.body = `functionId=${function_id}&body=${encodeURIComponent(
+      JSON.stringify(Object.assign(_body, body))
+    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`;
+  } else {
+    option.url = `https://api.m.jd.com/client.action?functionId=${function_id}&body=${encodeURIComponent(
+      JSON.stringify(Object.assign(_body, body))
+    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`;
+  }
+  return new Promise((resolve, reject) => {
+    if (method === 'post') {
+      $.post(option, (err, resp, data) => {
+        try {
+          if (resp.statusCode === 200 && JSON.parse(data) && JSON.parse(data).code === '0') {
+            _log.push(`🟢${eventName}: 请求成功`);
+            resolve(JSON.parse(data));
+          } else {
+            throw err || data;
+          }
+        } catch (error) {
+          error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
+          _errEvents.push(`🔴${eventName}`);
+          resolve();
+        }
+      });
+    } else {
+      $.get(option, (err, resp, data) => {
+        try {
+          if (resp.statusCode === 200 && JSON.parse(data) && JSON.parse(data).code === '0') {
+            _log.push(`🟢${eventName}: 请求成功`);
+            resolve(JSON.parse(data));
+          } else {
+            throw err || data;
+          }
+        } catch (error) {
+          error !== data ? _log.push(`🔴${eventName}: ${error}\n${data}`) : _log.push(`🔴${eventName}: ${error}`);
+          _errEvents.push(`🔴${eventName}`);
+          resolve();
+        }
+      });
+    }
+  });
 }
 
 function userAgent(app) {
