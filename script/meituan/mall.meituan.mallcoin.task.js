@@ -409,7 +409,7 @@ function coupons(queryStr, headers, totalCoins) {
     Object.assign(headers, _headers);
 
     if ((await totalCoins(queryStr, headers)) === -1) {
-      $.subt = '登录已失效,请重新登录,并通过重写规则重写获取关键信息';
+      $.subt = '登录已失效,请通过重写规则重新获取关键信息';
     } else {
       await checkIn(queryStr, headers);
       await share(queryStr, headers);
@@ -430,13 +430,14 @@ function coupons(queryStr, headers, totalCoins) {
     $.subt = '🔴 请先获取会话';
     _log.push($.subt);
   }
-
-  $.log(..._log);
-  $.desc = _desc.join('');
-  $.msg($.name, $.subt, $.desc);
 })()
-  .catch((e) => $.logErr(e))
-  .finally(() => $.done());
+  .catch((e) => _log.push(e))
+  .finally(() => {
+    $.log(..._log);
+    $.desc = _desc.join('');
+    $.msg($.name, $.subt, $.desc);
+    $.done();
+  });
 
 // prettier-ignore
 function ts(){return new Date().getTime()}
