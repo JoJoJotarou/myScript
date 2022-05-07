@@ -886,7 +886,7 @@ async function main(cookieObj) {
       } finally {
         $.log(..._log);
         $.log(..._errEvents);
-        if (_errEvents.length > 0) {
+        if (_errEvents.length > 1) {
           _desc.push(`❗ 查看日志了解详情>>`);
         } else {
           _desc.push(`🆗 查看日志了解详情>>`);

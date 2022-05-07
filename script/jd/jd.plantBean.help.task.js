@@ -1,12 +1,11 @@
 /**
- * @description 本脚本是对faker2仓库jd_plantBean.js脚本的修改
- * @description 支持多账号，暂无互助
+ * @description 支持多账号，种豆得豆内部互助, 支持获取/更新互助码
  */
-const $ = Env('京东种豆得豆');
+const $ = Env('京东种豆得豆互助');
 
 let _log, _errEvents, _desc;
-let _beans, _nutrients;
 let jdPlantBeanShareArr = [];
+let successHelp = 0;
 
 async function plantBeanIndex(cookie) {
   const eventName = '【种豆得豆首页】';
@@ -23,329 +22,6 @@ async function plantBeanIndex(cookie) {
   //     }
   //   }
   //   _errEvents.push(`🔴${eventName}`);
-}
-
-async function carveUp(cookie, lastRound) {
-  const eventName = '【瓜分京豆】';
-  const function_id = 'receivedBean';
-  if (lastRound.awardState === '6') {
-    _log.push(`🟡${eventName}: ${lastRound.dateDesc}, 奖励已领取, 获得京豆: ${lastRound.awardBeans}`);
-    return;
-  }
-  if (lastRound.awardState === '5') {
-    const body = {
-      roundId: lastRound.roundId,
-      monitor_refer: function_id,
-    };
-    const reward = await request(eventName, cookie, function_id, body);
-    if (reward) {
-      _beans += Number(reward.data.awardBean) || 0;
-      _log.push(`🟢${eventName}: ${lastRound.dateDesc},奖励领取成功, 获得京豆: ${reward.data.awardBean}`);
-    }
-  }
-}
-
-async function receiveNutrients(cookie, currentRound, timeNutrientsRes) {
-  const eventName = '【定时收集营养液】';
-  if (Number(timeNutrientsRes.nutrCount) > 0) {
-    const reward = await request(eventName, cookie, 'receiveNutrients', {
-      roundId: currentRound.roundId,
-      monitor_refer: 'plant_receiveNutrients',
-    });
-    if (reward) {
-      _nutrients += Number(timeNutrientsRes.nutrCount) || 0;
-      _log.push(`🟢${eventName}: 成功收集${timeNutrientsRes.nutrCount}瓶营养液`);
-    }
-  }
-}
-
-async function doTask(cookie, taskList) {
-  let name;
-  const eventName = `【做任务-${name}】`;
-  if (taskList && taskList.length > 0) {
-    for (const task of taskList.filter((task) => task.taskType === '8')) {
-      name = task.taskName;
-      _log.push(`🟡${eventName}: 需自行手动去京东APP完成`);
-    }
-    if (taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1).length === 0) {
-      _log.push(`🟢【做任务】: 全部任务已完成`);
-      return;
-    }
-    for (let task of taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1)) {
-      name = task.taskName;
-      if (task.dailyTimes === 1) {
-        await receiveNutrientsTask(cookie, eventName, task.taskType);
-        await $.wait(2000);
-      }
-      if (task.taskType === 3) {
-        //浏览店铺
-        let s = 0;
-        let unFinishedShopNum = task.totalNum - task.gainedNum;
-        if (unFinishedShopNum === 0) {
-          continue;
-        }
-        const { data } = await shopTaskList(cookie);
-        let goodShopListARR = [],
-          moreShopListARR = [],
-          shopList = [];
-        if (!data.goodShopList) {
-          data.goodShopList = [];
-        }
-        if (!data.moreShopList) {
-          data.moreShopList = [];
-        }
-        const { goodShopList, moreShopList } = data;
-        for (let i of goodShopList) {
-          if (i.taskState === '2') {
-            goodShopListARR.push(i);
-          }
-        }
-        for (let j of moreShopList) {
-          if (j.taskState === '2') {
-            moreShopListARR.push(j);
-          }
-        }
-        shopList = goodShopListARR.concat(moreShopListARR);
-        for (let shop of shopList) {
-          const { shopId, shopTaskId } = shop;
-          const body = {
-            monitor_refer: 'plant_shopNutrientsTask',
-            shopId: shopId,
-            shopTaskId: shopTaskId,
-          };
-          const shopRes = await request(eventName, cookie, 'shopNutrientsTask', body);
-          if (shopRes && shopRes.code === '0' && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
-            s++;
-          }
-          if (unFinishedShopNum === s) {
-            break;
-          } else {
-            await randomWait(2000);
-          }
-        }
-        let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
-          icon = '🟢';
-        } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
-        }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
-      }
-      if (task.taskType === 5) {
-        //挑选商品
-        let s = 0;
-        let unFinishedProductNum = task.totalNum - task.gainedNum;
-        if (unFinishedProductNum === 0) {
-          continue;
-        }
-        const { data } = await productTaskList(cookie);
-        let productListARR = [],
-          productList = [];
-        const { productInfoList } = data;
-        for (let i = 0; i < productInfoList.length; i++) {
-          for (let j = 0; j < productInfoList[i].length; j++) {
-            productListARR.push(productInfoList[i][j]);
-          }
-        }
-        for (let i of productListARR) {
-          if (i.taskState === '2') {
-            productList.push(i);
-          }
-        }
-        for (let product of productList) {
-          const { skuId, productTaskId } = product;
-          const body = {
-            monitor_refer: 'plant_productNutrientsTask',
-            productTaskId: productTaskId,
-            skuId: skuId,
-          };
-          const productRes = await request(eventName, cookie, 'productNutrientsTask', body);
-          if (productRes && productRes.code === '0' && productRes.data.nutrState && productRes.data.nutrState === '1') {
-            s++;
-          }
-          if (unFinishedProductNum === s) {
-            break;
-          } else {
-            await randomWait(2000);
-          }
-        }
-        let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
-          icon = '🟢';
-        } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
-        }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
-      }
-      if (task.taskType === 10) {
-        //关注频道
-        let s = 0;
-        let unFinishedChannelNum = task.totalNum - task.gainedNum;
-        if (unFinishedChannelNum === 0) {
-          continue;
-        }
-        const { data } = await plantChannelTaskList(cookie);
-        let goodChannelListARR = [],
-          normalChannelListARR = [],
-          channelList = [];
-        const { goodChannelList, normalChannelList } = data;
-        for (let i of goodChannelList) {
-          if (i.taskState === '2') {
-            goodChannelListARR.push(i);
-          }
-        }
-        for (let j of normalChannelList) {
-          if (j.taskState === '2') {
-            normalChannelListARR.push(j);
-          }
-        }
-        channelList = goodChannelListARR.concat(normalChannelListARR);
-        for (let channelItem of channelList) {
-          const { channelId, channelTaskId } = channelItem;
-          const body = {
-            channelId: channelId,
-            channelTaskId: channelTaskId,
-          };
-          const channelRes = await request(eventName, cookie, 'plantChannelNutrientsTask', body);
-          if (channelRes && channelRes.code === '0' && channelRes.data.nutrState && channelRes.data.nutrState === '1') {
-            s++;
-          }
-          if (unFinishedChannelNum === s) {
-            break;
-          }
-        }
-        let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
-          icon = '🟢';
-        } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
-        }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
-      }
-    }
-  }
-}
-
-async function shopTaskList(cookie) {
-  const eventName = '【店铺列表】';
-  return await request(eventName, cookie, 'shopTaskList', { monitor_refer: 'plant_shopList' });
-}
-async function productTaskList(cookie) {
-  const eventName = '【商品列表】';
-  return await request(eventName, cookie, 'productTaskList', { monitor_refer: 'plant_productTaskList' });
-}
-async function plantChannelTaskList(cookie) {
-  const eventName = '【频道列表】';
-  return await request(eventName, cookie, 'plantChannelTaskList');
-}
-
-async function receiveNutrientsTask(cookie, eventName, awardType) {
-  const functionId = 'receiveNutrientsTask';
-  const body = {
-    monitor_refer: 'plant_receiveNutrientsTask',
-    awardType: `${awardType}`,
-  };
-  let res = await request(eventName, cookie, functionId, body);
-  if (res) {
-    if (res.data.nutrState === '1' || res.data.status === '1') {
-      _log(`🟢${eventName}: 任务已完成`);
-      return true;
-    } else {
-      _log(`🔴${eventName}: 任务未完成\n${JSON.stringify(res, null, 2)}`);
-      _errEvents.push(`🔴${eventName}`);
-      return false;
-    }
-  }
-}
-
-async function friendList(cookie) {
-  const eventName = '【好友列表】';
-  const body = {
-    monitor_refer: 'plantFriendList',
-    monitor_source: 'plant_app_plant_index',
-    pageNum: '1',
-    pagesize: '1000',
-  };
-  return await request(eventName, cookie, 'plantFriendList', body, 'post');
-}
-
-async function collectFriendNutr(cookie, currentRound) {
-  const eventName = '【帮好友收营养液】';
-  const friends = await friendList();
-
-  if (!friends) {
-    return;
-  }
-  if (friends.data.tips) {
-    _log.push(`🟡${eventName}: 今日偷取好友营养液已达上限`);
-    return;
-  }
-
-  if (friends.data.friendInfoList && friends.data.friendInfoList.length > 0) {
-    let nowTimes = new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000);
-    for (let friend of friends.data.friendInfoList) {
-      let helpInfo;
-      if (new Date(nowTimes).getHours() === 20) {
-        if (friend.nutrCount >= 2) {
-          await randomWait();
-          helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
-          if (helpInfo) {
-            _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
-            _log.push(
-              `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
-                helpInfo.data.collectNutrRewards || 0
-              }个营养液}`
-            );
-          }
-        }
-      } else {
-        if (friend.nutrCount >= 3) {
-          await randomWait();
-          helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
-          if (helpInfo) {
-            _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
-            _log.push(
-              `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
-                helpInfo.data.collectNutrRewards || 0
-              }个营养液}`
-            );
-          }
-        }
-      }
-    }
-  }
-}
-
-async function collectUserNutr(cookie, roundId, paradiseUuid) {
-  const eventName = '【收好友营养液】';
-  let functionId = 'collectUserNutr';
-  const body = {
-    roundId: roundId,
-    paradiseUuid: paradiseUuid,
-    monitor_refer: 'collectUserNutr',
-    monitor_source: 'plant_app_plant_index',
-  };
-  return await request(eventName, cookie, functionId, body, 'post');
-}
-
-async function cultureBean(cookie, currentRound) {
-  let name;
-  let eventName = `【收任务营养液-${name}】`;
-  if (currentRound && currentRound.bubbleInfos && currentRound.bubbleInfos.length > 0) {
-    for (let bubbleInfo of plantBeanRound.bubbleInfos) {
-      await randomWait();
-      name = bubbleInfo.name;
-      let body = {
-        roundId: currentRound.roundId,
-        nutrientsType: bubbleInfo.nutrientsType,
-        monitor_refer: 'plant_receiveNutrients',
-      };
-      if (await request(eventName, cookie, 'cultureBean', body)) {
-        _nutrients += Number(bubbleInfo.nutrNum) || 0;
-        _log.push(`🟢${eventName}: 获得${bubbleInfo.nutrNum || 0}个营养液`);
-      }
-    }
-  }
 }
 
 async function doHelp(cookie) {
@@ -367,6 +43,7 @@ async function doHelp(cookie) {
       if (helpRes.data.helpShareRes) {
         if (helpRes.data.helpShareRes.state === '1') {
           _log.push(`🟢${eventName}: 助力好友${plantUuid}成功, ${helpRes.data.helpShareRes.promptText}`);
+          successHelp++;
         } else if (helpRes.data.helpShareRes.state === '2') {
           _log.push(`🟡${eventName}: 您今日助力的机会已耗尽，已不能再帮助好友助力了`);
           break;
@@ -375,7 +52,8 @@ async function doHelp(cookie) {
         } else if (helpRes.data.helpShareRes.state === '4') {
           _log.push(`🟡${eventName}: ${helpRes.data.helpShareRes.promptText}`);
         } else {
-          _log.push(`🟡${eventName}: 助力好友${plantUuid}失败, ${JSON.stringify(helpRes, null, 2)}`);
+          _log.push(`🔴${eventName}: 未知数据, 助力好友${plantUuid}失败, ${JSON.stringify(helpRes, null, 2)}`);
+          _errEvents.push(`🔴${eventName}`);
         }
       }
     }
@@ -390,56 +68,73 @@ async function helpShare(cookie, plantUuid) {
     shareUuid: '',
     followType: '1',
   };
-  return await request(eventName, cookie, `plantBeanIndex`, body);
+  return await request(eventName, cookie, `plantBeanIndex`, body, 'post');
+}
+
+function getParam(url, name) {
+  const reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+  const r = url.match(reg);
+  if (r != null) return unescape(r[2]);
+  return null;
+}
+
+function myShareCode(shareUrl, cookieObj) {
+  const eventName = '【我的互助码】';
+  let myPlantUuid = getParam(shareUrl, 'plantUuid');
+
+  if (myPlantUuid.length === 0) {
+    _desc.push(`🟡${eventName}: 暂无互助码`);
+    return;
+  }
+
+  if (!cookieObj.shareCode || !cookieObj.shareCode.plantBean) {
+    cookieObj['shareCode']['plantBean'] = myPlantUuid;
+    _log.push(`🟢${eventName}: 获取到互助码: ${myPlantUuid}`);
+    $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+    _desc.push(`成功获取互助码`);
+  } else if (cookieObj.shareCode && cookieObj.shareCode.plantBean && cookieObj.shareCode.plantBean !== myPlantUuid) {
+    cookieObj['shareCode']['plantBean'] = myPlantUuid;
+    _log.push(`🟢${eventName}: 更新互助码: ${myPlantUuid}`);
+    $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+    _desc.push(`成功互助码更新`);
+  }
 }
 
 async function main(cookieObj) {
-  _beans = _nutrients = 0;
+  _nutrients = 0;
   _log = [`\n++++++++++⭐${cookieObj.nickname}⭐++++++++++\n`];
   _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
   let indexInfo = await plantBeanIndex(cookieObj.cookie);
   if (indexInfo) {
-    // const shareUrl = $.plantBeanIndexResult.data.jwordShareInfo.shareUrl;
-    // $.myPlantUuid = getParam(shareUrl, 'plantUuid');
-    // console.log(`\n【京东账号${$.index}（${$.UserName}）的${$.name}好友互助码】${$.myPlantUuid}\n`);
+    const shareUrl = indexInfo.data.jwordShareInfo.shareUrl;
+    myShareCode(shareUrl, cookieObj);
 
-    const lastRound = indexInfo.data.roundList.filter((item) => item.roundState === '1')[0]; //上期的roundId
-    let currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
-    const taskList = indexInfo.data.taskList;
-    await randomWait();
-    await carveUp(cookieObj.cookie, lastRound);
-
-    await randomWait();
-    await receiveNutrients(cookieObj.cookie, currentRound, indexInfo.data.timeNutrientsRes); //定时领取营养液
-
-    await randomWait();
-    await collectFriendNutr(cookieObj.cookie, currentRound);
-
-    await randomWait();
-    await doTask(cookieObj.cookie, taskList); //做日常任务
-
-    await randomWait();
-    await doHelp(cookieObj.cookie); //助力好友
-  }
-  await randomWait();
-  indexInfo = await plantBeanIndex(cookieObj.cookie);
-  if (indexInfo) {
-    currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
-    await randomWait(2000);
-    await cultureBean(cookieObj.cookie, currentRound);
-  }
-
-  if (_beans === 0) {
-    _desc.push(`营养液: +${_nutrients}瓶 ~`);
-  } else {
-    _desc.push(`瓜分京豆: +${_beans}, 营养液: +${_nutrients}瓶 ~`);
+    if (jdPlantBeanShareArr.length > 0) {
+      await randomWait();
+      await doHelp(cookieObj.cookie);
+      _desc.push(`成功助力${successHelp}个好友 ~`);
+    } else {
+      _desc.push(`暂无需要助力的好友`);
+    }
   }
 }
 
+function getShareCodes(currentUserId) {
+  const eventName = '【获取互助码】';
+  jdPlantBeanShareArr = [];
+  cookieObjs.forEach((item) => {
+    if (item.userId !== currentUserId && item.shareCode && item.shareCode.plantBean) {
+      jdPlantBeanShareArr.push(item.name);
+    }
+  });
+  _log.push(`${eventName}: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
+}
+
+let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
+
 !(async () => {
-  let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
   const specifyUserId = $.getdata('GLOBAL_SPECIFY_USER_ID');
 
   if (cookieObjs && JSON.parse(cookieObjs).length > 0) {
@@ -449,9 +144,10 @@ async function main(cookieObj) {
       cookieObjs = cookieObjs.filter((cookie) => cookie.userId === specifyUserId);
     }
     let i = 1;
-    for (const cookieObj of cookieObjs) {
+    for (let cookieObj of cookieObjs) {
       try {
         $.subt = `${cookieObj.nickname}`;
+        getShareCodes(cookieObjs, cookieObj.userId);
         await main(cookieObj);
       } catch (error) {
         _log.push(`🔴 ${error}`);
