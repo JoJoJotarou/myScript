@@ -78,7 +78,8 @@ function jrSignIn(cookie, signBody) {
 function jdJrDoubleSignReward(cookie) {
   const eventName = '【京融双签领奖】';
   const option = getOption(
-    `https://nu.jr.jd.com/gw/generic/jrm/h5/m/process?_=${ts()}&reqData=%7B%22actCode%22%3A%22F68B2C3E71%22%2C%22type%22%3A4%2C%22frontParam%22%3A%7B%22belong%22%3A%22jingdou%22%7D%2C%22riskDeviceParam%22%3A%22%7B%5C%22fp%5C%22%3A%5C%229847ae780d67b91a200f87e5b0307ead%5C%22%2C%5C%22eid%5C%22%3A%5C%22PK7BGV22IJOGPW3RIR37RVVQAOL5MA5WG546B63HZIG7QIRJM4XZZHFT2UYT57ZL5EOKRLPDA3F6NWU2HIGXIVDUFY%5C%22%2C%5C%22sdkToken%5C%22%3A%5C%22%5C%22%2C%5C%22sid%5C%22%3A%5C%22%5C%22%7D%22%7D`,
+    // `https://nu.jr.jd.com/gw/generic/jrm/h5/m/process?_=${ts()}&reqData=%7B%22actCode%22%3A%22F68B2C3E71%22%2C%22type%22%3A4%2C%22frontParam%22%3A%7B%22belong%22%3A%22jingdou%22%7D%2C%22riskDeviceParam%22%3A%22%7B%5C%22fp%5C%22%3A%5C%229847ae780d67b91a200f87e5b0307ead%5C%22%2C%5C%22eid%5C%22%3A%5C%22PK7BGV22IJOGPW3RIR37RVVQAOL5MA5WG546B63HZIG7QIRJM4XZZHFT2UYT57ZL5EOKRLPDA3F6NWU2HIGXIVDUFY%5C%22%2C%5C%22sdkToken%5C%22%3A%5C%22%5C%22%2C%5C%22sid%5C%22%3A%5C%22%5C%22%7D%22%7D`,
+    `https://nu.jr.jd.com/gw/generic/jrm/h5/m/process?_=${ts()}&reqData=%7B%22actCode%22%3A%22F68B2C3E71%22%2C%22type%22%3A4%2C%22frontParam%22%3A%7B%22belong%22%3A%22jingdou%22%7D%7D`,
     {
       Cookie: cookie,
       Referer: 'https://m.jr.jd.com/integrate/signin/index.html',

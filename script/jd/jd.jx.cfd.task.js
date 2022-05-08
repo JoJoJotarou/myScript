@@ -335,7 +335,7 @@ async function jxCfdPickShells(cookie) {
   }
 
   let icon = '🟢';
-  if (remainTimes === successTimes) {
+  if (remainTimes !== successTimes) {
     icon = '🟡';
     _errEvents.push(
       `${icon}${eventName}${pickShellsTask.completedTimes + successTimes}/${pickShellsTask.targetTimes} `
@@ -487,7 +487,7 @@ async function jxCfdBuildsLvlUp(cookie, targetTimes) {
     _log.push(`🟡${eventName}: 所有建筑都不能升级`);
   }
   let icon = '🟢';
-  if (s === targetTimes) {
+  if (s !== targetTimes) {
     icon = '🟡';
     _errEvents.push(`${icon}${eventName}${s}/${targetTimes} `);
   }
@@ -631,7 +631,7 @@ async function jxCfdZcfCompleteTask(cookie) {
       } else {
         if (task.dwAwardStatus === 2) {
           // 仅领取奖励
-          _log.push(`🟡${eventName}【${task.strTaskName}】: 任务已完成，直接领取任务奖励`);
+          _log.push(`🟢${eventName}【${task.strTaskName}】: 任务已完成，直接领取任务奖励`);
           res = await jxCfdGetTaskReward(cookie, task);
           res ? num++ : num + 0;
         } else {
@@ -643,7 +643,7 @@ async function jxCfdZcfCompleteTask(cookie) {
     let icon = '🟢';
     if (num + finishedTaskNum === tasksInfo.TaskList.length) {
       _log.push(`${icon}${eventName}: 总共${tasksInfo.TaskList.length}个任务, 完成${num + finishedTaskNum}个任务`);
-      await randomWait();
+      await randomWait(3000);
       await jxCfdZcfGetFinalReward(cookie);
       return;
     }
@@ -821,7 +821,13 @@ async function main(cookieObj) {
   $.strPgUUNum = cookieObj.jx.cfd.strPgUUNum;
   $.h5st = cookieObj.jx.cfd.h5st;
 
-  if (!$.strPhoneID || !$.strPgUUNum || !$.h5st) {
+  if (
+    !cookieObj.jx ||
+    !cookieObj.jx.cfd ||
+    !cookieObj.jx.cfd.strPhoneID ||
+    !cookieObj.jx.cfd.strPgUUNum ||
+    !cookieObj.jx.cfd.h5st
+  ) {
     throw '请先按照重写规则说明获取财富岛所需关键信息 ';
   }
 
@@ -883,17 +889,17 @@ async function main(cookieObj) {
       try {
         $.subt = `${cookieObj.nickname}`;
         await main(cookieObj);
+        if (_errEvents.length > 1) {
+          _desc.push(`❗ 查看日志了解详情>>`);
+        } else {
+          _desc.push(`🆗 查看日志了解详情>>`);
+        }
       } catch (error) {
         _log.push(`🔴 ${error}`);
         _desc.push(`🔴 ${error}`);
       } finally {
         $.log(..._log);
         $.log(..._errEvents);
-        if (_errEvents.length > 1) {
-          _desc.push(`❗ 查看日志了解详情>>`);
-        } else {
-          _desc.push(`🆗 查看日志了解详情>>`);
-        }
         $.desc = _desc.join('\n');
         $.msg($.name, $.subt || '', $.desc);
       }
