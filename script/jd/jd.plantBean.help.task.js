@@ -87,16 +87,23 @@ function myShareCode(shareUrl, cookieObj) {
     return;
   }
 
-  if (!cookieObj.shareCode || !cookieObj.shareCode.plantBean) {
-    cookieObj['shareCode']['plantBean'] = myPlantUuid;
+  if (!cookieObj.shareCode) {
+    cookieObj['shareCode'] = { plantBean: myPlantUuid };
     _log.push(`🟢${eventName}: 获取到互助码: ${myPlantUuid}`);
     $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
     _desc.push(`成功获取互助码`);
-  } else if (cookieObj.shareCode && cookieObj.shareCode.plantBean && cookieObj.shareCode.plantBean !== myPlantUuid) {
-    cookieObj['shareCode']['plantBean'] = myPlantUuid;
-    _log.push(`🟢${eventName}: 更新互助码: ${myPlantUuid}`);
-    $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
-    _desc.push(`成功互助码更新`);
+  } else {
+    if (!cookieObj.shareCode.plantBean) {
+      cookieObj.shareCode['plantBean'] = myPlantUuid;
+      _log.push(`🟢${eventName}: 获取到互助码: ${myPlantUuid}`);
+      $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+      _desc.push(`成功获取互助码`);
+    } else if (cookieObj.shareCode.plantBean && cookieObj.shareCode.plantBean !== myPlantUuid) {
+      cookieObj.shareCode['plantBean'] = myPlantUuid;
+      _log.push(`🟢${eventName}: 更新互助码: ${myPlantUuid}`);
+      $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+      _desc.push(`成功互助码更新`);
+    }
   }
 }
 
