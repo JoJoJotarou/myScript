@@ -458,6 +458,9 @@ function request(eventName, cookie, function_id, body = {}, method = 'get') {
     monitor_refer: '',
   };
   let option = {
+    url: `https://api.m.jd.com/client.action?functionId=${function_id}&body=${encodeURIComponent(
+      JSON.stringify(Object.assign(_body, body))
+    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`,
     headers: {
       Cookie: cookie,
       Host: 'api.m.jd.com',
@@ -472,21 +475,7 @@ function request(eventName, cookie, function_id, body = {}, method = 'get') {
     },
     timeout: 10000,
   };
-  if (method === 'post') {
-    option.url = `https://api.m.jd.com/client.action?functionId=${function_id}`;
-    option.body = JSON.stringify({
-      appid: 'ld',
-      client: 'apple',
-      clientVersion: '10.5.2',
-      networkType: 'wifi',
-      osVersion: 14.6,
-      body: encodeURIComponent(JSON.stringify(Object.assign(_body, body))),
-    });
-  } else {
-    option.url = `https://api.m.jd.com/client.action?functionId=${function_id}&body=${encodeURIComponent(
-      JSON.stringify(Object.assign(_body, body))
-    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`;
-  }
+
   return new Promise((resolve, reject) => {
     if (method === 'post') {
       $.post(option, (err, resp, data) => {
