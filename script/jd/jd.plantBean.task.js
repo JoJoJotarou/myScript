@@ -285,7 +285,7 @@ async function friendList(cookie) {
 
 async function collectFriendNutr(cookie, currentRound) {
   const eventName = '【帮好友收营养液】';
-  const friends = await friendList();
+  const friends = await friendList(cookie);
 
   if (!friends) {
     return;
@@ -396,9 +396,9 @@ async function main(cookieObj) {
     }
 
     if (_beans === 0) {
-      _desc.push(`营养液: +${_nutrients}瓶 ~`);
+      $.subt = `${cookieObj.nickname}, 营养液: +${_nutrients}瓶 ~`;
     } else {
-      _desc.push(`瓜分京豆: +${_beans}, 营养液: +${_nutrients}瓶 ~`);
+      $.subt = `${cookieObj.nickname}, 瓜分京豆: +${_beans}, 营养液: +${_nutrients}瓶 ~`;
     }
   }
 }
