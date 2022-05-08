@@ -244,12 +244,12 @@ async function main(cookieObj) {
         doubleSignInfo.jx_sign_status === 1 &&
         doubleSignInfo.double_sign_status !== 1
       ) {
-        await jdJxDoubleSignReward(cookieObj.cookie);
         await randomWait();
+        await jdJxDoubleSignReward(cookieObj.cookie);
       } else {
         if (doubleSignInfo.jd_sign_status !== 1) {
+          await randomWait(2000);
           await jdSignIn(cookieObj.cookie);
-          await randomWait();
         }
         if (doubleSignInfo.jx_sign_status !== 1) {
           // 仅完成签到任务
@@ -258,16 +258,17 @@ async function main(cookieObj) {
           if (!signTask) {
             throw `无法找到签到领红包任务(taskId=3108), 请检查任务列表是否正常:\n${taskList}`;
           }
+          await randomWait(2000);
           const res = await jxCfdDoTask(cookieObj.cookie, signTask);
           if (res) {
+            await randomWait();
             await jxCfdGetTaskReward(cookieObj.cookie, signTask);
           }
-          await randomWait();
         }
+        await randomWait(2000);
         await jdJxDoubleSignReward(cookieObj.cookie);
-        await randomWait();
       }
-
+      await randomWait(2000);
       const [nickname, totalBeans] = await getUserInfo(cookieObj.cookie);
       $.subt = `${nickname}, 京豆: ${totalBeans}(+${_beans})，红包: +${_cash}`;
     } else {
