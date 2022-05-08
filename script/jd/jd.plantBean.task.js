@@ -88,11 +88,12 @@ async function doTask(cookie, taskList) {
       if (task.taskType === 3) {
         //浏览店铺
         let s = 0;
-        let unFinishedShopNum = task.totalNum - task.gainedNum;
+        let unFinishedShopNum = Number(task.totalNum) - Number(task.gainedNum);
         if (unFinishedShopNum === 0) {
           continue;
         }
         const { data } = await shopTaskList(cookie);
+        await randomWait(500);
         let goodShopListARR = [],
           moreShopListARR = [],
           shopList = [];
@@ -124,6 +125,9 @@ async function doTask(cookie, taskList) {
           const shopRes = await request(eventName, cookie, 'shopNutrientsTask', body);
           if (shopRes && shopRes.data && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
             s++;
+            _log.push(`🟢${eventName}: 成功关注店铺,  ${shopRes.data.nutrToast}`);
+          } else if (shopRes && shopRes.data && shopRes.data.nutrState) {
+            _log.push(`🟢${eventName}: ${shopRes.data.nutrToast}`);
           } else {
             _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(shopRes, null, 2)}`);
           }
@@ -134,21 +138,22 @@ async function doTask(cookie, taskList) {
           }
         }
         let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
+        if (Number(task.gainedNum) + s === task.totalNum) {
           icon = '🟢';
         } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
+          _errEvents.push(`${icon}${eventName}${Number(task.gainedNum) + s}/${task.totalNum}`);
         }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
+        _log.push(`${icon}${eventName}: 进度 ${Number(task.gainedNum) + s}/${task.totalNum}`);
       }
       if (task.taskType === 5) {
         //挑选商品
         let s = 0;
-        let unFinishedProductNum = task.totalNum - task.gainedNum;
+        let unFinishedProductNum = Number(task.totalNum) - Number(task.gainedNum);
         if (unFinishedProductNum === 0) {
           continue;
         }
         const { data } = await productTaskList(cookie);
+        await randomWait(500);
         let productListARR = [],
           productList = [];
         const { productInfoList } = data;
@@ -172,6 +177,9 @@ async function doTask(cookie, taskList) {
           const productRes = await request(eventName, cookie, 'productNutrientsTask', body);
           if (productRes && productRes.data && productRes.data.nutrState && productRes.data.nutrState === '1') {
             s++;
+            _log.push(`🟢${eventName}: 成功关注商品, ${productRes.data.nutrToast}`);
+          } else if (productRes && productRes.data && productRes.data.nutrState) {
+            _log.push(`🟢${eventName}: ${productRes.data.nutrToast}`);
           } else {
             _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(productRes, null, 2)}`);
           }
@@ -182,21 +190,22 @@ async function doTask(cookie, taskList) {
           }
         }
         let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
+        if (Number(task.gainedNum) + s === Number(task.totalNum)) {
           icon = '🟢';
         } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
+          _errEvents.push(`${icon}${eventName}${Number(task.gainedNum) + s}/${task.totalNum}`);
         }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
+        _log.push(`${icon}${eventName}: 进度 ${Number(task.gainedNum) + s}/${task.totalNum}`);
       }
       if (task.taskType === 10) {
         //关注频道
         let s = 0;
-        let unFinishedChannelNum = task.totalNum - task.gainedNum;
+        let unFinishedChannelNum = Number(task.totalNum) - Number(task.gainedNum);
         if (unFinishedChannelNum === 0) {
           continue;
         }
         const { data } = await plantChannelTaskList(cookie);
+        await randomWait(500);
         let goodChannelListARR = [],
           normalChannelListARR = [],
           channelList = [];
@@ -221,20 +230,25 @@ async function doTask(cookie, taskList) {
           const channelRes = await request(eventName, cookie, 'plantChannelNutrientsTask', body);
           if (channelRes && channelRes.data && channelRes.data.nutrState && channelRes.data.nutrState === '1') {
             s++;
+            _log.push(`${eventName}: 成功关注频道`);
+          } else if (channelRes && channelRes.data && channelRes.data.nutrState) {
+            _log.push(`${eventName}: ${channelRes.data.nutrToast}`);
           } else {
             _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(channelRes, null, 2)}`);
           }
           if (unFinishedChannelNum === s) {
             break;
+          } else {
+            await randomWait(2000);
           }
         }
         let icon = '🟡';
-        if (task.gainedNum + s === task.totalNum) {
+        if (Number(task.gainedNum) + s === task.totalNum) {
           icon = '🟢';
         } else {
-          _errEvents.push(`${icon}${eventName}${task.gainedNum + s}/${task.totalNum}`);
+          _errEvents.push(`${icon}${eventName}${Number(task.gainedNum) + s}/${task.totalNum}`);
         }
-        _log.push(`${icon}${eventName}: 进度 ${task.gainedNum + s}/${task.totalNum}`);
+        _log.push(`${icon}${eventName}: 进度 ${Number(task.gainedNum) + s}/${task.totalNum}`);
       }
     }
   }
@@ -308,10 +322,12 @@ async function collectFriendNutr(cookie, currentRound) {
             _log.push(
               `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
                 helpInfo.data.collectNutrRewards || 0
-              }个营养液}`
+              }个营养液`
             );
           } else if (helpInfo && helpInfo.errorMessage) {
-            _log.push(`🟡${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, ${helpInfo.errorMessage}`);
+            _log.push(
+              `🟡${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, ${helpInfo.errorMessage}, ${helpInfo}`
+            );
           } else {
             _log.push(`🔴${eventName}: 未知错误${JSON.stringify(helpInfo, null, 2)}`);
           }
@@ -351,12 +367,10 @@ async function collectUserNutr(cookie, roundId, paradiseUuid) {
 }
 
 async function cultureBean(cookie, currentRound) {
-  let name;
-  let eventName = `【收任务营养液-${name}】`;
+  let i = 1;
   if (currentRound && currentRound.bubbleInfos && currentRound.bubbleInfos.length > 0) {
     for (let bubbleInfo of currentRound.bubbleInfos) {
-      await randomWait();
-      name = bubbleInfo.name;
+      let eventName = `【收任务营养液-${bubbleInfo.name}】`;
       let body = {
         roundId: currentRound.roundId,
         nutrientsType: bubbleInfo.nutrientsType,
@@ -366,6 +380,10 @@ async function cultureBean(cookie, currentRound) {
         _nutrients += Number(bubbleInfo.nutrNum) || 0;
         _log.push(`🟢${eventName}: 获得${bubbleInfo.nutrNum || 0}个营养液`);
       }
+      if (i !== currentRound.bubbleInfos.length) {
+        await randomWait();
+      }
+      i++;
     }
   }
 }
