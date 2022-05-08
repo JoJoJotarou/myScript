@@ -143,12 +143,13 @@ let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
 
   if (cookieObjs && JSON.parse(cookieObjs).length > 0) {
     cookieObjs = JSON.parse(cookieObjs);
+    let specifyCookieObjs;
     if (specifyUserId && specifyUserId.indexOf('jd_') !== -1) {
       // 实现一次执行一个账号
-      cookieObjs = cookieObjs.filter((cookie) => cookie.userId === specifyUserId);
+      specifyCookieObjs = cookieObjs.filter((cookie) => cookie.userId === specifyUserId);
     }
     let i = 1;
-    for (let cookieObj of cookieObjs) {
+    for (let cookieObj of specifyCookieObjs || cookieObjs) {
       try {
         $.subt = `${cookieObj.nickname}`;
         getShareCodes(cookieObjs, cookieObj.userId);
