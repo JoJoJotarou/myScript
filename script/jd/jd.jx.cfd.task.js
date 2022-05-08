@@ -424,6 +424,7 @@ async function jxCfdPickShellByTimes(cookie, times = 0) {
   // 捡N次贝壳，冗余3次
   let maxPickTimes = times + 3;
   let s = 0;
+  let f = 0; // 当前失败3次强制结束（一般黑号后一直提示“岛上信号有点弱，请稍后再试”）
   const shellInfo = await jxCfdQueryShell(cookie);
 
   for (const shellList of [shellInfo.NormShell, shellInfo.CollShell]) {
@@ -438,14 +439,16 @@ async function jxCfdPickShellByTimes(cookie, times = 0) {
             await randomWait(500);
             if (res) {
               s++;
+            } else {
+              f++;
             }
             maxPickTimes--;
-            if (times === s || maxPickTimes === 0) {
+            if (times === s || maxPickTimes === 0 || f === 3) {
               break;
             }
           }
         }
-        if (times === s || maxPickTimes === 0) {
+        if (times === s || maxPickTimes === 0 || f === 3) {
           break;
         }
       }
