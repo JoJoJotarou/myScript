@@ -6,7 +6,6 @@ const $ = Env('京东种豆得豆');
 
 let _log, _errEvents, _desc;
 let _beans, _nutrients;
-let jdPlantBeanShareArr = [];
 
 async function plantBeanIndex(cookie) {
   const eventName = '【种豆得豆首页】';
@@ -315,10 +314,9 @@ async function collectFriendNutr(cookie, currentRound) {
       let helpInfo;
       if (new Date(nowTimes).getHours() === 20) {
         if (friend.nutrCount >= 2) {
-          await randomWait();
+          await randomWait(2000);
           helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
           if (helpInfo && helpInfo.data) {
-            _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
             _log.push(
               `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
                 helpInfo.data.collectNutrRewards || 0
@@ -334,10 +332,9 @@ async function collectFriendNutr(cookie, currentRound) {
         }
       } else {
         if (friend.nutrCount >= 3) {
-          await randomWait();
+          await randomWait(2000);
           helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
           if (helpInfo && helpInfo.data) {
-            _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
             _log.push(
               `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
                 helpInfo.data.collectNutrRewards || 0
@@ -355,7 +352,7 @@ async function collectFriendNutr(cookie, currentRound) {
 }
 
 async function collectUserNutr(cookie, roundId, paradiseUuid) {
-  const eventName = '【收好友营养液】';
+  const eventName = '【帮好友收营养液】';
   let functionId = 'collectUserNutr';
   const body = {
     roundId: roundId,
@@ -370,7 +367,7 @@ async function cultureBean(cookie, currentRound) {
   let i = 1;
   if (currentRound && currentRound.bubbleInfos && currentRound.bubbleInfos.length > 0) {
     for (let bubbleInfo of currentRound.bubbleInfos) {
-      let eventName = `【收任务营养液-${bubbleInfo.name}】`;
+      let eventName = `【收营养液-${bubbleInfo.name}】`;
       let body = {
         roundId: currentRound.roundId,
         nutrientsType: bubbleInfo.nutrientsType,
