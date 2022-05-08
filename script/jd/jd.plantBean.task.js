@@ -386,19 +386,20 @@ async function main(cookieObj) {
 
     await randomWait();
     await doTask(cookieObj.cookie, taskList); //做日常任务
-  }
-  await randomWait();
-  indexInfo = await plantBeanIndex(cookieObj.cookie);
-  if (indexInfo) {
-    currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
-    await randomWait(2000);
-    await cultureBean(cookieObj.cookie, currentRound);
-  }
 
-  if (_beans === 0) {
-    _desc.push(`营养液: +${_nutrients}瓶 ~`);
-  } else {
-    _desc.push(`瓜分京豆: +${_beans}, 营养液: +${_nutrients}瓶 ~`);
+    await randomWait();
+    indexInfo = await plantBeanIndex(cookieObj.cookie);
+    if (indexInfo) {
+      currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
+      await randomWait(2000);
+      await cultureBean(cookieObj.cookie, currentRound);
+    }
+
+    if (_beans === 0) {
+      _desc.push(`营养液: +${_nutrients}瓶 ~`);
+    } else {
+      _desc.push(`瓜分京豆: +${_beans}, 营养液: +${_nutrients}瓶 ~`);
+    }
   }
 }
 
