@@ -303,26 +303,34 @@ async function collectFriendNutr(cookie, currentRound) {
         if (friend.nutrCount >= 2) {
           await randomWait();
           helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
-          if (helpInfo) {
+          if (helpInfo && helpInfo.data) {
             _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
             _log.push(
               `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
                 helpInfo.data.collectNutrRewards || 0
               }个营养液}`
             );
+          } else if (helpInfo && helpInfo.errorMessage) {
+            _log.push(`🟡${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, ${helpInfo.errorMessage}`);
+          } else {
+            _log.push(`🔴${eventName}: 未知错误${JSON.stringify(helpInfo, null, 2)}`);
           }
         }
       } else {
         if (friend.nutrCount >= 3) {
           await randomWait();
           helpInfo = await collectUserNutr(cookie, currentRound.roundId, friend.paradiseUuid);
-          if (helpInfo) {
+          if (helpInfo && helpInfo.data) {
             _nutrients += Number(helpInfo.data.collectNutrRewards) || 0;
             _log.push(
               `🟢${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, 获得${
                 helpInfo.data.collectNutrRewards || 0
               }个营养液}`
             );
+          } else if (helpInfo && helpInfo.errorMessage) {
+            _log.push(`🟡${eventName}: 帮助好友${friend.paradiseUuid}收取营养液成功, ${helpInfo.errorMessage}`);
+          } else {
+            _log.push(`🔴${eventName}: 未知错误${JSON.stringify(helpInfo, null, 2)}`);
           }
         }
       }
