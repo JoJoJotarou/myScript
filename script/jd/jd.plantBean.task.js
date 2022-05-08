@@ -33,6 +33,7 @@ async function carveUp(cookie, lastRound) {
     return;
   }
   if (lastRound.awardState === '5') {
+    await randomWait();
     const body = {
       roundId: lastRound.roundId,
       monitor_refer: function_id,
@@ -48,6 +49,7 @@ async function carveUp(cookie, lastRound) {
 async function receiveNutrients(cookie, currentRound, timeNutrientsRes) {
   const eventName = '【定时收集营养液】';
   if (Number(timeNutrientsRes.nutrCount) > 0) {
+    await randomWait();
     const reward = await request(eventName, cookie, 'receiveNutrients', {
       roundId: currentRound.roundId,
       monitor_refer: 'plant_receiveNutrients',
@@ -60,11 +62,10 @@ async function receiveNutrients(cookie, currentRound, timeNutrientsRes) {
 }
 
 async function doTask(cookie, taskList) {
-  let name;
-  const eventName = `【做任务-${name}】`;
   if (taskList && taskList.length > 0) {
     for (const task of taskList.filter((task) => task.taskType === '8')) {
-      name = task.taskName;
+      let name = task.taskName;
+      let eventName = `【做任务-${name}】`;
       _log.push(`🟡${eventName}: 需自行手动去京东APP完成`);
     }
     if (taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1).length === 0) {
@@ -72,7 +73,8 @@ async function doTask(cookie, taskList) {
       return;
     }
     for (let task of taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1)) {
-      name = task.taskName;
+      let name = task.taskName;
+      let eventName = `【做任务-${name}】`;
       if (task.dailyTimes === 1) {
         await receiveNutrientsTask(cookie, eventName, task.taskType);
         await $.wait(2000);
@@ -248,10 +250,10 @@ async function receiveNutrientsTask(cookie, eventName, awardType) {
   let res = await request(eventName, cookie, functionId, body);
   if (res) {
     if (res.data.nutrState === '1' || res.data.status === '1') {
-      _log(`🟢${eventName}: 任务已完成`);
+      _log.push(`🟢${eventName}: 任务已完成`);
       return true;
     } else {
-      _log(`🔴${eventName}: 任务未完成\n${JSON.stringify(res, null, 2)}`);
+      _log.push(`🔴${eventName}: 任务未完成\n${JSON.stringify(res, null, 2)}`);
       _errEvents.push(`🔴${eventName}`);
       return false;
     }
@@ -408,10 +410,8 @@ async function main(cookieObj) {
     const lastRound = indexInfo.data.roundList.filter((item) => item.roundState === '1')[0]; //上期的roundId
     let currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
     const taskList = indexInfo.data.taskList;
-    await randomWait();
     await carveUp(cookieObj.cookie, lastRound);
 
-    await randomWait();
     await receiveNutrients(cookieObj.cookie, currentRound, indexInfo.data.timeNutrientsRes); //定时领取营养液
 
     await randomWait();
@@ -494,10 +494,6 @@ function request(eventName, cookie, function_id, body = {}, method = 'get') {
     monitor_refer: '',
   };
   let option = {
-    url: 'https://api.m.jd.com/client.action',
-    body: `functionId=${function_id}&body=${encodeURIComponent(
-      JSON.stringify(Object.assign(_body, body))
-    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`,
     headers: {
       Cookie: cookie,
       Host: 'api.m.jd.com',

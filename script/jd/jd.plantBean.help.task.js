@@ -204,10 +204,6 @@ function request(eventName, cookie, function_id, body = {}, method = 'get') {
     monitor_refer: '',
   };
   let option = {
-    url: 'https://api.m.jd.com/client.action',
-    body: `functionId=${function_id}&body=${encodeURIComponent(
-      JSON.stringify(Object.assign(_body, body))
-    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`,
     headers: {
       Cookie: cookie,
       Host: 'api.m.jd.com',
