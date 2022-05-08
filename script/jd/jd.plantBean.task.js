@@ -74,11 +74,11 @@ async function doTask(cookie, taskList) {
       let eventName = `【做任务-${name}】`;
       _log.push(`🟡${eventName}: 需自行手动去京东APP完成`);
     }
-    if (taskList.filter((task) => task.taskType !== 8 && task.taskType === 92 && task.isFinished !== 1).length === 0) {
+    if (taskList.filter((task) => task.taskType !== 8 && task.taskType !== 92 && task.isFinished !== 1).length === 0) {
       _log.push(`🟢【做任务】: 全部任务已完成`);
       return;
     }
-    for (let task of taskList.filter((task) => task.taskType !== 8 && task.taskType === 92 && task.isFinished !== 1)) {
+    for (let task of taskList.filter((task) => task.taskType !== 8 && task.taskType !== 92 && task.isFinished !== 1)) {
       let name = task.taskName;
       let eventName = `【做任务-${name}】`;
       if (task.dailyTimes === 1) {
@@ -346,7 +346,7 @@ async function cultureBean(cookie, currentRound) {
   let name;
   let eventName = `【收任务营养液-${name}】`;
   if (currentRound && currentRound.bubbleInfos && currentRound.bubbleInfos.length > 0) {
-    for (let bubbleInfo of plantBeanRound.bubbleInfos) {
+    for (let bubbleInfo of currentRound.bubbleInfos) {
       await randomWait();
       name = bubbleInfo.name;
       let body = {
