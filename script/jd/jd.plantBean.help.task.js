@@ -33,7 +33,7 @@ async function doHelp(cookie) {
     runTimes++;
     let helpRes = await helpShare(cookie, plantUuid);
     if (runTimes == 5) {
-      _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟.....`);
+      _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟`);
       await randomWait(30 * 1000);
       runTimes = 0;
     } else {
@@ -106,6 +106,7 @@ async function main(cookieObj) {
   _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
+  _log.push(`【获取互助码】: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
   let indexInfo = await plantBeanIndex(cookieObj.cookie);
   if (indexInfo) {
     const shareUrl = indexInfo.data.jwordShareInfo.shareUrl;
@@ -121,7 +122,7 @@ async function main(cookieObj) {
   }
 }
 
-function getShareCodes(currentUserId) {
+function getShareCodes(cookieObjs, currentUserId) {
   const eventName = '【获取互助码】';
   jdPlantBeanShareArr = [];
   cookieObjs.forEach((item) => {
@@ -129,7 +130,6 @@ function getShareCodes(currentUserId) {
       jdPlantBeanShareArr.push(item.name);
     }
   });
-  _log.push(`${eventName}: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
 }
 
 let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
