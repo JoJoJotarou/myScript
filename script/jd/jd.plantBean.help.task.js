@@ -131,7 +131,7 @@ function getShareCodes(cookieObjs, currentUserId) {
   jdPlantBeanShareArr = [];
   cookieObjs.forEach((item) => {
     if (item.userId !== currentUserId && item.shareCode && item.shareCode.plantBean) {
-      jdPlantBeanShareArr.push(item.name);
+      jdPlantBeanShareArr.push(item.shareCode.plantBean);
     }
   });
 }
