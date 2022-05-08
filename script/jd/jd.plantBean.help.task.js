@@ -1,5 +1,6 @@
 /**
- * @description 支持多账号，种豆得豆内部互助, 支持获取/更新互助码
+ * @description 本脚本是对faker2仓库jd_plantBean.js脚本的修改
+ * @description 支持多账号，种豆得豆内部互助（默认帮助author, 通过BoxJS设置变量zss_jd_help_author关闭）, 支持获取/更新互助码
  */
 const $ = Env('京东种豆得豆互助');
 
@@ -25,20 +26,13 @@ async function plantBeanIndex(cookie) {
 }
 
 async function doHelp(cookie) {
-  const eventName = '【内部好友互助】';
+  const eventName = '【助力好友】';
   let runTimes = 0;
 
   for (let plantUuid of jdPlantBeanShareArr) {
     if (!plantUuid) continue;
     runTimes++;
     let helpRes = await helpShare(cookie, plantUuid);
-    if (runTimes == 5) {
-      _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟`);
-      await randomWait(30 * 1000);
-      runTimes = 0;
-    } else {
-      await randomWait(3000);
-    }
     if (helpRes) {
       if (helpRes.data.helpShareRes) {
         if (helpRes.data.helpShareRes.state === '1') {
@@ -55,6 +49,15 @@ async function doHelp(cookie) {
           _log.push(`🔴${eventName}: 未知数据, 助力好友${plantUuid}失败, ${JSON.stringify(helpRes, null, 2)}`);
           _errEvents.push(`🔴${eventName}`);
         }
+      }
+    }
+    if (!/(^[1-9]\d*$)/.test(runTimes / 5)) {
+      _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟`);
+      await randomWait(30 * 1000);
+      runTimes = 0;
+    } else {
+      if (runTimes !== jdPlantBeanShareArr.length) {
+        await randomWait(3000);
       }
     }
   }
@@ -100,26 +103,37 @@ function myShareCode(shareUrl, cookieObj) {
       cookieObj.shareCode['plantBean'] = myPlantUuid;
       _log.push(`🟢${eventName}: 更新互助码: ${myPlantUuid}`);
       $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
+    } else {
+      _log.push(`🟢${eventName}: 互助码已存在`);
     }
   }
+  return myPlantUuid;
 }
 
 async function main(cookieObj) {
-  _nutrients = 0;
+  _nutrients = successHelp = 0;
   _log = [`\n++++++++++⭐${cookieObj.nickname}⭐++++++++++\n`];
   _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
-  _log.push(`🟢【获取互助码】: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
   let indexInfo = await plantBeanIndex(cookieObj.cookie);
   if (indexInfo) {
     const shareUrl = indexInfo.data.jwordShareInfo.shareUrl;
-    myShareCode(shareUrl, cookieObj);
+    let myPlantUuid = myShareCode(shareUrl, cookieObj);
+
+    if (
+      $.getdata('zss_jd_help_author') === 'true' &&
+      myPlantUuid != 'e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq' &&
+      jdPlantBeanShareArr.indexOf('e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq') !== -1
+    ) {
+      jdPlantBeanShareArr.push('e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq');
+    }
+    _log.push(`🟢【获取互助码】: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
 
     if (jdPlantBeanShareArr.length > 0) {
       await randomWait();
       await doHelp(cookieObj.cookie);
-      _desc.push(`助力${successHelp}个好友 ~`);
+      _desc.push(`助力${successHelp}个好友, 查看日志了解详情>>`);
     } else {
       _desc.push(`暂无需要助力的好友 ~`);
     }
@@ -154,11 +168,6 @@ let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
         $.subt = `${cookieObj.nickname}`;
         getShareCodes(cookieObjs, cookieObj.userId);
         await main(cookieObj);
-        if (_errEvents.length > 1) {
-          _desc.push(`❗ 查看日志了解详情>>`);
-        } else {
-          _desc.push(`🆗 查看日志了解详情>>`);
-        }
       } catch (error) {
         _log.push(`🔴 ${error}`);
         _desc.push(`🔴 ${error}`);
