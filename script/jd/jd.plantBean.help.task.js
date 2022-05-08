@@ -83,7 +83,7 @@ function myShareCode(shareUrl, cookieObj) {
   let myPlantUuid = getParam(shareUrl, 'plantUuid');
 
   if (myPlantUuid.length === 0) {
-    _desc.push(`🟡${eventName}: 暂无互助码`);
+    _log.push(`🟡${eventName}: 暂无互助码`);
     return;
   }
 
@@ -91,18 +91,15 @@ function myShareCode(shareUrl, cookieObj) {
     cookieObj['shareCode'] = { plantBean: myPlantUuid };
     _log.push(`🟢${eventName}: 获取到互助码: ${myPlantUuid}`);
     $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
-    _desc.push(`成功获取互助码`);
   } else {
     if (!cookieObj.shareCode.plantBean) {
       cookieObj.shareCode['plantBean'] = myPlantUuid;
       _log.push(`🟢${eventName}: 获取到互助码: ${myPlantUuid}`);
       $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
-      _desc.push(`成功获取互助码`);
     } else if (cookieObj.shareCode.plantBean && cookieObj.shareCode.plantBean !== myPlantUuid) {
       cookieObj.shareCode['plantBean'] = myPlantUuid;
       _log.push(`🟢${eventName}: 更新互助码: ${myPlantUuid}`);
       $.setdata(JSON.stringify(cookieObjs), 'GLOBAL_JD_COOKIES');
-      _desc.push(`成功互助码更新`);
     }
   }
 }
@@ -113,7 +110,7 @@ async function main(cookieObj) {
   _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
-  _log.push(`【获取互助码】: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
+  _log.push(`🟢【获取互助码】: 获取到${jdPlantBeanShareArr.length}个好友的互助码`);
   let indexInfo = await plantBeanIndex(cookieObj.cookie);
   if (indexInfo) {
     const shareUrl = indexInfo.data.jwordShareInfo.shareUrl;
@@ -122,9 +119,9 @@ async function main(cookieObj) {
     if (jdPlantBeanShareArr.length > 0) {
       await randomWait();
       await doHelp(cookieObj.cookie);
-      _desc.push(`成功助力${successHelp}个好友 ~`);
+      _desc.push(`助力${successHelp}个好友 ~`);
     } else {
-      _desc.push(`暂无需要助力的好友`);
+      _desc.push(`暂无需要助力的好友 ~`);
     }
   }
 }
@@ -156,17 +153,17 @@ let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
         $.subt = `${cookieObj.nickname}`;
         getShareCodes(cookieObjs, cookieObj.userId);
         await main(cookieObj);
+        if (_errEvents.length > 1) {
+          _desc.push(`❗ 查看日志了解详情>>`);
+        } else {
+          _desc.push(`🆗 查看日志了解详情>>`);
+        }
       } catch (error) {
         _log.push(`🔴 ${error}`);
         _desc.push(`🔴 ${error}`);
       } finally {
         $.log(..._log);
         $.log(..._errEvents);
-        if (_errEvents.length > 1) {
-          _desc.push(`❗ 查看日志了解详情>>`);
-        } else {
-          _desc.push(`🆗 查看日志了解详情>>`);
-        }
         $.desc = _desc.join('\n');
         $.msg($.name, $.subt || '', $.desc);
       }
