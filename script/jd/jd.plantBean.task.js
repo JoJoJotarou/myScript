@@ -38,7 +38,7 @@ async function carveUp(cookie, lastRound) {
       roundId: lastRound.roundId,
       monitor_refer: function_id,
     };
-    const reward = await request(eventName, cookie, function_id, body);
+    const reward = await request(eventName, cookie, function_id, body, 'post');
     if (reward) {
       _beans += Number(reward.data.awardBean) || 0;
       _log.push(`🟢${eventName}: ${lastRound.dateDesc},奖励领取成功, 获得京豆: ${reward.data.awardBean}`);
@@ -50,10 +50,16 @@ async function receiveNutrients(cookie, currentRound, timeNutrientsRes) {
   const eventName = '【定时收集营养液】';
   if (Number(timeNutrientsRes.nutrCount) > 0) {
     await randomWait();
-    const reward = await request(eventName, cookie, 'receiveNutrients', {
-      roundId: currentRound.roundId,
-      monitor_refer: 'plant_receiveNutrients',
-    });
+    const reward = await request(
+      eventName,
+      cookie,
+      'receiveNutrients',
+      {
+        roundId: currentRound.roundId,
+        monitor_refer: 'plant_receiveNutrients',
+      },
+      'post'
+    );
     if (reward) {
       _nutrients += Number(timeNutrientsRes.nutrCount) || 0;
       _log.push(`🟢${eventName}: 成功收集${timeNutrientsRes.nutrCount}瓶营养液`);
@@ -63,21 +69,21 @@ async function receiveNutrients(cookie, currentRound, timeNutrientsRes) {
 
 async function doTask(cookie, taskList) {
   if (taskList && taskList.length > 0) {
-    for (const task of taskList.filter((task) => task.taskType === '8')) {
+    for (const task of taskList.filter((task) => task.taskType === 8 || task.taskType === 92)) {
       let name = task.taskName;
       let eventName = `【做任务-${name}】`;
       _log.push(`🟡${eventName}: 需自行手动去京东APP完成`);
     }
-    if (taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1).length === 0) {
+    if (taskList.filter((task) => task.taskType !== 8 && task.taskType === 92 && task.isFinished !== 1).length === 0) {
       _log.push(`🟢【做任务】: 全部任务已完成`);
       return;
     }
-    for (let task of taskList.filter((task) => task.taskType !== '8' && task.isFinished !== 1)) {
+    for (let task of taskList.filter((task) => task.taskType !== 8 && task.taskType === 92 && task.isFinished !== 1)) {
       let name = task.taskName;
       let eventName = `【做任务-${name}】`;
       if (task.dailyTimes === 1) {
         await receiveNutrientsTask(cookie, eventName, task.taskType);
-        await $.wait(2000);
+        await randomWait(1500);
       }
       if (task.taskType === 3) {
         //浏览店铺
@@ -116,8 +122,10 @@ async function doTask(cookie, taskList) {
             shopTaskId: shopTaskId,
           };
           const shopRes = await request(eventName, cookie, 'shopNutrientsTask', body);
-          if (shopRes && shopRes.code === '0' && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
+          if (shopRes && shopRes.data && shopRes.data.nutrState && shopRes.data.nutrState === '1') {
             s++;
+          } else {
+            _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(shopRes, null, 2)}`);
           }
           if (unFinishedShopNum === s) {
             break;
@@ -162,8 +170,10 @@ async function doTask(cookie, taskList) {
             skuId: skuId,
           };
           const productRes = await request(eventName, cookie, 'productNutrientsTask', body);
-          if (productRes && productRes.code === '0' && productRes.data.nutrState && productRes.data.nutrState === '1') {
+          if (productRes && productRes.data && productRes.data.nutrState && productRes.data.nutrState === '1') {
             s++;
+          } else {
+            _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(productRes, null, 2)}`);
           }
           if (unFinishedProductNum === s) {
             break;
@@ -209,8 +219,10 @@ async function doTask(cookie, taskList) {
             channelTaskId: channelTaskId,
           };
           const channelRes = await request(eventName, cookie, 'plantChannelNutrientsTask', body);
-          if (channelRes && channelRes.code === '0' && channelRes.data.nutrState && channelRes.data.nutrState === '1') {
+          if (channelRes && channelRes.data && channelRes.data.nutrState && channelRes.data.nutrState === '1') {
             s++;
+          } else {
+            _log.push(`🔴${eventName}: 异常数据 ${JSON.stringify(channelRes, null, 2)}`);
           }
           if (unFinishedChannelNum === s) {
             break;
@@ -342,57 +354,12 @@ async function cultureBean(cookie, currentRound) {
         nutrientsType: bubbleInfo.nutrientsType,
         monitor_refer: 'plant_receiveNutrients',
       };
-      if (await request(eventName, cookie, 'cultureBean', body)) {
+      if (await request(eventName, cookie, 'cultureBean', body, 'post')) {
         _nutrients += Number(bubbleInfo.nutrNum) || 0;
         _log.push(`🟢${eventName}: 获得${bubbleInfo.nutrNum || 0}个营养液`);
       }
     }
   }
-}
-
-async function doHelp(cookie) {
-  const eventName = '【内部好友互助】';
-  let runTimes = 0;
-
-  for (let plantUuid of jdPlantBeanShareArr) {
-    if (!plantUuid) continue;
-    runTimes++;
-    let helpRes = await helpShare(cookie, plantUuid);
-    if (runTimes == 5) {
-      _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟.....`);
-      await randomWait(30 * 1000);
-      runTimes = 0;
-    } else {
-      await randomWait(3000);
-    }
-    if (helpRes) {
-      if (helpRes.data.helpShareRes) {
-        if (helpRes.data.helpShareRes.state === '1') {
-          _log.push(`🟢${eventName}: 助力好友${plantUuid}成功, ${helpRes.data.helpShareRes.promptText}`);
-        } else if (helpRes.data.helpShareRes.state === '2') {
-          _log.push(`🟡${eventName}: 您今日助力的机会已耗尽，已不能再帮助好友助力了`);
-          break;
-        } else if (helpRes.data.helpShareRes.state === '3') {
-          _log.push(`🟡${eventName}: 该好友今日已满9人助力/20瓶营养液,明天再来为Ta助力吧`);
-        } else if (helpRes.data.helpShareRes.state === '4') {
-          _log.push(`🟡${eventName}: ${helpRes.data.helpShareRes.promptText}`);
-        } else {
-          _log.push(`🟡${eventName}: 助力好友${plantUuid}失败, ${JSON.stringify(helpRes, null, 2)}`);
-        }
-      }
-    }
-  }
-}
-
-async function helpShare(cookie, plantUuid) {
-  const eventName = `【助力好友】`;
-  const body = {
-    plantUuid: plantUuid,
-    wxHeadImgUrl: '',
-    shareUuid: '',
-    followType: '1',
-  };
-  return await request(eventName, cookie, `plantBeanIndex`, body);
 }
 
 async function main(cookieObj) {
@@ -419,9 +386,6 @@ async function main(cookieObj) {
 
     await randomWait();
     await doTask(cookieObj.cookie, taskList); //做日常任务
-
-    await randomWait();
-    await doHelp(cookieObj.cookie); //助力好友
   }
   await randomWait();
   indexInfo = await plantBeanIndex(cookieObj.cookie);
@@ -509,10 +473,15 @@ function request(eventName, cookie, function_id, body = {}, method = 'get') {
     timeout: 10000,
   };
   if (method === 'post') {
-    option.url = 'https://api.m.jd.com/client.action';
-    option.body = `functionId=${function_id}&body=${encodeURIComponent(
-      JSON.stringify(Object.assign(_body, body))
-    )}&appid=ld&client=apple&clientVersion=10.5.2&networkType=wifi&osVersion=14.6`;
+    option.url = `https://api.m.jd.com/client.action?functionId=${function_id}`;
+    option.body = JSON.stringify({
+      appid: 'ld',
+      client: 'apple',
+      clientVersion: '10.5.2',
+      networkType: 'wifi',
+      osVersion: 14.6,
+      body: encodeURIComponent(JSON.stringify(Object.assign(_body, body))),
+    });
   } else {
     option.url = `https://api.m.jd.com/client.action?functionId=${function_id}&body=${encodeURIComponent(
       JSON.stringify(Object.assign(_body, body))
