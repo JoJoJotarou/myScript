@@ -124,7 +124,7 @@ async function main(cookieObj) {
     if (
       $.getdata('zss_jd_help_author') === 'true' &&
       myPlantUuid != 'e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq' &&
-      jdPlantBeanShareArr.indexOf('e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq') !== -1
+      jdPlantBeanShareArr.indexOf('e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq') === -1
     ) {
       jdPlantBeanShareArr.push('e7lhibzb3zek3wcj57kt7pjocmlfjvrhpn266uq');
     }
@@ -179,7 +179,7 @@ let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
       }
 
       // 切换账号等待至少5秒
-      if (i < cookieObjs.length) {
+      if (i < specifyCookieObjs ? specifyCookieObjs.length : cookieObjs.length) {
         await randomWait(5000);
       }
       i++;
