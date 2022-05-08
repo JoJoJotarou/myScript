@@ -1,6 +1,6 @@
 /**
  * @description 本脚本是对faker2仓库jd_plantBean.js脚本的修改
- * @description 支持多账号，种豆得豆内部互助（默认帮助author, 通过BoxJS设置变量zss_jd_help_author关闭）, 支持获取/更新互助码
+ * @description 支持多账号，种豆得豆内部互助（默认帮助author, 通过BoxJS设置变量zss_jd_help_author关闭）, 支持获取/更新互助码(需手动运行一次获取互助码)
  */
 const $ = Env('京东种豆得豆互助');
 
