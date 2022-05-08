@@ -51,7 +51,7 @@ async function doHelp(cookie) {
         }
       }
     }
-    if (!/(^[1-9]\d*$)/.test(runTimes / 5)) {
+    if (/(^[1-9]\d*$)/.test(runTimes / 5)) {
       _log.push(`🟡${eventName}: 访问接口次数达到5次，休息半分钟`);
       await randomWait(30 * 1000);
       runTimes = 0;
