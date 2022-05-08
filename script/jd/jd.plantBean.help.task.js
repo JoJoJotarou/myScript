@@ -179,7 +179,7 @@ let cookieObjs = $.getdata('GLOBAL_JD_COOKIES');
       }
 
       // 切换账号等待至少5秒
-      if (i < specifyCookieObjs ? specifyCookieObjs.length : cookieObjs.length) {
+      if (i < (specifyCookieObjs ? specifyCookieObjs.length : cookieObjs.length)) {
         await randomWait(5000);
       }
       i++;
