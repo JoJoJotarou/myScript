@@ -137,7 +137,7 @@ async function doTask(cookie, taskList) {
           }
         }
         let icon = '🟡';
-        if (Number(task.gainedNum) + s === task.totalNum) {
+        if (Number(task.gainedNum) + s === Number(task.totalNum)) {
           icon = '🟢';
         } else {
           _errEvents.push(`${icon}${eventName}${Number(task.gainedNum) + s}/${task.totalNum}`);
@@ -242,7 +242,7 @@ async function doTask(cookie, taskList) {
           }
         }
         let icon = '🟡';
-        if (Number(task.gainedNum) + s === task.totalNum) {
+        if (Number(task.gainedNum) + s === Number(task.totalNum)) {
           icon = '🟢';
         } else {
           _errEvents.push(`${icon}${eventName}${Number(task.gainedNum) + s}/${task.totalNum}`);
