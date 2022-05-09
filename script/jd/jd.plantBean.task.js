@@ -366,6 +366,7 @@ async function collectUserNutr(cookie, roundId, paradiseUuid) {
 async function cultureBean(cookie, currentRound) {
   let i = 1;
   if (currentRound && currentRound.bubbleInfos && currentRound.bubbleInfos.length > 0) {
+    await randomWait(2000);
     for (let bubbleInfo of currentRound.bubbleInfos) {
       let eventName = `【收营养液-${bubbleInfo.name}】`;
       let body = {
@@ -382,6 +383,8 @@ async function cultureBean(cookie, currentRound) {
       }
       i++;
     }
+  } else {
+    _log.push(`🟢【收营养液】: 暂无可以收取得营养液`);
   }
 }
 
@@ -414,7 +417,6 @@ async function main(cookieObj) {
     indexInfo = await plantBeanIndex(cookieObj.cookie);
     if (indexInfo) {
       currentRound = indexInfo.data.roundList.filter((item) => item.roundState === '2')[0]; //本期的roundId
-      await randomWait(2000);
       await cultureBean(cookieObj.cookie, currentRound);
     }
 
