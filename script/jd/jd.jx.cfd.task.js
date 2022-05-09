@@ -817,10 +817,6 @@ async function main(cookieObj) {
   _errEvents = ['\n++++++++++🔻事件提醒🔻++++++++++\n'];
   _desc = [];
 
-  $.strPhoneID = cookieObj.jx.cfd.strPhoneID;
-  $.strPgUUNum = cookieObj.jx.cfd.strPgUUNum;
-  $.h5st = cookieObj.jx.cfd.h5st;
-
   if (
     !cookieObj.jx ||
     !cookieObj.jx.cfd ||
