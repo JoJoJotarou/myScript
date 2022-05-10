@@ -1,6 +1,6 @@
 /**
  * B漫大会员特权（年度大会员10张福利券和10元漫画商城优惠券，非年度只有5张福利券，会员时长大于31天，每31天领取一次）
- * 🚨注意：Cookie需要使用NobyDa写的脚本获取，他的脚本包含签到和积分兑换 https://github.com/NobyDa/Script/tree/master/Bilibili-DailyBonus
+ * 🚨Cookie 有效期是否有一个月待验证
  * 🌟本脚本适用于年度大会员
  */
 const $ = Env('哔漫大会员特权');
@@ -10,7 +10,7 @@ let _log = [];
 let _desc = [];
 
 function getVipReward(eventName, url) {
-  let csrf = BILI_MANGA_COOKIE.match(/csrf=(\w+)/)[1];
+  let csrf = BILI_MANGA_COOKIE.match(/bili_jct=(\w+)/)[1];
   let option = {
     url: url,
     headers: {

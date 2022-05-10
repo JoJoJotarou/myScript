@@ -120,7 +120,7 @@
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
-            "config": "8 0 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, tag=摇京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdyjd.png, enabled=true",
+            "config": "30 7 * * * https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/jd.sharkBean.task.js, tag=摇京豆, img-url=https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/icon/jdyjd.png, enabled=true",
             "addons": "https://raw.githubusercontent.com/JoJoJotarou/myScript/master/script/jd/rewrite/jd.cookies.conf,tag=京东CK"
         },
         {
