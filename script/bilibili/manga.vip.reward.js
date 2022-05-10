@@ -10,12 +10,25 @@ let _log = [];
 let _desc = [];
 
 function getVipReward(eventName, url) {
+  let csrf = BILI_MANGA_COOKIE.match(/csrf=(\w+)/)[1];
   let option = {
     url: url,
     headers: {
+      Host: 'manga.bilibili.com',
+      Accept: '*/*',
+      native_api_from: 'h5',
+      'Accept-Language': 'zh-cn',
+      'Accept-Encoding': 'gzip, deflate, br',
+      'User-Agent':
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/611.2.7.0.4 (KHTML, like Gecko) Mobile/18F72 BiliApp/6791 os/ios model/iPhone 11 mobi_app/iphone_comic build/1400 osVer/14.6 network/2 channel/AppStore Buvid/Z042DA07830C491342CDAB412721528A68F5 c_locale/zh-Hans_CN s_locale/zh-Hans_TW sessionID/d6e4099d disable_rcmd/0 BiliComic/1400 VersionName/4.15.0 comic-universal/1400 CFNetwork/1240.0.4 Darwin/20.5.0 os/ios model/iPhone 11 mobi_app/iphone_comic build/1400 osVer/14.6 network/2 channel/AppStore',
+      Connection: 'keep-alive',
+      Referer: 'https://manga.bilibili.com/eden/membership-rewards.html?flutterReqCode=0&-F.pEncoded=1&from=0',
+      'X-CSRF-TOKEN': csrf,
       Cookie: BILI_MANGA_COOKIE,
     },
-    body: 'platform=ios',
+    body: `access_key=6c2bee60c69fb82836d6bd6607601551&actionKey=appkey&appkey=da44a5d9227fa9ef&build=1400&csrf=${csrf}&device=phone&mobi_app=iphone_comic&platform=ios&reason_id=0&statistics=%7B%22appId%22%3A17%2C%22version%22%3A%224.15.0%22%2C%22abtest%22%3A%22%22%2C%22platform%22%3A1%7D&ts=${
+      Date.parse(new Date()) / 1000
+    }&type=0`,
   };
 
   return new Promise((resolve, reject) => {
