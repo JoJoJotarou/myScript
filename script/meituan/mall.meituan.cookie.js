@@ -16,7 +16,7 @@ const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', '
     .join('&');
   const xuuid =
     $request.url
-      .match(/queryTaskListInfoV2\?(.*)/)[1]
+      .match(/queryTaskListInfoV.\?(.*)/)[1]
       .split('&')
       .filter((param) => 'xuuid' === param.split('=')[0])[0] || '';
 
