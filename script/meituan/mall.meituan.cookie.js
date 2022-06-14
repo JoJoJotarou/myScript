@@ -10,7 +10,7 @@ const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', '
 !(async () => {
   const cookie = $request.headers['Cookie'] || $request.headers['cookie'];
   const queryStr = $request.url
-    .match(/queryTaskListInfoV2\?(.*)/)[1]
+    .match(/queryTaskListInfoV.\?(.*)/)[1]
     .split('&')
     .filter((param) => generalQueryParams.includes(param.split('=')[0]))
     .join('&');
