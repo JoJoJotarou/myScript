@@ -348,7 +348,7 @@ function totalCoins(queryStr, headers) {
       } catch (error) {
         _log.push(`🔴${eventName}: ${error}`);
         _desc.push(`🔴${eventName}`);
-        resolve(0);
+        resolve(-2);
       }
     });
   });
@@ -408,8 +408,9 @@ function coupons(queryStr, headers, totalCoins) {
     };
     Object.assign(headers, _headers);
 
-    if ((await totalCoins(queryStr, headers)) === -1) {
-      $.subt = '登录已失效,请通过重写规则重新获取关键信息';
+    let pre = await totalCoins(queryStr, headers);
+    if (pre < 0) {
+      $.subt = '任务失败，查看日志了解详细信息>>';
     } else {
       await checkIn(queryStr, headers);
       await share(queryStr, headers);
