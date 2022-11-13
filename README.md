@@ -8,8 +8,7 @@ Safari浏览器打开 <https://m.iqiyi.com/user.html> 使用密码登录, 如通
 
 ## jd
 
-Safari浏览器打开登录 <https://home.m.jd.com/myJd/newhome.action> 点击"我的"页面
-或者使用旧版网址 <https://bean.m.jd.com/bean/signIndex.action> 点击签到并且出现签到日历
+Safari浏览器打开网址 <https://bean.m.jd.com/bean/signIndex.action> 点击签到并且出现签到日历
 如果通知获取Cookie成功, 则可以使用此签到脚本. 注: 请勿在京东APP内获取!!!
 获取京东金融签到Body说明: 正确添加脚本配置后, 进入"京东金融"APP, 在"首页"点击"签到"并签到一次, 待通知提示成功即可.
 
@@ -56,3 +55,20 @@ Safari浏览器打开登录 <https://home.m.jd.com/myJd/newhome.action> 点击"�
 ## 京东到家
 
 打开 APP 手动签到一次: `首页` > `签到` 或者 手机浏览器打开 <https://daojia.jd.com/html/index.html> 点击签到
+
+✅:ok, ❌:no, ❓:unknown
+
+| APP          | Cookie测试时间 | Cookie测试结果 | Task测试时间 | Task测试结果 |
+| ------------ | -------------- | -------------- | ------------ | ------------ |
+| jd           |                |                |              |              |
+| 京东到家     |                |                |              |              |
+| bilibili     |                |                |              |              |
+| bilibili漫画 |                |                |              |              |
+| 喜马拉雅     |                |                |              |              |
+| 网易云音乐   |                |                |              |              |
+| 顺丰速运     |                |                |              |              |
+| 中国联通     |                |                |              |              |
+| 叮咚买菜     |                |                |              |              |
+| 美团外卖     |                |                |              |              |
+| 美团         |                |                |              |              |
+| 美团买菜     |                |                |              |              |
