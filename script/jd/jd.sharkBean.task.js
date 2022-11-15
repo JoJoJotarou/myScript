@@ -1,7 +1,7 @@
 /**
  * @ZhouStarStar9527
  * @name 京东新版摇京豆 2021/03/02~2023/12/31
- * @description 支持多账号, 执行一个账号大约需要30s~60s
+ * @description 支持多账号, 执行一个账号大约需要30s~60s（🚨这是包括做任务的时间，感觉只有优惠价，默认注释掉了，需要的在 main 函数打开 doneTasks 的注释）
  * @description 入口：京东首页→领京豆→点击页面中的【摇京豆】”，进入摇京豆游戏页面参与活动。
  */
 
@@ -255,7 +255,7 @@ function _shake(cookie) {
 async function main(cookieObj) {
   await indexPage(cookieObj.cookie);
   await checkIn(cookieObj.cookie);
-  await doneTasks(cookieObj.cookie);
+  // await doneTasks(cookieObj.cookie);
   await randomWait();
   await indexPage(cookieObj.cookie);
   await shake(cookieObj.cookie);
