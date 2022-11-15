@@ -116,8 +116,8 @@ function jxCfdGetTaskReward(cookie, task) {
   return new Promise((resolve, reject) => {
     $.get(option, (err, resp, data) => {
       try {
-        if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && task.ddwTaskId === 3108) {
-          // “签到抽红包”任务特殊处理
+        if (resp.statusCode === 200 && JSON.parse(data).ret === 0 && JSON.parse(data).awardStatus !== 1 && task.ddwTaskId === 3108) {
+          // “签到抽红包”任务奖励为现金时特殊处理
           let prize = JSON.parse(JSON.parse(data).data.prizeInfo).strPrizeName;
           _cash += Number(prize.match(/([\d\.]+)/)[1]);
           _log.push(`🟢${eventName}: 获得${prize}现金红包奖励`);
