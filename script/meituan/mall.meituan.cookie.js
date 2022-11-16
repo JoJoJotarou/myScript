@@ -1,5 +1,5 @@
 /**
- * @author: @ZhouStarStar9527
+ * @author: @JoJoJotarou
  * @description: 方式1：美团APP -> 美团买菜 -> 我的 -> 买菜币 -> 去使用 -> 在退回上一级，QX提示成功即可
  * @description: 方式2：美团APP -> 美团买菜 -> 我的 -> 买菜币 -> 左滑一半做推出手势再松手（不要真的左滑退出） -> QX提示成功即可
  *
@@ -32,7 +32,7 @@ const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', '
           'User-Agent': $request.headers['User-Agent'],
         },
       }),
-      'zss_mall_meituan'
+      'jojo_mall_meituan'
     );
     $.subt = '🟢 获取会话成功';
   } else {
