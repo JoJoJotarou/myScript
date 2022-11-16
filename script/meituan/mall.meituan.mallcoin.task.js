@@ -1,5 +1,5 @@
 /**
- * @author: @ZhouStarStar9527
+ * @author: @JoJoJotarou
  * 美团买菜买菜币各项活动(签到、分享、浏览商品、3/7天礼包领取), 其中浏览商品, 第二次需与第一次间隔至少1小时
  */
 const $ = Env('美团买菜-买菜币');
@@ -384,15 +384,15 @@ function coupons(queryStr, headers, totalCoins) {
 }
 
 !(async () => {
-  let zss_mall_meituan = $.getdata('zss_mall_meituan');
-  if (zss_mall_meituan) {
-    zss_mall_meituan = JSON.parse(zss_mall_meituan);
+  let jojo_mall_meituan = $.getdata('jojo_mall_meituan');
+  if (jojo_mall_meituan) {
+    jojo_mall_meituan = JSON.parse(jojo_mall_meituan);
 
-    let headers = zss_mall_meituan.headers;
+    let headers = jojo_mall_meituan.headers;
     let queryStr = [
-      zss_mall_meituan.queryStr,
+      jojo_mall_meituan.queryStr,
       'ci=1&page_type=h5&uci=10&channel=7',
-      zss_mall_meituan.xuuid,
+      jojo_mall_meituan.xuuid,
       // headers.t,
     ].join('&');
     userId = queryStr.match(/userid=(\d+)/)[1];
