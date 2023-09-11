@@ -26,10 +26,10 @@ const generalQueryParams = ['tenantId', 'poiId', 'poi', 'bizId', 'utm_medium', '
         queryStr: queryStr,
         xuuid: xuuid,
         headers: {
-          'X-Titans-User': $request.headers['X-Titans-User'],
-          t: $request.headers['t'],
+          'X-Titans-User': $request.headers['X-Titans-User'] || $request.headers['x-titans-user'],
+          T: $request.headers['T'] || $request.headers['t'],
           Cookie: cookie,
-          'User-Agent': $request.headers['User-Agent'],
+          'User-Agent': $request.headers['User-Agent'] || $request.headers['user-agent'],
         },
       }),
       'jojo_mall_meituan'

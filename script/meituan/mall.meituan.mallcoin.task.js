@@ -12,7 +12,7 @@ let userId = '';
 function checkIn(queryStr, headers) {
   let eventName = '【签到】';
   headers['Content-Type'] = 'application/json';
-  let extQueryStr = `&t=${headers.t}`;
+  let extQueryStr = `&t=${headers.T || headers.t}`;
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/userCheckInNew?${queryStr}${extQueryStr}`,
     headers: headers,
@@ -93,7 +93,7 @@ function share(queryStr, headers) {
 
 function getTasks(queryStr, headers) {
   let eventName = '【获取任务列表】';
-  let extQueryStr = `&userId=${userId}&t=${headers.t}`;
+  let extQueryStr = `&userId=${userId}&t=${headers.T || headers.t}`;
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/queryTaskListInfoV2?${queryStr}${extQueryStr}`,
     headers: headers,
@@ -127,7 +127,7 @@ async function takeTask(queryStr, headers) {
 
 function _takeTask(queryStr, headers, taskName, taskId, activityId) {
   let eventName = `【领任务-${taskName}】`;
-  let extQueryStr = `&deviceId=&userId=${userId}&taskId=${taskId}&activityId=${activityId}&t=${headers.t}`;
+  let extQueryStr = `&deviceId=&userId=${userId}&taskId=${taskId}&activityId=${activityId}&t=${headers.T || headers.t}`;
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/takeTask?${queryStr}${extQueryStr}`,
     headers: headers,
@@ -326,7 +326,7 @@ function getPopReward(queryStr, headers, checkInCount) {
 
 function totalCoins(queryStr, headers) {
   let eventName = '【账户买菜币】';
-  let extQueryStr = `&t=${headers.t}`;
+  let extQueryStr = `&t=${headers.T || headers.t}`;
   let option = {
     url: `https://mall.meituan.com/api/c/mallcoin/checkIn/getUserInfo?${queryStr}${extQueryStr}`,
     headers: headers,
@@ -393,7 +393,7 @@ function coupons(queryStr, headers, totalCoins) {
       jojo_mall_meituan.queryStr,
       'ci=1&page_type=h5&uci=10&channel=7',
       jojo_mall_meituan.xuuid,
-      // headers.t,
+      // headers.T || headers.t,
     ].join('&');
     userId = queryStr.match(/userid=(\d+)/)[1];
 
@@ -404,7 +404,7 @@ function coupons(queryStr, headers, totalCoins) {
       Accept: '*/*',
       'Accept-Language': 'zh-cn',
       Referer: 'https://mall.meituan.com/checkin/home.html',
-      personalRecommendClose: 0,
+      personalRecommendClose: '0',
     };
     Object.assign(headers, _headers);
 
